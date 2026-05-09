@@ -1,0 +1,66 @@
+<?php
+// app/controllers/PabController.php
+
+class PabController extends Controller
+{
+    public function index(): void
+    {
+        $sm       = new SettingModel();
+        $isOpen   = $sm->isPabOpen();
+        $settings = $sm->getAll();
+        $flash    = $this->getFlash();
+        $csrf     = $this->csrfToken();
+        $this->view('pages/pab', compact('isOpen', 'settings', 'flash', 'csrf'), 'main');
+    }
+
+    public function register(): void
+    {
+        $this->verifyCsrf();
+
+        $sm = new SettingModel();
+        if (!$sm->isPabOpen()) {
+            $this->flash('error', 'Pendaftaran PAB sedang ditutup.');
+            $this->redirect('/pab');
+        }
+
+        // Sanitize input
+        $nama = htmlspecialchars(trim($_POST['nama_lengkap'] ?? ''), ENT_QUOTES);
+        $kelas   = htmlspecialchars(trim($_POST['kelas'] ?? ''), ENT_QUOTES);
+        $no_hp   = preg_replace('/\D/', '', $_POST['no_hp'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $passConf = $_POST['password_confirmation'] ?? '';
+
+        $errors = [];
+        if (strlen($nama) < 3)            $errors[] = 'Nama lengkap minimal 3 karakter.';
+        if (empty($kelas))                 $errors[] = 'Kelas wajib diisi.';
+        if (strlen($no_hp) < 10)           $errors[] = 'Nomor HP tidak valid.';
+        if (strlen($password) < 6)         $errors[] = 'Password minimal 6 karakter.';
+        if ($password !== $passConf)       $errors[] = 'Konfirmasi password tidak cocok.';
+        if (empty($_FILES['foto']['name'])) $errors[] = 'Pas foto wajib diunggah.';
+
+        if ($errors) {
+            $this->flash('error', implode('<br>', $errors));
+            $this->redirect('/pab');
+        }
+
+        // Upload foto
+        try {
+            $fotoName = FileUploader::uploadFoto($_FILES['foto'], 'pab');
+        } catch (RuntimeException $e) {
+            $this->flash('error', $e->getMessage());
+            $this->redirect('/pab');
+        }
+
+        $pm = new PabModel();
+        $pm->create([
+            'nama_lengkap'  => $nama,
+            'kelas'         => $kelas,
+            'no_hp'         => $no_hp,
+            'password_hash' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]),
+            'foto'          => $fotoName,
+        ]);
+
+        $this->flash('success', 'Pendaftaran berhasil! Tunggu verifikasi Admin.');
+        $this->redirect('/pab');
+    }
+}
