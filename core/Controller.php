@@ -7,17 +7,24 @@ class Controller
     protected function view(
         string $page,
         array  $data   = [],
-        string $layout = 'default'
+        ?string $layout = 'default'
     ): void {
         extract($data, EXTR_SKIP);
         $contentFile = BASE_PATH . '/app/views/' . $page . '.php';
-        $layoutFile  = BASE_PATH . '/app/views/layouts/' . $layout . '.php';
 
         if (!file_exists($contentFile)) {
             http_response_code(404);
             require BASE_PATH . '/app/views/errors/404.php';
             return;
         }
+
+        // Jika layout null → render standalone tanpa layout
+        if ($layout === null) {
+            require $contentFile;
+            return;
+        }
+
+        $layoutFile = BASE_PATH . '/app/views/layouts/' . $layout . '.php';
 
         // Buffer konten halaman
         ob_start();

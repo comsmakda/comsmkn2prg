@@ -21,6 +21,16 @@ class UserModel extends Model
         );
     }
 
+    public function find(int $id): array|false
+    {
+        return $this->fetch(
+            "SELECT id, nama_lengkap, email, no_hp, foto, role, status,
+                    password_hash, nia, kelas, sumber, tahun_daftar, created_at
+             FROM users WHERE id = ? LIMIT 1",
+            [$id]
+        );
+    }
+
     public function createAnggota(array $d): int
     {
         $this->execute(
@@ -60,22 +70,78 @@ class UserModel extends Model
         return $nia;
     }
 
+    /**
+     * Update profil — support anggota (nama, kelas, no_hp, foto)
+     * maupun admin (+ email).
+     * Hanya key yang ada di $d yang di-update.
+     */
     public function updateProfile(int $id, array $d): void
     {
+        $allowed = ['nama_lengkap', 'kelas', 'no_hp', 'email', 'foto'];
+        $fields  = [];
+        $params  = [];
+
+        foreach ($allowed as $col) {
+            if (array_key_exists($col, $d)) {
+                // foto: kalau null gunakan nilai lama (COALESCE)
+                if ($col === 'foto') {
+                    $fields[]  = "foto = COALESCE(?, foto)";
+                } else {
+                    $fields[]  = "{$col} = ?";
+                }
+                $params[] = $d[$col];
+            }
+        }
+
+        if (empty($fields)) return;
+
+        $params[] = $id;
         $this->execute(
-            "UPDATE users
-             SET nama_lengkap = ?, kelas = ?, no_hp = ?, foto = COALESCE(?, foto)
-             WHERE id = ?",
-            [$d['nama_lengkap'], $d['kelas'], $d['no_hp'], $d['foto'] ?? null, $id]
+            "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ?",
+            $params
         );
     }
 
-    public function changePassword(int $id, string $hash): void
+    /**
+     * Ganti password hash (dipakai admin & member).
+     */
+    public function updatePassword(int $id, string $hash): void
     {
         $this->execute(
             "UPDATE users SET password_hash = ? WHERE id = ?",
             [$hash, $id]
         );
+    }
+
+    /**
+     * Alias changePassword → updatePassword (agar MemberController tidak perlu diubah).
+     */
+    public function changePassword(int $id, string $hash): void
+    {
+        $this->updatePassword($id, $hash);
+    }
+
+    /**
+     * Invalidate semua sesi aktif user di tabel user_sessions (jika ada).
+     * Jika tabel tidak ada, tidak melakukan apa-apa —
+     * controller yang bertanggung jawab session_destroy().
+     */
+    public function invalidateAllSessions(int $userId): void
+    {
+        $db = Database::getInstance();
+
+        $tableExists = $db->query(
+            "SELECT COUNT(*) FROM information_schema.tables
+             WHERE table_schema = DATABASE()
+               AND table_name = 'user_sessions'"
+        )->fetchColumn();
+
+        if ($tableExists) {
+            $db->query(
+                'DELETE FROM user_sessions WHERE user_id = ?',
+                [$userId]
+            );
+        }
     }
 
     /** Anggota aktif untuk keperluan absensi/filter */

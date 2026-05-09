@@ -55,9 +55,9 @@ class AdminController extends Controller
         $langsung = isset($_POST['aktivasi_langsung']);
 
         $errors = [];
-        if (strlen($nama) < 3)    $errors[] = 'Nama minimal 3 karakter.';
-        if (empty($kelas))         $errors[] = 'Kelas wajib diisi.';
-        if (strlen($password) < 6) $errors[] = 'Password minimal 6 karakter.';
+        if (strlen($nama) < 3)     $errors[] = 'Nama minimal 3 karakter.';
+        if (empty($kelas))          $errors[] = 'Kelas wajib diisi.';
+        if (strlen($password) < 6)  $errors[] = 'Password minimal 6 karakter.';
 
         if ($errors) {
             $this->flash('error', implode('<br>', $errors));
@@ -110,7 +110,10 @@ class AdminController extends Controller
     {
         $this->requireAdmin();
         $anggota = (new UserModel())->find((int)$id);
-        if (!$anggota) { $this->flash('error', 'Data tidak ditemukan.'); $this->redirect('/admin/anggota'); }
+        if (!$anggota) {
+            $this->flash('error', 'Data tidak ditemukan.');
+            $this->redirect('/admin/anggota');
+        }
         $this->view('admin/anggota_edit', ['anggota' => $anggota, 'flash' => $this->getFlash(), 'csrf' => $this->csrfToken()], 'admin');
     }
 
@@ -126,7 +129,10 @@ class AdminController extends Controller
         ];
         if (!empty($_FILES['foto']['name'])) {
             try   { $d['foto'] = FileUploader::uploadFoto($_FILES['foto'], 'edit'); }
-            catch (RuntimeException $e) { $this->flash('error', $e->getMessage()); $this->redirect("/admin/anggota/{$id}/edit"); }
+            catch (RuntimeException $e) {
+                $this->flash('error', $e->getMessage());
+                $this->redirect("/admin/anggota/{$id}/edit");
+            }
         }
         (new UserModel())->updateProfile((int)$id, $d);
         $this->flash('success', 'Data anggota diperbarui.');
@@ -138,6 +144,27 @@ class AdminController extends Controller
         $this->requireAdmin();
         (new UserModel())->softDelete((int)$id);
         $this->flash('success', 'Anggota dinonaktifkan.');
+        $this->redirect('/admin/anggota');
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  RESET PASSWORD ANGGOTA
+    // ════════════════════════════════════════════════════════
+    public function anggotaResetPassword(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $anggota = (new UserModel())->find((int)$id);
+        if (!$anggota) {
+            $this->flash('error', 'Data anggota tidak ditemukan.');
+            $this->redirect('/admin/anggota');
+        }
+
+        $newHash = password_hash('cosmakda', PASSWORD_BCRYPT, ['cost' => 12]);
+        (new UserModel())->updatePassword((int)$id, $newHash);
+
+        $this->flash('success', 'Password <strong>' . htmlspecialchars($anggota['nama_lengkap']) . '</strong> berhasil direset ke <strong>cosmakda</strong>.');
         $this->redirect('/admin/anggota');
     }
 
@@ -205,49 +232,35 @@ class AdminController extends Controller
         $this->requireAdmin();
         $this->verifyCsrf();
 
-        // ── Semua field teks yang diizinkan ──────────────────────────────────
         $allowed = [
-            // Organisasi
             'org_name', 'org_tagline', 'org_description', 'org_vision', 'org_mission',
             'org_nilai',
             'contact_email', 'contact_phone', 'contact_address',
             'footer_text',
-            // Hero
             'hero_badge_text', 'ticker_items',
-            // Statistik
             'stat_members', 'stat_years', 'stat_events', 'stat_awards',
-            // PAB
             'pab_info', 'pab_deadline',
-            // CTA
             'cta_title', 'cta_desc',
         ];
 
-        // Fitur (6 item × 2 field)
         for ($i = 1; $i <= 6; $i++) {
             $allowed[] = "feature_{$i}_title";
             $allowed[] = "feature_{$i}_desc";
         }
-
-        // Program (4 item × 3 field)
         for ($i = 1; $i <= 4; $i++) {
             $allowed[] = "program_{$i}_title";
             $allowed[] = "program_{$i}_desc";
             $allowed[] = "program_{$i}_tag";
         }
-
-        // Testimoni (5 item × 3 field)
         for ($i = 1; $i <= 5; $i++) {
             $allowed[] = "testi_{$i}_quote";
             $allowed[] = "testi_{$i}_name";
             $allowed[] = "testi_{$i}_role";
         }
-
-        // Galeri labels (6 item)
         for ($i = 1; $i <= 6; $i++) {
             $allowed[] = "gallery_label_{$i}";
         }
 
-        // ── Kumpulkan data teks ──────────────────────────────────────────────
         $data = [];
         foreach ($allowed as $key) {
             if (array_key_exists($key, $_POST)) {
@@ -255,12 +268,10 @@ class AdminController extends Controller
             }
         }
 
-        // ── Upload file: definisi slot ────────────────────────────────────────
-        // Format: ['field_name' => 'settings_key']
         $fileSlots = [
-            'org_logo'    => 'org_logo',
-            'org_photo'   => 'org_photo',
-            'hero_image'  => 'hero_image',
+            'org_logo'   => 'org_logo',
+            'org_photo'  => 'org_photo',
+            'hero_image' => 'hero_image',
         ];
         for ($i = 1; $i <= 6; $i++) {
             $fileSlots["gallery_img_{$i}"] = "gallery_img_{$i}";
@@ -277,9 +288,7 @@ class AdminController extends Controller
             }
         }
 
-        // ── Simpan semua ke database ─────────────────────────────────────────
         (new SettingModel())->setMany($data);
-
         $this->flash('success', 'Pengaturan berhasil disimpan.');
         $this->redirect('/admin/settings');
     }
@@ -321,7 +330,10 @@ class AdminController extends Controller
         $this->requireAdmin();
         $am   = new AttendanceModel();
         $sesi = $am->getSession((int)$id);
-        if (!$sesi) { $this->flash('error', 'Sesi tidak ditemukan.'); $this->redirect('/admin/absensi'); }
+        if (!$sesi) {
+            $this->flash('error', 'Sesi tidak ditemukan.');
+            $this->redirect('/admin/absensi');
+        }
 
         $filter    = ['kelas' => $_GET['kelas'] ?? ''];
         $records   = $am->getRecordsForPrint((int)$id, $filter);
@@ -337,5 +349,118 @@ class AdminController extends Controller
         (new AttendanceModel())->deleteSession((int)$id);
         $this->flash('success', 'Sesi dihapus.');
         $this->redirect('/admin/absensi');
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  PROFIL ADMIN
+    // ════════════════════════════════════════════════════════
+    public function profil(): void
+    {
+        $this->requireAdmin();
+        $admin = (new UserModel())->find((int)$_SESSION['user_id']);
+        if (!$admin) {
+            $this->flash('error', 'Data admin tidak ditemukan.');
+            $this->redirect('/admin/dashboard');
+        }
+        $flash = $this->getFlash();
+        $csrf  = $this->csrfToken();
+        $this->view('admin/profil', compact('admin', 'flash', 'csrf'), 'admin');
+    }
+
+    public function profilSimpan(): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $id      = (int)$_SESSION['user_id'];
+        $um      = new UserModel();
+        $current = $um->find($id);
+
+        if (!$current) {
+            $this->flash('error', 'Data admin tidak ditemukan.');
+            $this->redirect('/admin/profil');
+        }
+
+        // ── Validasi ──────────────────────────────────────
+        $nama  = htmlspecialchars(trim($_POST['nama_lengkap'] ?? ''), ENT_QUOTES);
+        $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+        $noHp  = preg_replace('/\D/', '', $_POST['no_hp'] ?? '');
+
+        $errors = [];
+        if (strlen($nama) < 3) $errors[] = 'Nama minimal 3 karakter.';
+        if (!$email)            $errors[] = 'Email tidak valid.';
+
+        if ($errors) {
+            $this->flash('error', implode('<br>', $errors));
+            $this->redirect('/admin/profil');
+        }
+
+        // ── Foto ──────────────────────────────────────────
+        $foto = $current['foto'];
+
+        if (!empty($_POST['hapus_foto']) && $foto) {
+            $fotoPath = ROOT . '/public/uploads/' . $foto;
+            if (file_exists($fotoPath)) @unlink($fotoPath);
+            $foto = null;
+        }
+
+        if (!empty($_FILES['foto']['name'])) {
+            try {
+                if ($foto) {
+                    $fotoPath = ROOT . '/public/uploads/' . $foto;
+                    if (file_exists($fotoPath)) @unlink($fotoPath);
+                }
+                $foto = FileUploader::uploadFoto($_FILES['foto'], 'admin-profil');
+            } catch (RuntimeException $e) {
+                $this->flash('error', $e->getMessage());
+                $this->redirect('/admin/profil');
+            }
+        }
+
+        // ── Update data dasar ──────────────────────────────
+        $um->updateProfile($id, [
+            'nama_lengkap' => $nama,
+            'email'        => $email,
+            'no_hp'        => $noHp,
+            'foto'         => $foto,
+        ]);
+
+        // ── Ganti password (opsional) ──────────────────────
+        $pwLama = $_POST['password_lama']       ?? '';
+        $pwBaru = $_POST['password_baru']       ?? '';
+        $pwKonf = $_POST['password_konfirmasi'] ?? '';
+
+        if ($pwBaru !== '' || $pwKonf !== '') {
+            if (!password_verify($pwLama, $current['password_hash'])) {
+                $this->flash('error', 'Password saat ini salah.');
+                $this->redirect('/admin/profil');
+            }
+            if (strlen($pwBaru) < 8) {
+                $this->flash('error', 'Password baru minimal 8 karakter.');
+                $this->redirect('/admin/profil');
+            }
+            if ($pwBaru !== $pwKonf) {
+                $this->flash('error', 'Konfirmasi password tidak cocok.');
+                $this->redirect('/admin/profil');
+            }
+            $um->updatePassword($id, password_hash($pwBaru, PASSWORD_BCRYPT, ['cost' => 12]));
+        }
+
+        $_SESSION['user_name'] = $nama;
+
+        $this->flash('success', 'Profil berhasil diperbarui.');
+        $this->redirect('/admin/profil');
+    }
+
+    public function profilLogoutAll(): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $id = (int)$_SESSION['user_id'];
+        (new UserModel())->invalidateAllSessions($id);
+
+        session_destroy();
+        $this->redirect('/login');
     }
 }

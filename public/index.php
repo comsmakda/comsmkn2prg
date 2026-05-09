@@ -62,6 +62,11 @@ $router->post('/admin/absensi/create',                  [AdminController::class,
 $router->get('/admin/absensi/:id/print',                [AdminController::class, 'absensiPrint']);
 $router->post('/admin/absensi/:id/delete',              [AdminController::class, 'absensiDelete']);
 
+// Profil Admin
+$router->get('/admin/profil',               [AdminController::class, 'profil']);
+$router->post('/admin/profil/simpan',       [AdminController::class, 'profilSimpan']);
+$router->post('/admin/profil/logout-all',   [AdminController::class, 'profilLogoutAll']);
+
 // ── Member routes ─────────────────────────────────────────────
 $router->get('/member/dashboard',                       [MemberController::class, 'dashboard']);
 $router->get('/member/profile',                         [MemberController::class, 'profile']);

@@ -11,7 +11,7 @@ class AuthController extends Controller
         $settings = (new SettingModel())->getAll();
         $flash    = $this->getFlash();
         $csrf     = $this->csrfToken();
-        $this->view('pages/login', compact('settings', 'flash', 'csrf'), 'auth');
+        $this->view('pages/login', compact('settings', 'flash', 'csrf'), null);
     }
 
     public function loginPost(): void
@@ -22,7 +22,6 @@ class AuthController extends Controller
         $password  = trim($_POST['password'] ?? '');
 
         if ($loginType === 'admin') {
-            // Admin login: gunakan email
             $email = trim($_POST['email'] ?? '');
 
             if (!$email || !$password) {
@@ -37,7 +36,6 @@ class AuthController extends Controller
                 $this->redirect('/login');
             }
         } else {
-            // Member login: gunakan NIA
             $nia = trim($_POST['nia'] ?? '');
 
             if (!$nia || !$password) {

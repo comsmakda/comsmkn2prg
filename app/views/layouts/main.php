@@ -11,6 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/custom.css">
 
+  <!-- Open Graph / WhatsApp (di-inject dari halaman PAB jika ada) -->
+  <?= $extra_head ?? '' ?>
+
   <style>
     :root {
       --c-bg:        #03070e;
@@ -25,6 +28,7 @@
       --c-sky:       #0ea5e9;
       --c-sky-light: #38bdf8;
       --c-indigo:    #6366f1;
+      --c-cyan:      #22d3ee;
       --nav-h:       66px;
       --top-h:       32px;
       --font-display:'Sora', sans-serif;
@@ -400,7 +404,12 @@
 
     <div class="nav-sep"></div>
 
+    <!-- ── Nav links (+ Home) ── -->
     <div class="nav-links">
+      <a href="<?= BASE_URL ?>/"          class="nav-link" data-page="home">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-1px;margin-right:3px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </a>
       <a href="<?= BASE_URL ?>/#about"    class="nav-link">Tentang</a>
       <a href="<?= BASE_URL ?>/#features" class="nav-link">Layanan</a>
       <a href="<?= BASE_URL ?>/#programs" class="nav-link">Program</a>
@@ -434,6 +443,11 @@
 
 <!-- Mobile drawer -->
 <div class="mobile-drawer" id="mobile-drawer">
+  <!-- Home di mobile drawer -->
+  <a href="<?= BASE_URL ?>/" class="mob-link">
+    Home
+    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </a>
   <a href="<?= BASE_URL ?>/#about"    class="mob-link">Tentang Kami <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
   <a href="<?= BASE_URL ?>/#features" class="mob-link">Layanan <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
   <a href="<?= BASE_URL ?>/#programs" class="mob-link">Program <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
@@ -524,6 +538,7 @@
       <div data-reveal>
         <div class="fc-head"><h4>Navigasi</h4><div class="fc-line"></div></div>
         <ul class="fc-ul">
+          <li><a href="<?= BASE_URL ?>/">Home</a></li>
           <li><a href="<?= BASE_URL ?>/#about">Tentang Kami</a></li>
           <li><a href="<?= BASE_URL ?>/#features">Platform Digital</a></li>
           <li><a href="<?= BASE_URL ?>/#programs">Program Kegiatan</a></li>
@@ -608,7 +623,7 @@
   }
   tick(); setInterval(tick,1000);
 
-  /* navbar */
+  /* navbar scroll */
   const nav=document.getElementById('nav'); let ly=0;
   window.addEventListener('scroll',()=>{
     const y=window.scrollY;
@@ -633,10 +648,28 @@
   window.addEventListener('scroll',()=>bt.classList.toggle('show',window.scrollY>500),{passive:true});
   bt.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 
-  /* active link */
+  /* active nav link — Home aktif saat di halaman utama (bukan hash) */
+  const path = window.location.pathname.replace(/\/+$/,'');
+  const base = '<?= rtrim(BASE_URL, '/') ?>';
+  const isHome = (path === base || path === base + '/');
+
+  document.querySelectorAll('.nav-link').forEach(l => {
+    const href = l.getAttribute('href');
+    if (isHome && (href === base + '/' || href === base)) {
+      l.classList.add('active');
+    }
+  });
+
+  /* active link untuk section (hash-based) */
   document.querySelectorAll('section[id]').forEach(s=>{
     new IntersectionObserver(entries=>{
-      entries.forEach(e=>{ if(e.isIntersecting) document.querySelectorAll('.nav-link').forEach(l=>l.classList.toggle('active',l.getAttribute('href').includes(s.id))); });
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          document.querySelectorAll('.nav-link').forEach(l=>{
+            l.classList.toggle('active', l.getAttribute('href').includes('#'+s.id));
+          });
+        }
+      });
     },{threshold:0.35}).observe(s);
   });
 

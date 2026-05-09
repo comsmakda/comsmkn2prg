@@ -1,5 +1,32 @@
 <?php // app/views/pages/pab.php ?>
 
+<?php
+/* ── Open Graph meta tags (inject ke <head> via layout) ── */
+$og_title       = "Daftar Sekarang! PAB " . ($settings['org_name']['value'] ?? APP_NAME) . " — Komunitas Programmer SMKN 2 Pinrang";
+$og_description = "Bergabunglah bersama komunitas programmer SMKN 2 Pinrang! Daftarkan diri kamu sekarang dan jadilah bagian dari generasi teknologi berikutnya. 💻🚀";
+$og_url         = BASE_URL . "/pab";
+$og_image       = BASE_URL . "/assets/img/logo-com.png";
+
+/* Inject ke <head> jika layout mendukung $extra_head atau ob_start */
+if (!isset($extra_head)) $extra_head = '';
+$extra_head .= '
+<meta property="og:type"         content="website">
+<meta property="og:url"          content="' . htmlspecialchars($og_url) . '">
+<meta property="og:title"        content="' . htmlspecialchars($og_title) . '">
+<meta property="og:description"  content="' . htmlspecialchars($og_description) . '">
+<meta property="og:image"        content="' . htmlspecialchars($og_image) . '">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale"       content="id_ID">
+<meta property="og:site_name"    content="' . htmlspecialchars($settings['org_name']['value'] ?? APP_NAME) . '">
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="' . htmlspecialchars($og_title) . '">
+<meta name="twitter:description" content="' . htmlspecialchars($og_description) . '">
+<meta name="twitter:image"       content="' . htmlspecialchars($og_image) . '">
+<meta name="description"         content="' . htmlspecialchars($og_description) . '">
+';
+?>
+
 <style>
 /* ═══════════════════════════════════════════
    PAB PAGE
@@ -51,6 +78,39 @@
   text-align: center;
   margin-bottom: 2rem;
 }
+
+/* ── Logo ── */
+.pab-logo-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+.pab-logo {
+  height: 88px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 20px rgba(14,165,233,.3)) drop-shadow(0 4px 12px rgba(0,0,0,.4));
+  animation: logo-float 4s ease-in-out infinite;
+}
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-5px); }
+}
+
+/* ── Tagline ajakan ── */
+.pab-tagline {
+  font-size: .82rem;
+  color: var(--c-muted2);
+  line-height: 1.75;
+  margin-bottom: .75rem;
+  letter-spacing: .01em;
+}
+.pab-tagline strong {
+  color: var(--c-sky);
+  font-weight: 600;
+}
+
 .pab-badge {
   display: inline-flex;
   align-items: center;
@@ -435,9 +495,12 @@
   .pab-card-body { padding: 1.4rem; }
   .pab-card-head { padding: 1.1rem 1.4rem; }
   .pab-grid-2 { grid-template-columns: 1fr; }
-  .pab-steps { display: none; } /* terlalu sempit, sembunyikan di HP kecil */
+  .pab-steps { display: none; }
   .pab-title { font-size: 1.6rem; }
+  .pab-logo { height: 68px; }
 }
+
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 
 <div class="pab-wrap">
@@ -445,11 +508,25 @@
 
     <!-- ── Header ── -->
     <div class="pab-header">
+
+      <!-- Logo -->
+      <div class="pab-logo-wrap">
+        <img
+          src="<?= BASE_URL ?>/assets/img/logo-com.png"
+          alt="Logo <?= htmlspecialchars($settings['org_name']['value'] ?? APP_NAME) ?>"
+          class="pab-logo"
+          width="88" height="88"
+          loading="eager"
+          onerror="this.style.display='none'">
+      </div>
+
+      <!-- Badge -->
       <div class="pab-badge">
         <span class="pab-badge-pulse"></span>
         Penerimaan Anggota Baru
       </div>
 
+      <!-- Judul -->
       <h1 class="pab-title">
         <?php
           $name  = $settings['org_name']['value'] ?? APP_NAME;
@@ -460,6 +537,12 @@
           echo '<span class="t-grad">' . htmlspecialchars($last) . '</span>';
         ?>
       </h1>
+
+      <!-- Tagline ajakan -->
+      <p class="pab-tagline">
+        Bergabunglah bersama <strong>Komunitas Programmer SMKN 2 Pinrang</strong>.<br>
+        Jadilah bagian dari generasi teknologi berikutnya!
+      </p>
 
       <?php if (!empty($settings['pab_info']['value'])): ?>
         <p class="pab-info"><?= htmlspecialchars($settings['pab_info']['value']) ?></p>
@@ -662,8 +745,8 @@
   }
 
   /* ── Password match indicator ── */
-  var pass2Input    = document.getElementById('pab-pass2');
-  var matchIcon     = document.getElementById('pass-match-icon');
+  var pass2Input = document.getElementById('pab-pass2');
+  var matchIcon  = document.getElementById('pass-match-icon');
   function checkMatch() {
     if (!passInput || !pass2Input || !pass2Input.value) {
       matchIcon.style.display = 'none';
@@ -681,11 +764,11 @@
   }
 
   /* ── Dropzone / file upload ── */
-  var dropzone   = document.getElementById('pab-dropzone');
-  var fileInput  = document.getElementById('pab-foto');
-  var preview    = document.getElementById('pab-preview');
-  var dzInner    = document.getElementById('pab-dz-inner');
-  var resetBtn   = document.getElementById('pab-reset-photo');
+  var dropzone  = document.getElementById('pab-dropzone');
+  var fileInput = document.getElementById('pab-foto');
+  var preview   = document.getElementById('pab-preview');
+  var dzInner   = document.getElementById('pab-dz-inner');
+  var resetBtn  = document.getElementById('pab-reset-photo');
 
   function showPreview(file) {
     if (!file || !file.type.startsWith('image/')) return;
@@ -731,7 +814,7 @@
       dropzone.classList.remove('drag-over');
       var files = e.dataTransfer.files;
       if (files.length) {
-        fileInput.files = files; /* set file input if browser allows */
+        fileInput.files = files;
         showPreview(files[0]);
       }
     });
@@ -749,7 +832,7 @@
   }
 
   /* ── Step indicator update on input ── */
-  var namaEl = document.getElementById('pab-nama');
+  var namaEl  = document.getElementById('pab-nama');
   var kelasEl = document.getElementById('pab-kelas');
   var hpEl    = document.getElementById('pab-hp');
   var steps   = document.querySelectorAll('.pab-step');
@@ -768,8 +851,8 @@
   });
 
   /* ── Submit loading state ── */
-  var form       = document.getElementById('pab-form');
-  var submitBtn  = document.getElementById('pab-submit');
+  var form      = document.getElementById('pab-form');
+  var submitBtn = document.getElementById('pab-submit');
   if (form && submitBtn) {
     form.addEventListener('submit', function () {
       submitBtn.disabled = true;
@@ -778,7 +861,3 @@
   }
 })();
 </script>
-
-<style>
-@keyframes spin { to { transform: rotate(360deg); } }
-</style>

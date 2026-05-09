@@ -623,6 +623,18 @@
   border-color: rgba(252,129,129,0.30);
 }
 
+/* ── TAMBAHAN: Reset password button ── */
+.act-btn--reset {
+  background: transparent;
+  color: var(--ac);
+  border-color: var(--ac-dim);
+}
+.act-btn--reset:hover {
+  background: var(--ac-dim);
+  border-color: var(--bd-accent);
+  color: var(--ac);
+}
+
 /* Row empty state */
 .tbl-empty {
   text-align: center;
@@ -748,6 +760,20 @@
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+}
+
+/* ── Reset dialog: password badge ── */
+.pw-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ac);
+  background: var(--ac-dim);
+  border: 1px solid var(--bd-accent);
+  border-radius: var(--r-xs);
+  padding: 2px 8px;
+  letter-spacing: 0.05em;
 }
 
 /* ═══════════════════════════════════════
@@ -1006,7 +1032,7 @@
           <th style="width:90px;">Sumber</th>
           <th style="width:80px;">Status</th>
           <th style="width:50px;">Foto</th>
-          <th style="width:130px;">Aksi</th>
+          <th style="width:160px;">Aksi</th>
         </tr>
       </thead>
       <tbody>
@@ -1086,19 +1112,38 @@
           <!-- Aksi -->
           <td>
             <div class="act-group">
+
+              <!-- Edit -->
               <a href="<?= BASE_URL ?>/admin/anggota/<?= (int)$m['id'] ?>/edit" class="act-btn">
                 <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z"/>
                 </svg>
                 Edit
               </a>
+
+              <!-- Reset Password -->
+              <button type="button" class="act-btn act-btn--reset"
+                      data-reset-id="<?= (int)$m['id'] ?>"
+                      data-reset-name="<?= htmlspecialchars($m['nama_lengkap'], ENT_QUOTES) ?>"
+                      title="Reset Password">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M2.5 7A4.5 4.5 0 0 1 11 4.5"/>
+                  <path d="M11.5 2v3h-3"/>
+                  <rect x="3" y="8" width="8" height="5" rx="1"/>
+                  <circle cx="7" cy="10.5" r=".8" fill="currentColor" stroke="none"/>
+                </svg>
+              </button>
+
+              <!-- Nonaktifkan -->
               <button type="button" class="act-btn act-btn--danger"
                       data-confirm-id="<?= (int)$m['id'] ?>"
-                      data-confirm-name="<?= htmlspecialchars($m['nama_lengkap'], ENT_QUOTES) ?>">
+                      data-confirm-name="<?= htmlspecialchars($m['nama_lengkap'], ENT_QUOTES) ?>"
+                      title="Nonaktifkan">
                 <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M2 4h10M5 4V2.5h4V4M5.5 7v3M8.5 7v3M3 4l.8 7.5a1 1 0 001 .9h4.4a1 1 0 001-.9L11 4"/>
                 </svg>
               </button>
+
             </div>
           </td>
         </tr>
@@ -1148,7 +1193,7 @@
 </div><!-- /.tpanel -->
 
 <!-- ─────────────────────────────────
-     CONFIRM DIALOG
+     DIALOG: Nonaktifkan
 ────────────────────────────────── -->
 <div class="confirm-overlay" id="confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
   <div class="confirm-box">
@@ -1174,13 +1219,46 @@
   </div>
 </div>
 
+<!-- ─────────────────────────────────
+     DIALOG: Reset Password
+────────────────────────────────── -->
+<div class="confirm-overlay" id="reset-overlay" role="dialog" aria-modal="true" aria-labelledby="reset-title">
+  <div class="confirm-box">
+    <div class="confirm-box__ico" style="background:var(--ac-dim);color:var(--ac);">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3.5 10A6.5 6.5 0 0 1 15 5.5"/>
+        <path d="M16 2.5v4h-4"/>
+        <rect x="4" y="11" width="12" height="7" rx="1.5"/>
+        <circle cx="10" cy="14.5" r="1.2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="confirm-box__title" id="reset-title">Reset Password?</div>
+    <div class="confirm-box__sub">
+      Password <strong id="reset-name-display">—</strong> akan direset ke
+      <span class="pw-badge">cosmakda</span>.
+      Anggota wajib mengganti password setelah login kembali.
+    </div>
+    <div class="confirm-box__acts">
+      <button type="button" class="btn-sec" id="reset-cancel">Batal</button>
+      <form method="POST" id="reset-form">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
+        <button type="submit" class="btn-pri">
+          Ya, Reset Password
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
 </div><!-- /.ang-root -->
 
 <script>
 (function () {
   'use strict';
 
-  /* ── Confirm dialog ── */
+  /* ════════════════════════════════════
+     DIALOG: Nonaktifkan
+  ════════════════════════════════════ */
   var overlay   = document.getElementById('confirm-overlay');
   var nameEl    = document.getElementById('confirm-name-display');
   var formEl    = document.getElementById('confirm-form');
@@ -1188,32 +1266,60 @@
 
   document.querySelectorAll('[data-confirm-id]').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var id   = btn.dataset.confirmId;
-      var name = btn.dataset.confirmName;
-      nameEl.textContent  = name;
-      formEl.action = '<?= BASE_URL ?>/admin/anggota/' + id + '/delete';
+      nameEl.textContent = btn.dataset.confirmName;
+      formEl.action      = '<?= BASE_URL ?>/admin/anggota/' + btn.dataset.confirmId + '/delete';
       overlay.classList.add('is-open');
       document.body.style.overflow = 'hidden';
     });
   });
 
-  function closeDialog() {
+  function closeConfirm() {
     overlay.classList.remove('is-open');
     document.body.style.overflow = '';
   }
 
-  cancelBtn.addEventListener('click', closeDialog);
-  overlay.addEventListener('click', function (e) {
-    if (e.target === overlay) closeDialog();
-  });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeDialog();
+  cancelBtn.addEventListener('click', closeConfirm);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeConfirm(); });
+
+  /* ════════════════════════════════════
+     DIALOG: Reset Password
+  ════════════════════════════════════ */
+  var resetOverlay = document.getElementById('reset-overlay');
+  var resetNameEl  = document.getElementById('reset-name-display');
+  var resetFormEl  = document.getElementById('reset-form');
+  var resetCancel  = document.getElementById('reset-cancel');
+
+  document.querySelectorAll('[data-reset-id]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      resetNameEl.textContent = btn.dataset.resetName;
+      resetFormEl.action      = '<?= BASE_URL ?>/admin/anggota/' + btn.dataset.resetId + '/reset-password';
+      resetOverlay.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    });
   });
 
-  /* ── Auto-submit filter on select change ── */
+  function closeReset() {
+    resetOverlay.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+
+  resetCancel.addEventListener('click', closeReset);
+  resetOverlay.addEventListener('click', function (e) { if (e.target === resetOverlay) closeReset(); });
+
+  /* ── Escape menutup dialog mana pun yang terbuka ── */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (overlay.classList.contains('is-open'))      closeConfirm();
+    if (resetOverlay.classList.contains('is-open')) closeReset();
+  });
+
+  /* ════════════════════════════════════
+     AUTO-SUBMIT FILTER
+  ════════════════════════════════════ */
   var form = document.getElementById('filter-form');
   form.querySelectorAll('select').forEach(function (sel) {
     sel.addEventListener('change', function () { form.submit(); });
   });
+
 }());
 </script>
