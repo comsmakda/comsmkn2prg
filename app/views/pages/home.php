@@ -52,8 +52,8 @@ $og_sitename = $og_title;
 <meta name="twitter:image"       content="<?= htmlspecialchars($og_image) ?>">
 
 <!-- Favicon & App Icon -->
-<link rel="icon"             type="image/png" href="<?= BASE_URL ?>/assets/img/logo.png">
-<link rel="apple-touch-icon"                  href="<?= BASE_URL ?>/assets/img/logo.png">
+<link rel="icon"             type="image/png" href="<?= BASE_URL ?>/assets/img/logo-com.png">
+<link rel="apple-touch-icon"                  href="<?= BASE_URL ?>/assets/img/logo-com.png">
 <!-- ═══════════════════════════════════════════ -->
 
 <style>
