@@ -3,9 +3,6 @@
 
 class AdminController extends Controller
 {
-    // ════════════════════════════════════════════════════════
-    //  DASHBOARD
-    // ════════════════════════════════════════════════════════
     public function dashboard(): void
     {
         $this->requireAdmin();
@@ -20,9 +17,6 @@ class AdminController extends Controller
         $this->view('admin/dashboard', compact('stats', 'flash'), 'admin');
     }
 
-    // ════════════════════════════════════════════════════════
-    //  MANAJEMEN ANGGOTA
-    // ════════════════════════════════════════════════════════
     public function anggota(): void
     {
         $this->requireAdmin();
@@ -55,9 +49,9 @@ class AdminController extends Controller
         $langsung = isset($_POST['aktivasi_langsung']);
 
         $errors = [];
-        if (strlen($nama) < 3)     $errors[] = 'Nama minimal 3 karakter.';
-        if (empty($kelas))          $errors[] = 'Kelas wajib diisi.';
-        if (strlen($password) < 6)  $errors[] = 'Password minimal 6 karakter.';
+        if (strlen($nama) < 3)    $errors[] = 'Nama minimal 3 karakter.';
+        if (empty($kelas))         $errors[] = 'Kelas wajib diisi.';
+        if (strlen($password) < 6) $errors[] = 'Password minimal 6 karakter.';
 
         if ($errors) {
             $this->flash('error', implode('<br>', $errors));
@@ -147,9 +141,6 @@ class AdminController extends Controller
         $this->redirect('/admin/anggota');
     }
 
-    // ════════════════════════════════════════════════════════
-    //  RESET PASSWORD ANGGOTA
-    // ════════════════════════════════════════════════════════
     public function anggotaResetPassword(string $id): void
     {
         $this->requireAdmin();
@@ -168,9 +159,6 @@ class AdminController extends Controller
         $this->redirect('/admin/anggota');
     }
 
-    // ════════════════════════════════════════════════════════
-    //  PAB VERIFIKASI
-    // ════════════════════════════════════════════════════════
     public function pab(): void
     {
         $this->requireAdmin();
@@ -215,9 +203,6 @@ class AdminController extends Controller
         $this->redirect('/admin/pab');
     }
 
-    // ════════════════════════════════════════════════════════
-    //  CMS / SETTINGS
-    // ════════════════════════════════════════════════════════
     public function settings(): void
     {
         $this->requireAdmin();
@@ -241,6 +226,8 @@ class AdminController extends Controller
             'stat_members', 'stat_years', 'stat_events', 'stat_awards',
             'pab_info', 'pab_deadline',
             'cta_title', 'cta_desc',
+            'pembina_nama', 'pembina_jabatan', 'pembina_masa',
+            'pembina_sambutan', 'sambutan_eyebrow', 'sambutan_show',
         ];
 
         for ($i = 1; $i <= 6; $i++) {
@@ -269,9 +256,10 @@ class AdminController extends Controller
         }
 
         $fileSlots = [
-            'org_logo'   => 'org_logo',
-            'org_photo'  => 'org_photo',
-            'hero_image' => 'hero_image',
+            'org_logo'     => 'org_logo',
+            'org_photo'    => 'org_photo',
+            'hero_image'   => 'hero_image',
+            'pembina_foto' => 'pembina_foto',
         ];
         for ($i = 1; $i <= 6; $i++) {
             $fileSlots["gallery_img_{$i}"] = "gallery_img_{$i}";
@@ -293,9 +281,6 @@ class AdminController extends Controller
         $this->redirect('/admin/settings');
     }
 
-    // ════════════════════════════════════════════════════════
-    //  ABSENSI
-    // ════════════════════════════════════════════════════════
     public function absensi(): void
     {
         $this->requireAdmin();
@@ -351,9 +336,6 @@ class AdminController extends Controller
         $this->redirect('/admin/absensi');
     }
 
-    // ════════════════════════════════════════════════════════
-    //  PROFIL ADMIN
-    // ════════════════════════════════════════════════════════
     public function profil(): void
     {
         $this->requireAdmin();
@@ -381,7 +363,6 @@ class AdminController extends Controller
             $this->redirect('/admin/profil');
         }
 
-        // ── Validasi ──────────────────────────────────────
         $nama  = htmlspecialchars(trim($_POST['nama_lengkap'] ?? ''), ENT_QUOTES);
         $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
         $noHp  = preg_replace('/\D/', '', $_POST['no_hp'] ?? '');
@@ -395,7 +376,6 @@ class AdminController extends Controller
             $this->redirect('/admin/profil');
         }
 
-        // ── Foto ──────────────────────────────────────────
         $foto = $current['foto'];
 
         if (!empty($_POST['hapus_foto']) && $foto) {
@@ -417,7 +397,6 @@ class AdminController extends Controller
             }
         }
 
-        // ── Update data dasar ──────────────────────────────
         $um->updateProfile($id, [
             'nama_lengkap' => $nama,
             'email'        => $email,
@@ -425,7 +404,6 @@ class AdminController extends Controller
             'foto'         => $foto,
         ]);
 
-        // ── Ganti password (opsional) ──────────────────────
         $pwLama = $_POST['password_lama']       ?? '';
         $pwBaru = $_POST['password_baru']       ?? '';
         $pwKonf = $_POST['password_konfirmasi'] ?? '';
@@ -462,5 +440,148 @@ class AdminController extends Controller
 
         session_destroy();
         $this->redirect('/login');
+    }
+
+    public function riwayat(): void
+    {
+        $this->requireAdmin();
+        $rpm      = new RiwayatPengurusModel();
+        $list     = $rpm->getAll();
+        $editData = null;
+        $flash    = $this->getFlash();
+        $csrf     = $this->csrfToken();
+        $this->view('admin/riwayat', compact('list', 'editData', 'flash', 'csrf'), 'admin');
+    }
+
+    public function riwayatStore(): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $nama        = htmlspecialchars(trim($_POST['nama']    ?? ''), ENT_QUOTES);
+        $tipe        = in_array($_POST['tipe'] ?? '', ['ketua', 'pembina']) ? $_POST['tipe'] : 'ketua';
+        $jabatan     = htmlspecialchars(trim($_POST['jabatan']  ?? 'Ketua Umum'), ENT_QUOTES);
+        $periode     = htmlspecialchars(trim($_POST['periode']  ?? ''), ENT_QUOTES);
+        $tahunDari   = (int)($_POST['tahun_dari']   ?? 0) ?: null;
+        $tahunSampai = (int)($_POST['tahun_sampai'] ?? 0) ?: null;
+        $urutan      = max(0, (int)($_POST['urutan'] ?? 0));
+        $catatan     = htmlspecialchars(trim($_POST['catatan'] ?? ''), ENT_QUOTES);
+
+        if (strlen($nama) < 2 || empty($periode)) {
+            $this->flash('error', 'Nama dan periode wajib diisi.');
+            $this->redirect('/admin/riwayat#form-tambah');
+        }
+
+        $foto = null;
+        if (!empty($_FILES['foto']['name'])) {
+            try   { $foto = FileUploader::uploadFoto($_FILES['foto'], 'riwayat'); }
+            catch (RuntimeException $e) {
+                $this->flash('error', 'Upload foto gagal: ' . $e->getMessage());
+                $this->redirect('/admin/riwayat#form-tambah');
+            }
+        }
+
+        (new RiwayatPengurusModel())->create([
+            'tipe'         => $tipe,
+            'nama'         => $nama,
+            'jabatan'      => $jabatan,
+            'periode'      => $periode,
+            'tahun_dari'   => $tahunDari,
+            'tahun_sampai' => $tahunSampai,
+            'foto'         => $foto,
+            'catatan'      => $catatan,
+            'urutan'       => $urutan,
+        ]);
+
+        $this->flash('success', 'Data pengurus berhasil ditambahkan.');
+        $this->redirect('/admin/riwayat');
+    }
+
+    public function riwayatEdit(string $id): void
+    {
+        $this->requireAdmin();
+        $rpm      = new RiwayatPengurusModel();
+        $editData = $rpm->find((int)$id);
+        if (!$editData) {
+            $this->flash('error', 'Data tidak ditemukan.');
+            $this->redirect('/admin/riwayat');
+        }
+        $list  = $rpm->getAll();
+        $flash = $this->getFlash();
+        $csrf  = $this->csrfToken();
+        $this->view('admin/riwayat', compact('list', 'editData', 'flash', 'csrf'), 'admin');
+    }
+
+    public function riwayatUpdate(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $rpm     = new RiwayatPengurusModel();
+        $current = $rpm->find((int)$id);
+        if (!$current) {
+            $this->flash('error', 'Data tidak ditemukan.');
+            $this->redirect('/admin/riwayat');
+        }
+
+        $nama        = htmlspecialchars(trim($_POST['nama']    ?? ''), ENT_QUOTES);
+        $tipe        = in_array($_POST['tipe'] ?? '', ['ketua', 'pembina']) ? $_POST['tipe'] : 'ketua';
+        $jabatan     = htmlspecialchars(trim($_POST['jabatan']  ?? 'Ketua Umum'), ENT_QUOTES);
+        $periode     = htmlspecialchars(trim($_POST['periode']  ?? ''), ENT_QUOTES);
+        $tahunDari   = (int)($_POST['tahun_dari']   ?? 0) ?: null;
+        $tahunSampai = (int)($_POST['tahun_sampai'] ?? 0) ?: null;
+        $urutan      = max(0, (int)($_POST['urutan'] ?? 0));
+        $catatan     = htmlspecialchars(trim($_POST['catatan'] ?? ''), ENT_QUOTES);
+
+        if (strlen($nama) < 2 || empty($periode)) {
+            $this->flash('error', 'Nama dan periode wajib diisi.');
+            $this->redirect('/admin/riwayat/' . $id . '/edit#form-tambah');
+        }
+
+        $foto = $current['foto'];
+        if (!empty($_FILES['foto']['name'])) {
+            try {
+                if ($foto) {
+                    $fotoPath = ROOT . '/public/uploads/' . $foto;
+                    if (file_exists($fotoPath)) @unlink($fotoPath);
+                }
+                $foto = FileUploader::uploadFoto($_FILES['foto'], 'riwayat');
+            } catch (RuntimeException $e) {
+                $this->flash('error', 'Upload foto gagal: ' . $e->getMessage());
+                $this->redirect('/admin/riwayat/' . $id . '/edit#form-tambah');
+            }
+        }
+
+        $rpm->update((int)$id, [
+            'tipe'         => $tipe,
+            'nama'         => $nama,
+            'jabatan'      => $jabatan,
+            'periode'      => $periode,
+            'tahun_dari'   => $tahunDari,
+            'tahun_sampai' => $tahunSampai,
+            'foto'         => $foto,
+            'catatan'      => $catatan,
+            'urutan'       => $urutan,
+        ]);
+
+        $this->flash('success', 'Data pengurus berhasil diperbarui.');
+        $this->redirect('/admin/riwayat');
+    }
+
+    public function riwayatDelete(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $rpm     = new RiwayatPengurusModel();
+        $current = $rpm->find((int)$id);
+        if ($current && !empty($current['foto'])) {
+            $fotoPath = ROOT . '/public/uploads/' . $current['foto'];
+            if (file_exists($fotoPath)) @unlink($fotoPath);
+        }
+        $rpm->delete((int)$id);
+
+        $this->flash('success', 'Data pengurus berhasil dihapus.');
+        $this->redirect('/admin/riwayat');
     }
 }

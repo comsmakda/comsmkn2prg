@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/custom.css">
 
-  <!-- Open Graph / WhatsApp (di-inject dari halaman PAB jika ada) -->
   <?= $extra_head ?? '' ?>
 
   <style>
@@ -231,27 +230,6 @@
 
     .footer-inner { max-width:1240px; margin:0 auto; padding:0 1.5rem 2.5rem; position:relative; z-index:1; }
 
-    /* stat strip */
-    .f-stats { display:flex; border-bottom:1px solid var(--c-border); }
-    .f-stat { flex:1; padding:2rem 0; text-align:center; border-right:1px solid var(--c-border); }
-    .f-stat:last-child { border-right:none; }
-    .f-stat-num {
-      font-family: var(--font-display); font-size:1.6rem; font-weight:800;
-      display:block; line-height:1;
-      background:linear-gradient(135deg,#fff 20%, var(--c-sky-light) 100%);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    }
-    .f-stat-lbl {
-      font-size:.62rem; color: var(--c-muted); text-transform:uppercase;
-      letter-spacing:.1em; font-family: var(--font-mono); display:block; margin-top:5px;
-    }
-    @media(max-width:580px) {
-      .f-stats { flex-wrap:wrap; }
-      .f-stat { flex:1 1 50%; border-bottom:1px solid var(--c-border); }
-      .f-stat:nth-child(2) { border-right:none; }
-      .f-stat:nth-child(3),.f-stat:nth-child(4) { border-bottom:none; }
-    }
-
     /* grid */
     .f-grid {
       display:grid; grid-template-columns:2.1fr 1fr 1fr 1.1fr;
@@ -404,9 +382,8 @@
 
     <div class="nav-sep"></div>
 
-    <!-- ── Nav links (+ Home) ── -->
     <div class="nav-links">
-      <a href="<?= BASE_URL ?>/"          class="nav-link" data-page="home">
+      <a href="<?= BASE_URL ?>/" class="nav-link" data-page="home">
         <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-1px;margin-right:3px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         Home
       </a>
@@ -443,7 +420,6 @@
 
 <!-- Mobile drawer -->
 <div class="mobile-drawer" id="mobile-drawer">
-  <!-- Home di mobile drawer -->
   <a href="<?= BASE_URL ?>/" class="mob-link">
     Home
     <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
@@ -479,14 +455,6 @@
 <!-- ══ FOOTER ══ -->
 <footer class="site-footer">
   <div class="footer-inner">
-
-    <!-- Stats -->
-    <div class="f-stats" data-reveal>
-      <div class="f-stat"><span class="f-stat-num">200+</span><span class="f-stat-lbl">Anggota Aktif</span></div>
-      <div class="f-stat"><span class="f-stat-num">50+</span><span class="f-stat-lbl">Program</span></div>
-      <div class="f-stat"><span class="f-stat-num">10+</span><span class="f-stat-lbl">Prestasi</span></div>
-      <div class="f-stat"><span class="f-stat-num">5th</span><span class="f-stat-lbl">Tahun Berdiri</span></div>
-    </div>
 
     <!-- Grid -->
     <div class="f-grid">
@@ -615,7 +583,6 @@
 
 <script>
 (function(){
-  /* clock WIB (UTC+7) */
   function tick(){
     const d=new Date(), u=new Date(d.getTime()+7*3600000);
     const t=[u.getUTCHours(),u.getUTCMinutes(),u.getUTCSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
@@ -623,7 +590,6 @@
   }
   tick(); setInterval(tick,1000);
 
-  /* navbar scroll */
   const nav=document.getElementById('nav'); let ly=0;
   window.addEventListener('scroll',()=>{
     const y=window.scrollY;
@@ -632,7 +598,6 @@
     ly=y;
   },{passive:true});
 
-  /* hamburger */
   const btn=document.getElementById('hamburger'),drw=document.getElementById('mobile-drawer');
   btn.addEventListener('click',()=>{
     btn.classList.toggle('open'); drw.classList.toggle('open');
@@ -643,24 +608,18 @@
     document.body.style.overflow='';
   }));
 
-  /* back to top */
   const bt=document.getElementById('back-top');
   window.addEventListener('scroll',()=>bt.classList.toggle('show',window.scrollY>500),{passive:true});
   bt.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 
-  /* active nav link — Home aktif saat di halaman utama (bukan hash) */
   const path = window.location.pathname.replace(/\/+$/,'');
   const base = '<?= rtrim(BASE_URL, '/') ?>';
   const isHome = (path === base || path === base + '/');
-
   document.querySelectorAll('.nav-link').forEach(l => {
     const href = l.getAttribute('href');
-    if (isHome && (href === base + '/' || href === base)) {
-      l.classList.add('active');
-    }
+    if (isHome && (href === base + '/' || href === base)) l.classList.add('active');
   });
 
-  /* active link untuk section (hash-based) */
   document.querySelectorAll('section[id]').forEach(s=>{
     new IntersectionObserver(entries=>{
       entries.forEach(e=>{
@@ -673,13 +632,11 @@
     },{threshold:0.35}).observe(s);
   });
 
-  /* reveal */
   const rv=new IntersectionObserver(entries=>{
     entries.forEach((e,i)=>{ if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('_vis'),i*65); rv.unobserve(e.target); } });
   },{threshold:0.1});
   document.querySelectorAll('[data-reveal]').forEach(el=>rv.observe(el));
 
-  /* newsletter */
   const nb=document.getElementById('nl-btn'),ni=document.getElementById('nl-inp');
   if(nb&&ni) nb.addEventListener('click',()=>{
     if(!ni.value.trim()) return;

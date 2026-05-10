@@ -174,6 +174,7 @@ textarea.fi { resize:vertical; min-height:68px; line-height:1.65; }
 }
 .img-thumb--empty svg { width:22px; height:22px; opacity:.4; }
 .img-thumb--sm { width:48px; height:48px; }
+.img-thumb--circle { border-radius:50%; }
 .img-upload__area { flex:1; display:flex; flex-direction:column; gap:6px; }
 .img-upload__btn {
   display:inline-flex; align-items:center; gap:7px;
@@ -224,6 +225,53 @@ input[type="file"].fhidden {
 }
 .stat-input-wrap .fi { background:var(--bg-o); }
 
+/* ── Riwayat preview rows ── */
+.riwayat-row {
+  display:flex; align-items:center; gap:10px;
+  background:var(--bg-e); border:1px solid var(--bd);
+  border-radius:var(--r); padding:8px 12px;
+}
+.riwayat-avatar {
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  object-fit:cover;
+}
+.riwayat-avatar--placeholder {
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg,#0ea5e9,#6366f1);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:.65rem; color:#fff;
+}
+.riwayat-info { flex:1; min-width:0; }
+.riwayat-info__name {
+  font-size:12px; font-weight:700; color:var(--tx);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.riwayat-info__period { font-size:10.5px; color:var(--tx3); }
+.riwayat-edit-btn {
+  font-size:11px; color:var(--ac); text-decoration:none;
+  padding:4px 10px; border:1px solid rgba(56,189,248,.2);
+  border-radius:6px; white-space:nowrap; flex-shrink:0;
+  transition: all 120ms;
+}
+.riwayat-edit-btn:hover { background:var(--ac-d); border-color:rgba(56,189,248,.4); }
+
+/* ── Section label ── */
+.sec-lbl {
+  display:flex; align-items:center; gap:10px;
+}
+.sec-lbl__text {
+  font-family:var(--font-mono); font-size:9.5px; font-weight:600;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--tx3);
+  white-space:nowrap;
+}
+.sec-lbl__line { flex:1; height:1px; background:linear-gradient(to right, var(--bd), transparent); }
+
+/* ── Empty state ── */
+.empty-state {
+  font-size:12px; color:var(--tx3); text-align:center;
+  padding:20px 0;
+}
+
 /* ═══════════════════════════════════════════════════
    SAVE BAR
 ═══════════════════════════════════════════════════ */
@@ -253,6 +301,18 @@ input[type="file"].fhidden {
 .btn-save svg { width:14px; height:14px; }
 .save-hint { font-family:var(--font-mono); font-size:10px; color:var(--tx3); }
 
+/* ── Btn outline (link style) ── */
+.btn-outline {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:9px 16px; background:var(--bg-e); color:var(--tx2);
+  font-family:var(--font-ui); font-size:12px; font-weight:600;
+  border:1px solid var(--bd); border-radius:var(--r);
+  text-decoration:none; cursor:pointer;
+  transition: all 150ms var(--ease);
+}
+.btn-outline:hover { border-color:var(--bd2); color:var(--tx); background:var(--bg-o); }
+.btn-outline svg { width:13px; height:13px; }
+
 /* ─── Preview badge ─── */
 .preview-link {
   display:inline-flex; align-items:center; gap:6px;
@@ -264,16 +324,19 @@ input[type="file"].fhidden {
 .preview-link:hover { border-color:var(--bd2); color:var(--tx); }
 .preview-link svg { width:12px; height:12px; }
 
-/* ─── Section label ─── */
-.sec-lbl {
-  display:flex; align-items:center; gap:10px;
+/* ── Toggle switch ── */
+.toggle-wrap {
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--bg-e); border:1px solid var(--bd);
+  border-radius:var(--r2); padding:12px 14px; gap:12px;
 }
-.sec-lbl__text {
-  font-family:var(--font-mono); font-size:9.5px; font-weight:600;
-  letter-spacing:.18em; text-transform:uppercase; color:var(--tx3);
-  white-space:nowrap;
+.toggle-wrap__info { flex:1; }
+.toggle-wrap__label {
+  font-size:12px; font-weight:700; color:var(--tx); display:block;
 }
-.sec-lbl__line { flex:1; height:1px; background:linear-gradient(to right, var(--bd), transparent); }
+.toggle-wrap__hint {
+  font-size:10.5px; color:var(--tx3); margin-top:2px; display:block;
+}
 </style>
 
 <div class="cms-root">
@@ -337,6 +400,18 @@ input[type="file"].fhidden {
     <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 9a1.5 1.5 0 01-1.5 1.5H4L1.5 13V3A1.5 1.5 0 013 1.5h8A1.5 1.5 0 0112.5 3v6z"/></svg>
     Testimoni
   </button>
+  <button class="cms-tab" data-tab="sambutan" role="tab">
+    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="7" cy="5" r="3"/><path d="M1 13c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+    </svg>
+    Sambutan
+  </button>
+  <button class="cms-tab" data-tab="riwayat" role="tab">
+    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v3l2 1.5"/>
+    </svg>
+    Riwayat
+  </button>
   <button class="cms-tab" data-tab="pab" role="tab">
     <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2h10a1 1 0 011 1v9a1 1 0 01-1 1H2a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M4 5h6M4 7.5h4M4 10h3"/></svg>
     PAB &amp; CTA
@@ -397,7 +472,7 @@ input[type="file"].fhidden {
         </div>
         <div class="fdiv"></div>
         <div class="fg">
-          <label class="lbl" for="f-desc">Deskripsi <span class="lbl__hint">Tampil di Hero & About</span></label>
+          <label class="lbl" for="f-desc">Deskripsi <span class="lbl__hint">Tampil di Hero &amp; About</span></label>
           <textarea id="f-desc" name="org_description" rows="3" class="fi" placeholder="Deskripsi singkat organisasi…"><?= $v('org_description') ?></textarea>
         </div>
         <div class="fg">
@@ -769,6 +844,252 @@ input[type="file"].fhidden {
     </div>
 
   </div><!-- /panel-testimoni -->
+
+  <!-- ══════════════════════════════════════════════
+       PANEL: SAMBUTAN PEMBINA
+  ══════════════════════════════════════════════ -->
+  <div class="cms-panel" id="panel-sambutan">
+
+    <!-- Card 1: Visibilitas -->
+    <div class="cms-card">
+      <div class="cms-card__head">
+        <div class="cms-card__ico cms-card__ico--blue">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 7s2.5-5 6-5 6 5 6 5-2.5 5-6 5-6-5-6-5z"/>
+            <circle cx="7" cy="7" r="2"/>
+          </svg>
+        </div>
+        <div>
+          <div class="cms-card__title">Visibilitas Seksi</div>
+          <div class="cms-card__desc">Atur apakah seksi sambutan tampil di halaman publik.</div>
+        </div>
+      </div>
+      <div class="cms-card__body">
+        <div class="toggle-wrap">
+          <div class="toggle-wrap__info">
+            <span class="toggle-wrap__label">Tampilkan Seksi Sambutan</span>
+            <span class="toggle-wrap__hint">Pilih "Ya" agar sambutan pembina tampil di halaman utama</span>
+          </div>
+          <select id="f-sambutan-show" name="sambutan_show" class="fi" style="width:auto;min-width:160px">
+            <option value="1" <?= ($settings['sambutan_show']['value'] ?? '1') === '1' ? 'selected' : '' ?>>
+              ✓ Ya — Tampilkan
+            </option>
+            <option value="0" <?= ($settings['sambutan_show']['value'] ?? '1') === '0' ? 'selected' : '' ?>>
+              ✕ Tidak — Sembunyikan
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Identitas Pembina -->
+    <div class="cms-card">
+      <div class="cms-card__head">
+        <div class="cms-card__ico cms-card__ico--blue">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="7" cy="5" r="3"/><path d="M1 13c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+          </svg>
+        </div>
+        <div>
+          <div class="cms-card__title">Identitas Pembina</div>
+          <div class="cms-card__desc">Foto, nama, jabatan, dan masa menjabat pembina.</div>
+        </div>
+      </div>
+      <div class="cms-card__body">
+
+        <!-- Foto pembina -->
+        <div class="fg">
+          <label class="lbl">Foto Pembina <span class="lbl__hint">Disarankan foto formal, rasio 1:1</span></label>
+          <div class="img-upload">
+            <?php if (!empty($settings['pembina_foto']['value'])): ?>
+              <img src="<?= UPLOAD_URL . '/' . $v('pembina_foto') ?>"
+                   class="img-thumb img-thumb--circle" id="prev-pembina-foto" alt="Foto Pembina">
+            <?php else: ?>
+              <div class="img-thumb img-thumb--empty img-thumb--circle" id="prev-pembina-foto-empty">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2">
+                  <circle cx="10" cy="7" r="4"/>
+                  <path d="M2 18c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+                </svg>
+              </div>
+              <img src="" class="img-thumb img-thumb--circle" id="prev-pembina-foto"
+                   style="display:none" alt="Preview">
+            <?php endif; ?>
+            <div class="img-upload__area">
+              <label for="f-pembina-foto" class="img-upload__btn">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <path d="M7 9V1M4 4l3-3 3 3M1 11v1a1 1 0 001 1h10a1 1 0 001-1v-1"/>
+                </svg>
+                Pilih Foto
+              </label>
+              <input type="file" id="f-pembina-foto" name="pembina_foto" accept="image/*" class="fhidden"
+                     data-preview="prev-pembina-foto"
+                     data-empty="prev-pembina-foto-empty"
+                     data-name="fname-pembina-foto">
+              <span class="img-upload__name" id="fname-pembina-foto">
+                <?= !empty($settings['pembina_foto']['value'])
+                    ? htmlspecialchars(basename($settings['pembina_foto']['value']))
+                    : 'Belum ada file' ?>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fdiv"></div>
+
+        <!-- Identitas -->
+        <div class="fg--2">
+          <div class="fg">
+            <label class="lbl" for="f-pembina-nama">Nama Lengkap Pembina</label>
+            <input id="f-pembina-nama" name="pembina_nama" type="text" class="fi"
+                   placeholder="Drs. Nama Pembina, M.Pd."
+                   value="<?= $v('pembina_nama') ?>">
+          </div>
+          <div class="fg">
+            <label class="lbl" for="f-pembina-jabatan">Jabatan / Gelar</label>
+            <input id="f-pembina-jabatan" name="pembina_jabatan" type="text" class="fi"
+                   placeholder="Guru Pembina COM SMKN 2 Pinrang"
+                   value="<?= $v('pembina_jabatan', 'Guru Pembina COM SMKN 2 Pinrang') ?>">
+          </div>
+        </div>
+
+        <div class="fg--2">
+          <div class="fg">
+            <label class="lbl" for="f-pembina-masa">
+              Masa Menjabat
+              <span class="lbl__hint">Contoh: 2020 – Sekarang</span>
+            </label>
+            <input id="f-pembina-masa" name="pembina_masa" type="text" class="fi"
+                   placeholder="2020 – Sekarang"
+                   value="<?= $v('pembina_masa') ?>">
+          </div>
+          <div class="fg">
+            <label class="lbl" for="f-sambutan-eyebrow">
+              Teks Eyebrow Seksi
+              <span class="lbl__hint">Label kecil di atas judul</span>
+            </label>
+            <input id="f-sambutan-eyebrow" name="sambutan_eyebrow" type="text" class="fi"
+                   placeholder="Sambutan Pembina"
+                   value="<?= $v('sambutan_eyebrow', 'Sambutan Pembina') ?>">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Card 3: Teks Sambutan -->
+    <div class="cms-card">
+      <div class="cms-card__head">
+        <div class="cms-card__ico cms-card__ico--purple">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.5 9a1.5 1.5 0 01-1.5 1.5H4L1.5 13V3A1.5 1.5 0 013 1.5h8A1.5 1.5 0 0112.5 3v6z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="cms-card__title">Teks Sambutan</div>
+          <div class="cms-card__desc">Isi sambutan yang ditampilkan di halaman utama.</div>
+        </div>
+      </div>
+      <div class="cms-card__body">
+        <div class="fg">
+          <label class="lbl" for="f-pembina-sambutan">
+            Isi Teks Sambutan
+            <span class="lbl__hint">Baris baru = paragraf baru</span>
+          </label>
+          <textarea id="f-pembina-sambutan" name="pembina_sambutan" rows="8" class="fi"
+                    placeholder="Assalamu'alaikum wr. wb.&#10;&#10;Selamat datang di platform digital COM SMKN 2 Pinrang..."><?= $v('pembina_sambutan') ?></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /panel-sambutan -->
+
+  <!-- ══════════════════════════════════════════════
+       PANEL: RIWAYAT PENGURUS
+  ══════════════════════════════════════════════ -->
+  <div class="cms-panel" id="panel-riwayat">
+
+    <!-- Card info + tombol kelola -->
+    <div class="cms-card">
+      <div class="cms-card__head">
+        <div class="cms-card__ico cms-card__ico--amber">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="7" cy="7" r="5.5"/>
+            <path d="M7 4.5v3l2 1.5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="cms-card__title">Riwayat Ketua &amp; Pembina</div>
+          <div class="cms-card__desc">Data periode kepengurusan dikelola di halaman terpisah.</div>
+        </div>
+      </div>
+      <div class="cms-card__body">
+
+        <a href="<?= BASE_URL ?>/admin/riwayat" class="btn-save"
+           style="text-decoration:none;width:fit-content">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 2h10a1 1 0 011 1v9a1 1 0 01-1 1H2a1 1 0 01-1-1V3a1 1 0 011-1z"/>
+            <path d="M4 5h6M4 7.5h4M4 10h3"/>
+          </svg>
+          Kelola Riwayat Pengurus
+        </a>
+
+        <?php
+          $rpmAll      = (new RiwayatPengurusModel())->getAll();
+          $ketuaRows   = array_values(array_filter($rpmAll, fn($r) => $r['tipe'] === 'ketua'));
+          $pembinaRows = array_values(array_filter($rpmAll, fn($r) => $r['tipe'] === 'pembina'));
+        ?>
+
+        <?php if (count($rpmAll)): ?>
+
+          <?php foreach (['ketua' => ['label'=>'Ketua Organisasi','rows'=>$ketuaRows], 'pembina' => ['label'=>'Guru Pembina','rows'=>$pembinaRows]] as $tipe => $cfg): ?>
+          <?php if (count($cfg['rows'])): ?>
+
+          <div class="fdiv"></div>
+
+          <div>
+            <div class="sec-lbl" style="margin-bottom:10px">
+              <span class="sec-lbl__text"><?= $cfg['label'] ?></span>
+              <div class="sec-lbl__line"></div>
+              <span style="font-family:var(--font-mono);font-size:9.5px;color:var(--tx3);white-space:nowrap">
+                <?= count($cfg['rows']) ?> periode
+              </span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <?php foreach ($cfg['rows'] as $rw): ?>
+              <div class="riwayat-row">
+                <?php if (!empty($rw['foto'])): ?>
+                  <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($rw['foto']) ?>"
+                       class="riwayat-avatar" alt="<?= htmlspecialchars($rw['nama']) ?>">
+                <?php else: ?>
+                  <div class="riwayat-avatar--placeholder">
+                    <?= strtoupper(mb_substr($rw['nama'], 0, 2)) ?>
+                  </div>
+                <?php endif; ?>
+                <div class="riwayat-info">
+                  <div class="riwayat-info__name"><?= htmlspecialchars($rw['nama']) ?></div>
+                  <div class="riwayat-info__period"><?= htmlspecialchars($rw['periode']) ?></div>
+                </div>
+                <a href="<?= BASE_URL ?>/admin/riwayat/<?= $rw['id'] ?>/edit"
+                   class="riwayat-edit-btn">Edit</a>
+              </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+
+          <?php endif; ?>
+          <?php endforeach; ?>
+
+        <?php else: ?>
+          <p class="empty-state">
+            Belum ada data riwayat pengurus.<br>
+            Klik tombol di atas untuk mulai menambahkan.
+          </p>
+        <?php endif; ?>
+
+      </div>
+    </div>
+
+  </div><!-- /panel-riwayat -->
 
   <!-- ══════════════════════════════════════════════
        PANEL: PAB & CTA

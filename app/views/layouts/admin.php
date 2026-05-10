@@ -8,7 +8,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/custom.css">
 
@@ -16,67 +16,75 @@
 /* ==========================================================================
    RESET
    ========================================================================== */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* ==========================================================================
    DESIGN TOKENS
    ========================================================================== */
 :root {
-  --sidebar-w:    260px;
-  --topbar-h:     56px;
+  --sidebar-w:  248px;
+  --topbar-h:   60px;
 
-  --bg-base:      #080c12;
-  --bg-surface:   #0d1117;
-  --bg-elevated:  #131b27;
-  --bg-overlay:   #1a2333;
-  --bg-hover:     rgba(255,255,255,0.04);
-  --bg-active:    rgba(88,150,255,0.09);
+  /* Surfaces */
+  --bg-canvas:  #070b13;
+  --bg-surface: #0b1120;
+  --bg-raised:  #0f1929;
+  --bg-overlay: #152035;
+  --bg-hover:   rgba(255,255,255,0.035);
+  --bg-active:  rgba(99,161,255,0.08);
 
-  --bd-subtle:    rgba(255,255,255,0.055);
-  --bd-default:   rgba(255,255,255,0.09);
-  --bd-strong:    rgba(255,255,255,0.15);
-  --bd-accent:    rgba(88,150,255,0.30);
+  /* Borders */
+  --bd-faint:   rgba(255,255,255,0.04);
+  --bd-subtle:  rgba(255,255,255,0.07);
+  --bd-default: rgba(255,255,255,0.11);
+  --bd-strong:  rgba(255,255,255,0.18);
+  --bd-accent:  rgba(99,161,255,0.28);
 
-  --tx-primary:   #e6edf3;
-  --tx-secondary: #7d8fa8;
-  --tx-muted:     #3d4d60;
+  /* Text */
+  --tx-primary:   #dce8f5;
+  --tx-secondary: #6b829e;
+  --tx-muted:     #2e3f55;
+  --tx-hint:      #1c2a3a;
 
-  --ac:           #5896ff;
-  --ac-hover:     #74aaff;
-  --ac-dim:       rgba(88,150,255,0.10);
+  /* Accent — electric blue */
+  --ac:       #63a1ff;
+  --ac-bright: #85b8ff;
+  --ac-dim:   rgba(99,161,255,0.09);
+  --ac-glow:  rgba(99,161,255,0.15);
 
-  --ok:           #3fb950;
-  --ok-dim:       rgba(63,185,80,0.10);
-  --ok-bd:        rgba(63,185,80,0.25);
+  /* Semantic */
+  --ok:    #34d399;
+  --ok-dim: rgba(52,211,153,0.08);
+  --ok-bd: rgba(52,211,153,0.22);
 
-  --er:           #f85149;
-  --er-dim:       rgba(248,81,73,0.10);
-  --er-bd:        rgba(248,81,73,0.25);
+  --er:    #f87171;
+  --er-dim: rgba(248,113,113,0.08);
+  --er-bd: rgba(248,113,113,0.22);
 
-  --wa:           #e3b341;
-  --wa-dim:       rgba(227,179,65,0.10);
-  --wa-bd:        rgba(227,179,65,0.25);
+  --wa:    #fbbf24;
+  --wa-dim: rgba(251,191,36,0.08);
+  --wa-bd: rgba(251,191,36,0.22);
 
-  --in:           #58a6ff;
-  --in-dim:       rgba(88,166,255,0.10);
-  --in-bd:        rgba(88,166,255,0.25);
+  --in:    #60a5fa;
+  --in-dim: rgba(96,165,250,0.08);
+  --in-bd: rgba(96,165,250,0.22);
 
-  --r-xs:         4px;
-  --r-sm:         6px;
-  --r-md:         8px;
-  --r-lg:         12px;
+  /* Radius */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 9px;
+  --r-lg: 13px;
+  --r-xl: 18px;
 
-  --font:         'Sora', system-ui, -apple-system, sans-serif;
-  --font-mono:    'SFMono-Regular', Consolas, monospace;
+  /* Typography */
+  --font:      'DM Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', 'SFMono-Regular', Consolas, monospace;
 
-  --ease:         cubic-bezier(0.16, 1, 0.3, 1);
-  --t-fast:       120ms;
-  --t-base:       200ms;
-  --t-slow:       300ms;
+  /* Motion */
+  --ease:   cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast: 110ms;
+  --t-base: 200ms;
+  --t-slow: 320ms;
 }
 
 /* ==========================================================================
@@ -86,7 +94,7 @@ html, body { height: 100%; }
 
 body {
   font-family:             var(--font);
-  background:              var(--bg-base);
+  background:              var(--bg-canvas);
   color:                   var(--tx-primary);
   font-size:               13.5px;
   line-height:             1.6;
@@ -99,12 +107,16 @@ a      { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
 svg    { display: block; }
 
-::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar       { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--bd-default); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: var(--bd-strong); }
+::-webkit-scrollbar-thumb { background: var(--bd-subtle); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--bd-default); }
 
-:focus-visible { outline: 2px solid var(--ac); outline-offset: 2px; }
+:focus-visible {
+  outline:        2px solid var(--ac);
+  outline-offset: 2px;
+  border-radius:  var(--r-xs);
+}
 
 /* ==========================================================================
    APP SHELL
@@ -115,20 +127,34 @@ svg    { display: block; }
   overflow: hidden;
 }
 
+/* Subtle grid texture */
+.app-shell::before {
+  content:    '';
+  position:   fixed;
+  inset:      0;
+  z-index:    0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(99,161,255,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,161,255,0.022) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
+}
+
 /* ==========================================================================
-   BACKDROP — mobile overlay
+   BACKDROP
    ========================================================================== */
 .backdrop {
   display:    none;
   position:   fixed;
   inset:      0;
   z-index:    35;
-  background: rgba(8,12,18,0.78);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(7,11,19,0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 .backdrop.is-visible {
-  display: block;
+  display:   block;
   animation: bd-in var(--t-base) var(--ease) both;
 }
 @keyframes bd-in { from { opacity: 0; } to { opacity: 1; } }
@@ -146,19 +172,32 @@ svg    { display: block; }
   display:        flex;
   flex-direction: column;
   background:     var(--bg-surface);
-  border-right:   1px solid var(--bd-subtle);
+  border-right:   1px solid var(--bd-faint);
   transform:      translateX(-100%);
-  transition:     transform var(--t-slow) var(--ease),
-                  box-shadow var(--t-slow) var(--ease);
-  will-change:    transform;
-  overflow:       hidden;
+  transition:
+    transform  var(--t-slow) var(--ease),
+    box-shadow var(--t-slow) var(--ease);
+  will-change: transform;
+  overflow:    hidden;
 }
+
+/* Top ambient glow */
+.sidebar::after {
+  content:    '';
+  position:   absolute;
+  top: 0; left: 0; right: 0;
+  height:     200px;
+  background: radial-gradient(ellipse 100% 100% at 50% -10%, rgba(99,161,255,0.07) 0%, transparent 100%);
+  pointer-events: none;
+  z-index:    0;
+}
+
 @media (min-width: 768px) {
   .sidebar { transform: translateX(0) !important; box-shadow: none !important; }
 }
 .sidebar.is-open {
   transform:  translateX(0);
-  box-shadow: 24px 0 80px rgba(0,0,0,0.55);
+  box-shadow: 32px 0 80px rgba(0,0,0,0.6);
 }
 
 /* ── Brand ── */
@@ -168,23 +207,46 @@ svg    { display: block; }
   gap:           10px;
   height:        var(--topbar-h);
   padding:       0 16px;
-  border-bottom: 1px solid var(--bd-subtle);
+  border-bottom: 1px solid var(--bd-faint);
   flex-shrink:   0;
   user-select:   none;
+  position:      relative;
+  z-index:       1;
 }
 
+.sidebar__logo-wrap {
+  width:           32px;
+  height:          32px;
+  border-radius:   var(--r-md);
+  background:      var(--ac-dim);
+  border:          1px solid var(--bd-accent);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-shrink:     0;
+  box-shadow:      0 0 0 4px var(--ac-glow);
+  overflow:        hidden;
+}
+
+/* If logo image is present, show it; fallback to SVG icon */
 .sidebar__logo {
-  height:      26px;
-  width:       auto;
-  object-fit:  contain;
-  flex-shrink: 0;
+  width:      100%;
+  height:     100%;
+  object-fit: contain;
+  display:    block;
+}
+
+.sidebar__logo-icon {
+  width:  16px;
+  height: 16px;
+  color:  var(--ac-bright);
 }
 
 .sidebar__appname {
   flex:           1;
   font-size:      13.5px;
   font-weight:    700;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
   color:          var(--tx-primary);
   white-space:    nowrap;
   overflow:       hidden;
@@ -194,14 +256,14 @@ svg    { display: block; }
 .sidebar__tag {
   font-family:    var(--font-mono);
   font-size:      9px;
-  font-weight:    700;
-  letter-spacing: 0.1em;
+  font-weight:    500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color:          var(--ac);
   background:     var(--ac-dim);
   border:         1px solid var(--bd-accent);
   border-radius:  var(--r-xs);
-  padding:        2px 7px;
+  padding:        2px 8px;
   flex-shrink:    0;
 }
 
@@ -209,112 +271,132 @@ svg    { display: block; }
 .sidebar__nav {
   flex:           1;
   overflow-y:     auto;
-  padding:        8px;
+  padding:        10px;
   display:        flex;
   flex-direction: column;
   gap:            1px;
+  position:       relative;
+  z-index:        1;
+}
+
+.nav-section { margin-bottom: 2px; }
+
+.nav-section + .nav-section {
+  margin-top:  8px;
+  padding-top: 8px;
+  border-top:  1px solid var(--bd-faint);
 }
 
 .nav-group__label {
-  font-size:      9px;
-  font-weight:    700;
-  letter-spacing: 0.14em;
+  font-size:      9.5px;
+  font-weight:    600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color:          var(--tx-muted);
-  padding:        10px 10px 4px;
-  margin-top:     4px;
+  padding:        6px 10px 5px;
+  display:        block;
 }
 
 .nav-item {
   position:      relative;
   display:       flex;
   align-items:   center;
-  gap:           9px;
-  padding:       8px 10px;
+  gap:           10px;
+  padding:       8.5px 10px;
   border-radius: var(--r-md);
   font-size:     13px;
   font-weight:   500;
   color:         var(--tx-secondary);
-  border:        1px solid transparent;
   transition:
-    color        var(--t-fast) var(--ease),
-    background   var(--t-fast) var(--ease),
-    border-color var(--t-fast) var(--ease);
+    color      var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
+  user-select: none;
 }
 
 .nav-item:hover {
-  color:        var(--tx-primary);
-  background:   var(--bg-hover);
-  border-color: var(--bd-subtle);
+  color:      var(--tx-primary);
+  background: var(--bg-hover);
 }
 
 .nav-item.is-active {
-  color:        var(--ac-hover);
-  background:   var(--bg-active);
-  border-color: var(--bd-accent);
+  color:      var(--ac-bright);
+  background: var(--bg-active);
 }
 
+/* Active indicator */
 .nav-item.is-active::before {
   content:       '';
   position:      absolute;
   left:          0;
   top:           50%;
   transform:     translateY(-50%);
-  width:         3px;
-  height:        14px;
-  background:    var(--ac);
-  border-radius: 0 3px 3px 0;
+  width:         2.5px;
+  height:        16px;
+  background:    linear-gradient(180deg, var(--ac-bright), var(--ac));
+  border-radius: 0 2px 2px 0;
 }
 
 .nav-item__icon {
-  width:       15px;
-  height:      15px;
+  width:      16px;
+  height:     16px;
   flex-shrink: 0;
-  opacity:     0.5;
-  transition:  opacity var(--t-fast) var(--ease);
+  color:       var(--tx-muted);
+  transition:  color var(--t-fast) var(--ease);
 }
-.nav-item:hover .nav-item__icon,
-.nav-item.is-active .nav-item__icon { opacity: 1; }
+.nav-item:hover .nav-item__icon     { color: var(--tx-secondary); }
+.nav-item.is-active .nav-item__icon { color: var(--ac); }
 
-.nav-item__label { flex: 1; line-height: 1; }
-
-/* ── Divider ── */
-.nav-divider {
-  height:     1px;
-  background: var(--bd-subtle);
-  margin:     4px 2px;
-}
+.nav-item__label { flex: 1; line-height: 1.2; }
 
 /* ── Footer ── */
 .sidebar__footer {
-  padding:     8px;
-  border-top:  1px solid var(--bd-subtle);
+  padding:     10px;
+  border-top:  1px solid var(--bd-faint);
   flex-shrink: 0;
+  position:    relative;
+  z-index:     1;
+}
+
+.sidebar__version {
+  font-size:      10px;
+  font-family:    var(--font-mono);
+  color:          var(--tx-muted);
+  text-align:     center;
+  margin-bottom:  8px;
+  letter-spacing: 0.04em;
 }
 
 .user-card {
   display:       flex;
   align-items:   center;
-  gap:           9px;
-  padding:       8px 10px;
-  border-radius: var(--r-md);
-  background:    var(--bg-elevated);
+  gap:           10px;
+  padding:       10px 11px;
+  border-radius: var(--r-lg);
+  background:    var(--bg-raised);
   border:        1px solid var(--bd-subtle);
-  transition:    border-color var(--t-fast) var(--ease);
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background   var(--t-fast) var(--ease);
 }
-.user-card:hover { border-color: var(--bd-default); }
+.user-card:hover {
+  border-color: var(--bd-default);
+  background:   var(--bg-overlay);
+}
 
 .user-card__av {
-  width:           30px;
-  height:          30px;
+  width:           34px;
+  height:          34px;
   border-radius:   50%;
-  background:      var(--ac-dim);
+  background:      linear-gradient(135deg, var(--ac-dim), var(--bg-overlay));
   border:          1px solid var(--bd-accent);
   display:         flex;
   align-items:     center;
   justify-content: center;
   flex-shrink:     0;
-  color:           var(--ac);
+  font-size:       12px;
+  font-weight:     700;
+  color:           var(--ac-bright);
+  letter-spacing:  -0.02em;
 }
 .user-card__av svg { width: 14px; height: 14px; }
 
@@ -327,22 +409,23 @@ svg    { display: block; }
   white-space:    nowrap;
   overflow:       hidden;
   text-overflow:  ellipsis;
-  letter-spacing: -0.01em;
-  line-height:    1.2;
+  letter-spacing: -0.015em;
+  line-height:    1.3;
 }
 
 .user-card__role {
-  font-size:  10.5px;
-  color:      var(--tx-muted);
-  margin-top: 1px;
+  font-size:   10.5px;
+  color:       var(--tx-muted);
+  margin-top:  1px;
+  font-weight: 500;
 }
 
 .btn-logout {
   display:         flex;
   align-items:     center;
   justify-content: center;
-  width:           27px;
-  height:          27px;
+  width:           28px;
+  height:          28px;
   border-radius:   var(--r-sm);
   background:      transparent;
   border:          1px solid transparent;
@@ -351,7 +434,7 @@ svg    { display: block; }
     background   var(--t-fast) var(--ease),
     border-color var(--t-fast) var(--ease),
     color        var(--t-fast) var(--ease);
-  flex-shrink: 0;
+  flex-shrink:     0;
 }
 .btn-logout:hover {
   background:   var(--er-dim);
@@ -370,6 +453,8 @@ svg    { display: block; }
   overflow:       hidden;
   min-width:      0;
   margin-left:    0;
+  position:       relative;
+  z-index:        1;
 }
 @media (min-width: 768px) {
   .main-area { margin-left: var(--sidebar-w); }
@@ -383,50 +468,144 @@ svg    { display: block; }
   display:       flex;
   align-items:   center;
   gap:           12px;
-  padding:       0 20px;
+  padding:       0 22px;
   background:    var(--bg-surface);
-  border-bottom: 1px solid var(--bd-subtle);
+  border-bottom: 1px solid var(--bd-faint);
   flex-shrink:   0;
   position:      sticky;
   top:           0;
   z-index:       20;
 }
 
+/* Accent line at bottom of topbar */
+.topbar::after {
+  content:    '';
+  position:   absolute;
+  bottom:     0; left: 0; right: 0;
+  height:     1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(99,161,255,0.12) 25%,
+    rgba(99,161,255,0.12) 75%,
+    transparent
+  );
+  pointer-events: none;
+}
+
 .btn-menu {
   display:         flex;
   align-items:     center;
   justify-content: center;
-  width:           32px;
-  height:          32px;
-  border-radius:   var(--r-sm);
+  width:           34px;
+  height:          34px;
+  border-radius:   var(--r-md);
   background:      transparent;
-  border:          1px solid var(--bd-default);
+  border:          1px solid var(--bd-subtle);
   color:           var(--tx-secondary);
   transition:
-    background var(--t-fast) var(--ease),
-    color      var(--t-fast) var(--ease);
+    background   var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease),
+    color        var(--t-fast) var(--ease);
   flex-shrink: 0;
 }
-.btn-menu:hover { background: var(--bg-hover); color: var(--tx-primary); }
-.btn-menu svg   { width: 14px; height: 14px; }
+.btn-menu:hover {
+  background:   var(--bg-hover);
+  border-color: var(--bd-default);
+  color:        var(--tx-primary);
+}
+.btn-menu svg { width: 14px; height: 14px; }
 @media (min-width: 768px) { .btn-menu { display: none; } }
 
+/* ── Breadcrumb ── */
 .breadcrumb {
   display:     flex;
   align-items: center;
-  gap:         6px;
+  gap:         0;
   font-size:   12.5px;
 }
-.breadcrumb__root { color: var(--tx-muted); font-weight: 500; }
-.breadcrumb__sep  { color: var(--tx-muted); opacity: 0.3; font-size: 13px; }
-.breadcrumb__page { color: var(--tx-secondary); font-weight: 600; }
+.breadcrumb__root {
+  color:       var(--tx-muted);
+  font-weight: 500;
+  font-size:   12px;
+}
+.breadcrumb__sep {
+  color:       var(--tx-hint);
+  font-size:   16px;
+  margin:      0 6px;
+  line-height: 1;
+}
+.breadcrumb__page {
+  color:       var(--tx-secondary);
+  font-weight: 600;
+  font-size:   13px;
+}
 @media (max-width: 767px) { .breadcrumb { display: none; } }
 
-.topbar__actions {
+/* ── Search ── */
+.topbar__search {
+  flex:      1;
+  max-width: 300px;
   margin-left: auto;
+  position:  relative;
+}
+.topbar__search input {
+  width:         100%;
+  height:        34px;
+  background:    var(--bg-raised);
+  border:        1px solid var(--bd-subtle);
+  border-radius: var(--r-md);
+  padding:       0 44px 0 34px;
+  font-family:   var(--font);
+  font-size:     12.5px;
+  color:         var(--tx-primary);
+  outline:       none;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background   var(--t-fast) var(--ease),
+    box-shadow   var(--t-fast) var(--ease);
+}
+.topbar__search input::placeholder { color: var(--tx-muted); }
+.topbar__search input:focus {
+  border-color: var(--bd-accent);
+  background:   var(--bg-overlay);
+  box-shadow:   0 0 0 3px var(--ac-glow);
+}
+.topbar__search-icon {
+  position:       absolute;
+  left:           10px;
+  top:            50%;
+  transform:      translateY(-50%);
+  width:          14px;
+  height:         14px;
+  color:          var(--tx-muted);
+  pointer-events: none;
+}
+.topbar__search-kbd {
+  position:       absolute;
+  right:          9px;
+  top:            50%;
+  transform:      translateY(-50%);
+  font-family:    var(--font-mono);
+  font-size:      9px;
+  color:          var(--tx-muted);
+  background:     var(--bg-canvas);
+  border:         1px solid var(--bd-subtle);
+  border-radius:  var(--r-xs);
+  padding:        1px 5px;
+  pointer-events: none;
+}
+
+/* ── Actions ── */
+.topbar__actions {
   display:     flex;
   align-items: center;
   gap:         6px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 767px) {
+  .topbar__search  { display: none; }
+  .topbar__actions { margin-left: auto; }
 }
 
 .btn-icon {
@@ -434,41 +613,47 @@ svg    { display: block; }
   display:         flex;
   align-items:     center;
   justify-content: center;
-  width:           32px;
-  height:          32px;
-  border-radius:   var(--r-sm);
+  width:           34px;
+  height:          34px;
+  border-radius:   var(--r-md);
   background:      transparent;
-  border:          1px solid var(--bd-default);
+  border:          1px solid var(--bd-subtle);
   color:           var(--tx-secondary);
   transition:
-    background var(--t-fast) var(--ease),
-    color      var(--t-fast) var(--ease);
+    background   var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease),
+    color        var(--t-fast) var(--ease);
 }
-.btn-icon:hover { background: var(--bg-hover); color: var(--tx-primary); }
-.btn-icon svg   { width: 14px; height: 14px; }
+.btn-icon:hover {
+  background:   var(--bg-hover);
+  border-color: var(--bd-default);
+  color:        var(--tx-primary);
+}
+.btn-icon svg { width: 14px; height: 14px; }
 
 .notif-dot {
   position:      absolute;
-  top:           6px;
-  right:         6px;
-  width:         5px;
-  height:        5px;
+  top:           7px;
+  right:         7px;
+  width:         6px;
+  height:        6px;
   border-radius: 50%;
   background:    var(--er);
   border:        1.5px solid var(--bg-surface);
 }
 
+/* ── Status chip ── */
 .chip-status {
   display:        flex;
   align-items:    center;
-  gap:            6px;
-  padding:        4px 10px;
-  border-radius:  var(--r-sm);
-  background:     var(--bg-elevated);
-  border:         1px solid var(--bd-subtle);
+  gap:            7px;
+  padding:        5px 12px;
+  border-radius:  var(--r-lg);
+  background:     var(--ok-dim);
+  border:         1px solid var(--ok-bd);
   font-size:      11.5px;
   font-weight:    600;
-  color:          var(--tx-secondary);
+  color:          var(--ok);
   letter-spacing: 0.01em;
   user-select:    none;
 }
@@ -477,30 +662,56 @@ svg    { display: block; }
   height:        5px;
   border-radius: 50%;
   background:    var(--ok);
-  animation:     pulse-dot 2.6s ease infinite;
+  flex-shrink:   0;
+  animation:     pulse-dot 2.4s ease infinite;
 }
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.45; }
+  0%, 100% { opacity: 1;   box-shadow: 0 0 0 0   rgba(52,211,153,0.4); }
+  50%       { opacity: 0.7; box-shadow: 0 0 0 4px rgba(52,211,153,0);   }
+}
+
+/* ── Topbar avatar ── */
+.topbar__av {
+  width:           34px;
+  height:          34px;
+  border-radius:   50%;
+  background:      var(--ac-dim);
+  border:          1px solid var(--bd-accent);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       12px;
+  font-weight:     700;
+  color:           var(--ac-bright);
+  cursor:          pointer;
+  flex-shrink:     0;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    box-shadow   var(--t-fast) var(--ease);
+  letter-spacing: -0.02em;
+}
+.topbar__av:hover {
+  border-color: var(--ac);
+  box-shadow:   0 0 0 3px var(--ac-glow);
 }
 
 /* ==========================================================================
    FLASH ALERT
    ========================================================================== */
-.flash-region { padding: 16px 20px 0; }
+.flash-region { padding: 18px 22px 0; }
 
 .alert {
   display:       flex;
   align-items:   flex-start;
-  gap:           10px;
-  padding:       11px 14px;
-  border-radius: var(--r-md);
+  gap:           11px;
+  padding:       12px 14px;
+  border-radius: var(--r-lg);
   font-size:     13px;
   font-weight:   500;
   border:        1px solid;
   line-height:   1.5;
 }
-.alert__icon    { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; }
+.alert__icon    { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1.5px; }
 .alert__message { flex: 1; }
 .alert__close {
   background:  none;
@@ -508,16 +719,16 @@ svg    { display: block; }
   font-size:   18px;
   line-height: 1;
   color:       inherit;
-  opacity:     0.45;
+  opacity:     0.4;
   padding:     0;
-  transition:  opacity var(--t-fast) var(--ease);
+  transition:  opacity var(--t-fast);
   flex-shrink: 0;
 }
 .alert__close:hover { opacity: 1; }
 
-.alert--success { background: var(--ok-dim); border-color: var(--ok-bd); color: #56d364; }
+.alert--success { background: var(--ok-dim); border-color: var(--ok-bd); color: var(--ok); }
 .alert--error,
-.alert--danger  { background: var(--er-dim); border-color: var(--er-bd); color: #ff7b72; }
+.alert--danger  { background: var(--er-dim); border-color: var(--er-bd); color: var(--er); }
 .alert--warning { background: var(--wa-dim); border-color: var(--wa-bd); color: var(--wa); }
 .alert--info    { background: var(--in-dim); border-color: var(--in-bd); color: var(--in); }
 
@@ -527,13 +738,13 @@ svg    { display: block; }
 .page-content {
   flex:       1;
   overflow-y: auto;
-  padding:    24px 20px;
+  padding:    26px 22px;
 }
 
 @media (max-width: 480px) {
-  .topbar       { padding: 0 14px; gap: 10px; }
-  .flash-region { padding: 12px 14px 0; }
-  .page-content { padding: 16px 14px; }
+  .topbar        { padding: 0 14px; gap: 10px; }
+  .flash-region  { padding: 12px 14px 0; }
+  .page-content  { padding: 16px 14px; }
 }
   </style>
 </head>
@@ -544,18 +755,27 @@ svg    { display: block; }
   <!-- Backdrop -->
   <div class="backdrop" id="js-backdrop" onclick="closeSidebar()" aria-hidden="true"></div>
 
-  <!-- SIDEBAR -->
+  <!-- ================================================================
+       SIDEBAR
+       ================================================================ -->
   <aside class="sidebar" id="js-sidebar" role="navigation" aria-label="Navigasi utama">
 
     <!-- Brand -->
     <div class="sidebar__brand">
-      <img
-        class="sidebar__logo"
-        src="<?= BASE_URL ?>/assets/img/logo-com.png"
-        alt="Logo <?= htmlspecialchars(APP_NAME) ?>"
-        loading="eager"
-        decoding="sync"
-      >
+      <div class="sidebar__logo-wrap">
+        <img
+          class="sidebar__logo"
+          src="<?= BASE_URL ?>/assets/img/logo-com.png"
+          alt="Logo <?= htmlspecialchars(APP_NAME) ?>"
+          loading="eager"
+          decoding="sync"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='block';"
+        >
+        <svg class="sidebar__logo-icon" style="display:none;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M8 1L13.5 4v8L8 15 2.5 12V4L8 1z"/>
+          <path d="M8 6l2.5 1.5v3L8 12 5.5 10.5v-3L8 6z"/>
+        </svg>
+      </div>
       <span class="sidebar__appname"><?= htmlspecialchars(APP_NAME) ?></span>
       <span class="sidebar__tag">Admin</span>
     </div>
@@ -604,21 +824,22 @@ svg    { display: block; }
 
         foreach ($navGroups as $group => $items):
       ?>
-        <span class="nav-group__label"><?= htmlspecialchars($group) ?></span>
-        <?php foreach ($items as $item):
-          $active = str_starts_with($current, $item['href']);
-          $cls    = $active ? ' is-active' : '';
-          $aria   = $active ? ' aria-current="page"' : '';
-        ?>
-        <a
-          href="<?= BASE_URL . htmlspecialchars($item['href']) ?>"
-          class="nav-item<?= $cls ?>"<?= $aria ?>
-        >
-          <span class="nav-item__icon" aria-hidden="true"><?= $item['icon'] ?></span>
-          <span class="nav-item__label"><?= htmlspecialchars($item['label']) ?></span>
-        </a>
-        <?php endforeach; ?>
-        <div class="nav-divider" role="separator"></div>
+        <div class="nav-section">
+          <span class="nav-group__label"><?= htmlspecialchars($group) ?></span>
+          <?php foreach ($items as $item):
+            $active = str_starts_with($current, $item['href']);
+            $cls    = $active ? ' is-active' : '';
+            $aria   = $active ? ' aria-current="page"' : '';
+          ?>
+          <a
+            href="<?= BASE_URL . htmlspecialchars($item['href']) ?>"
+            class="nav-item<?= $cls ?>"<?= $aria ?>
+          >
+            <span class="nav-item__icon" aria-hidden="true"><?= $item['icon'] ?></span>
+            <span class="nav-item__label"><?= htmlspecialchars($item['label']) ?></span>
+          </a>
+          <?php endforeach; ?>
+        </div>
       <?php endforeach; ?>
     </nav>
 
@@ -626,10 +847,15 @@ svg    { display: block; }
     <div class="sidebar__footer">
       <div class="user-card">
         <div class="user-card__av" aria-hidden="true">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="8" cy="5.5" r="2.5"/>
-            <path d="M2.5 14c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5"/>
-          </svg>
+          <?php
+            $name     = $_SESSION['user_name'] ?? 'Administrator';
+            $initials = '';
+            foreach (explode(' ', $name) as $word) {
+              $initials .= mb_strtoupper(mb_substr($word, 0, 1));
+              if (strlen($initials) >= 2) break;
+            }
+            echo htmlspecialchars($initials ?: 'A');
+          ?>
         </div>
         <div class="user-card__info">
           <div class="user-card__name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Administrator') ?></div>
@@ -651,7 +877,9 @@ svg    { display: block; }
 
   </aside>
 
-  <!-- MAIN AREA -->
+  <!-- ================================================================
+       MAIN AREA
+       ================================================================ -->
   <div class="main-area" id="js-main">
 
     <!-- Topbar -->
@@ -672,9 +900,18 @@ svg    { display: block; }
 
       <nav class="breadcrumb" aria-label="Lokasi halaman">
         <span class="breadcrumb__root"><?= htmlspecialchars(APP_NAME) ?></span>
-        <span class="breadcrumb__sep" aria-hidden="true">/</span>
+        <span class="breadcrumb__sep" aria-hidden="true">›</span>
         <span class="breadcrumb__page">Panel Administrator</span>
       </nav>
+
+      <div class="topbar__search" role="search">
+        <svg class="topbar__search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.5"/>
+          <path d="M10.5 10.5L14 14"/>
+        </svg>
+        <input type="text" placeholder="Cari menu atau halaman…" aria-label="Cari" id="js-search-input">
+        <span class="topbar__search-kbd" aria-hidden="true">⌘K</span>
+      </div>
 
       <div class="topbar__actions" role="toolbar" aria-label="Aksi">
 
@@ -689,6 +926,18 @@ svg    { display: block; }
         <div class="chip-status" role="status" aria-live="polite" aria-label="Status sistem">
           <span class="chip-status__dot" aria-hidden="true"></span>
           <span>Sistem Aktif</span>
+        </div>
+
+        <?php
+          $name     = $_SESSION['user_name'] ?? 'Administrator';
+          $initials = '';
+          foreach (explode(' ', $name) as $word) {
+            $initials .= mb_strtoupper(mb_substr($word, 0, 1));
+            if (strlen($initials) >= 2) break;
+          }
+        ?>
+        <div class="topbar__av" role="button" tabindex="0" aria-label="Profil admin" title="<?= htmlspecialchars($name) ?>">
+          <?= htmlspecialchars($initials ?: 'A') ?>
         </div>
 
       </div>
@@ -721,9 +970,9 @@ svg    { display: block; }
       <?= $content ?>
     </main>
 
-  </div>
+  </div><!-- /.main-area -->
 
-</div>
+</div><!-- /.app-shell -->
 
 <script>
 (function () {
@@ -771,6 +1020,7 @@ svg    { display: block; }
     }
   });
 
+  /* Flash dismiss */
   var flashEl = document.getElementById('js-flash');
 
   window.dismissFlash = function () {
@@ -782,6 +1032,15 @@ svg    { display: block; }
   };
 
   if (flashEl) setTimeout(window.dismissFlash, 5500);
+
+  /* Search shortcut ⌘K / Ctrl+K */
+  document.addEventListener('keydown', function (e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      var inp = document.getElementById('js-search-input');
+      if (inp) inp.focus();
+    }
+  });
 
 }());
 </script>

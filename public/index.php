@@ -67,6 +67,13 @@ $router->get('/admin/profil',               [AdminController::class, 'profil']);
 $router->post('/admin/profil/simpan',       [AdminController::class, 'profilSimpan']);
 $router->post('/admin/profil/logout-all',   [AdminController::class, 'profilLogoutAll']);
 
+// Riwayat Pengurus
+$router->get('/admin/riwayat',                      [AdminController::class, 'riwayat']);
+$router->post('/admin/riwayat/store',               [AdminController::class, 'riwayatStore']);
+$router->get('/admin/riwayat/:id/edit',             [AdminController::class, 'riwayatEdit']);
+$router->post('/admin/riwayat/:id/update',          [AdminController::class, 'riwayatUpdate']);
+$router->post('/admin/riwayat/:id/delete',          [AdminController::class, 'riwayatDelete']);
+
 // ── Member routes ─────────────────────────────────────────────
 $router->get('/member/dashboard',                       [MemberController::class, 'dashboard']);
 $router->get('/member/profile',                         [MemberController::class, 'profile']);
