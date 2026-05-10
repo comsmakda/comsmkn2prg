@@ -175,6 +175,12 @@ textarea.fi { resize:vertical; min-height:68px; line-height:1.65; }
 .img-thumb--empty svg { width:22px; height:22px; opacity:.4; }
 .img-thumb--sm { width:48px; height:48px; }
 .img-thumb--circle { border-radius:50%; }
+.img-thumb--wide {
+  width:120px; height:68px; border-radius:var(--r2);
+  border:1px solid var(--bd2); object-fit:cover; flex-shrink:0;
+  background:var(--bg-o);
+}
+.img-thumb--wide.img-thumb--empty svg { width:28px; height:28px; }
 .img-upload__area { flex:1; display:flex; flex-direction:column; gap:6px; }
 .img-upload__btn {
   display:inline-flex; align-items:center; gap:7px;
@@ -189,6 +195,36 @@ textarea.fi { resize:vertical; min-height:68px; line-height:1.65; }
 input[type="file"].fhidden {
   position:absolute; width:1px; height:1px;
   overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+/* ── Hero image preview area ── */
+.hero-img-preview {
+  position:relative; border-radius:var(--r2); overflow:hidden;
+  background:var(--bg-o); border:1px solid var(--bd);
+  min-height:120px; display:flex; align-items:center; justify-content:center;
+}
+.hero-img-preview img {
+  width:100%; max-height:200px; object-fit:cover; display:block;
+}
+.hero-img-preview__empty {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:8px; padding:28px; color:var(--tx3); min-height:120px;
+}
+.hero-img-preview__empty svg { opacity:.3; }
+.hero-img-preview__empty span { font-size:11px; }
+.hero-img-badge {
+  position:absolute; top:8px; right:8px;
+  font-family:var(--font-mono); font-size:9px; font-weight:700;
+  padding:3px 9px; border-radius:99px; letter-spacing:.06em;
+  background:rgba(74,222,128,.18); color:var(--grn);
+  border:1px solid rgba(74,222,128,.25);
+}
+.hero-img-badge--none {
+  background:rgba(74,114,222,.12); color:var(--tx3);
+  border-color:var(--bd);
+}
+.hero-img-controls {
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
 }
 
 /* ── Divider ── */
@@ -272,6 +308,18 @@ input[type="file"].fhidden {
   padding:20px 0;
 }
 
+/* ── Info box ── */
+.info-box {
+  display:flex; align-items:flex-start; gap:10px;
+  background:var(--ac-d); border:1px solid rgba(56,189,248,.18);
+  border-radius:var(--r); padding:11px 14px; font-size:11.5px; color:var(--tx2);
+  line-height:1.6;
+}
+.info-box svg { flex-shrink:0; color:var(--ac); margin-top:1px; }
+.info-box--red {
+  background:var(--red-d); border-color:rgba(248,113,113,.2); color:var(--red);
+}
+
 /* ═══════════════════════════════════════════════════
    SAVE BAR
 ═══════════════════════════════════════════════════ */
@@ -313,6 +361,22 @@ input[type="file"].fhidden {
 .btn-outline:hover { border-color:var(--bd2); color:var(--tx); background:var(--bg-o); }
 .btn-outline svg { width:13px; height:13px; }
 
+/* ── Btn danger ── */
+.btn-danger {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:7px 13px; background:var(--red-d); color:var(--red);
+  font-family:var(--font-ui); font-size:12px; font-weight:600;
+  border:1px solid rgba(248,113,113,.25); border-radius:var(--r);
+  cursor:pointer; transition:all 150ms var(--ease);
+}
+.btn-danger:hover {
+  background:rgba(248,113,113,.18); border-color:rgba(248,113,113,.4);
+}
+.btn-danger svg { width:12px; height:12px; }
+.btn-danger:disabled {
+  opacity:.4; cursor:not-allowed; pointer-events:none;
+}
+
 /* ─── Preview badge ─── */
 .preview-link {
   display:inline-flex; align-items:center; gap:6px;
@@ -337,6 +401,15 @@ input[type="file"].fhidden {
 .toggle-wrap__hint {
   font-size:10.5px; color:var(--tx3); margin-top:2px; display:block;
 }
+
+/* ── Strikethrough / deleted state ── */
+.img-deleted-notice {
+  display:flex; align-items:center; gap:8px;
+  font-size:11.5px; color:var(--red); font-weight:600;
+  padding:8px 12px; background:var(--red-d);
+  border:1px solid rgba(248,113,113,.2); border-radius:var(--r);
+}
+.img-deleted-notice svg { flex-shrink:0; }
 </style>
 
 <div class="cms-root">
@@ -424,10 +497,13 @@ input[type="file"].fhidden {
 <form method="POST" action="<?= BASE_URL ?>/admin/settings/save"
       enctype="multipart/form-data" id="cms-form">
   <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
+  <!-- Flag hapus hero image — diisi JS saat tombol ditekan -->
+  <input type="hidden" name="hero_image_delete" id="hero-image-delete-flag" value="0">
 
   <?php
   // Helper
   $v = fn(string $k, string $d='') => htmlspecialchars($settings[$k]['value'] ?? $d);
+  $hasHeroImage = !empty($settings['hero_image']['value']);
   ?>
 
   <!-- ══════════════════════════════════════════════
@@ -547,14 +623,15 @@ input[type="file"].fhidden {
   ══════════════════════════════════════════════ -->
   <div class="cms-panel" id="panel-hero">
 
+    <!-- Card 1: Teks Hero -->
     <div class="cms-card">
       <div class="cms-card__head">
         <div class="cms-card__ico cms-card__ico--blue">
-          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="2" width="12" height="10" rx="1.5"/><path d="M1 6h12"/><path d="M5 10h4"/></svg>
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h10M2 7h7M2 10h5"/></svg>
         </div>
         <div>
-          <div class="cms-card__title">Konten Hero Section</div>
-          <div class="cms-card__desc">Badge, heading, tombol CTA, dan gambar background.</div>
+          <div class="cms-card__title">Teks &amp; Badge Hero</div>
+          <div class="cms-card__desc">Badge kecil di atas heading dan teks marquee/ticker berjalan.</div>
         </div>
       </div>
       <div class="cms-card__body">
@@ -565,35 +642,127 @@ input[type="file"].fhidden {
                  value="<?= $v('hero_badge_text','Organisasi Resmi · SMKN 2 Pinrang') ?>">
         </div>
         <div class="fg">
-          <label class="lbl">Gambar Hero / Background <span class="lbl__hint">Opsional — tampil sebagai background hero</span></label>
-          <div class="img-upload">
-            <?php if ($settings['hero_image']['value'] ?? ''): ?>
-              <img src="<?= UPLOAD_URL . '/' . $v('hero_image') ?>" class="img-thumb" id="prev-hero" alt="Hero">
-            <?php else: ?>
-              <div class="img-thumb img-thumb--empty" id="prev-hero-empty">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="2" width="16" height="16" rx="3"/><circle cx="7.5" cy="7.5" r="2"/><path d="M2 13l4-4 3 3 3-4 6 5"/></svg>
-              </div>
-              <img src="" class="img-thumb" id="prev-hero" style="display:none" alt="Preview">
-            <?php endif; ?>
-            <div class="img-upload__area">
-              <label for="f-hero-img" class="img-upload__btn">
-                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 9V1M4 4l3-3 3 3M1 11v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg>
-                Pilih File
-              </label>
-              <input type="file" id="f-hero-img" name="hero_image" accept="image/*" class="fhidden"
-                     data-preview="prev-hero" data-empty="prev-hero-empty" data-name="fname-hero">
-              <span class="img-upload__name" id="fname-hero"><?= $settings['hero_image']['value'] ? htmlspecialchars(basename($settings['hero_image']['value'])) : 'Belum ada file' ?></span>
-            </div>
-          </div>
-        </div>
-        <div class="fdiv"></div>
-        <div class="fg">
           <label class="lbl" for="f-ticker">Ticker / Marquee <span class="lbl__hint">Pisahkan tiap item dengan tanda |</span></label>
           <textarea id="f-ticker" name="ticker_items" rows="2" class="fi"
                     placeholder="Item 1|Item 2|Item 3"><?= $v('ticker_items','COM Academy|Tech Talk|Creative Festival') ?></textarea>
         </div>
       </div>
     </div>
+
+    <!-- Card 2: Gambar Hero (dengan fitur hapus) -->
+    <div class="cms-card">
+      <div class="cms-card__head">
+        <div class="cms-card__ico cms-card__ico--<?= $hasHeroImage ? 'green' : 'amber' ?>">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="12" height="12" rx="1.5"/><circle cx="4.5" cy="4.5" r="1.2"/><path d="M1 9.5l3-3 3 3 2-2.5 4 4"/></svg>
+        </div>
+        <div>
+          <div class="cms-card__title">Gambar Hero / Background</div>
+          <div class="cms-card__desc">Gambar yang ditampilkan sebagai background atau ilustrasi utama seksi hero.</div>
+        </div>
+      </div>
+      <div class="cms-card__body">
+
+        <!-- Info status saat ini -->
+        <div class="info-box" id="hero-status-box"
+             style="<?= $hasHeroImage ? '' : 'display:none' ?>">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5.5"/><path d="M7 6.5v3"/><circle cx="7" cy="5" r=".5" fill="currentColor"/></svg>
+          Gambar hero sedang aktif. Anda bisa mengganti dengan upload baru, atau hapus agar hero tampil tanpa background.
+        </div>
+        <div class="info-box" id="hero-empty-box"
+             style="<?= $hasHeroImage ? 'display:none' : '' ?>">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5.5"/><path d="M7 6.5v3"/><circle cx="7" cy="5" r=".5" fill="currentColor"/></svg>
+          Belum ada gambar hero. Upload gambar agar tampil sebagai background utama.
+        </div>
+
+        <!-- Pratinjau gambar -->
+        <div class="fg">
+          <label class="lbl">Pratinjau Gambar Hero</label>
+
+          <!-- Kondisi: ada gambar tersimpan di DB -->
+          <div id="hero-preview-existing" style="<?= $hasHeroImage ? '' : 'display:none' ?>">
+            <div class="hero-img-preview" id="hero-existing-wrap">
+              <img src="<?= $hasHeroImage ? UPLOAD_URL . '/' . $v('hero_image') : '' ?>"
+                   id="img-hero-existing" alt="Gambar Hero"
+                   style="<?= $hasHeroImage ? '' : 'display:none' ?>">
+              <span class="hero-img-badge" id="hero-badge-existing">Terpasang</span>
+            </div>
+            <div style="margin-top:8px">
+              <span class="img-upload__name" id="fname-hero-existing">
+                <?= $hasHeroImage ? htmlspecialchars(basename($settings['hero_image']['value'])) : '' ?>
+              </span>
+            </div>
+            <!-- Notifikasi akan dihapus (muncul saat tombol hapus diklik) -->
+            <div class="img-deleted-notice" id="hero-delete-notice" style="display:none;margin-top:8px">
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h10M5 4V3a1 1 0 011-1h2a1 1 0 011 1v1M6 7v3M8 7v3M3 4l.8 7.2A1 1 0 004.8 12h4.4a1 1 0 001-.8L11 4"/></svg>
+              Gambar akan dihapus saat kamu menyimpan perubahan.
+              <button type="button" id="hero-undo-delete"
+                style="margin-left:auto;font-size:11px;color:var(--tx2);background:none;border:none;cursor:pointer;text-decoration:underline;padding:0">
+                Batalkan
+              </button>
+            </div>
+          </div>
+
+          <!-- Preview gambar baru yang baru dipilih (belum ada di DB) -->
+          <div id="hero-preview-new" style="display:none">
+            <div class="hero-img-preview">
+              <img id="img-hero-new" src="" alt="Preview Gambar Baru">
+              <span class="hero-img-badge" style="background:rgba(167,139,250,.18);color:var(--pur);border-color:rgba(167,139,250,.3)">Baru — Belum Disimpan</span>
+            </div>
+            <div style="margin-top:8px">
+              <span class="img-upload__name" id="fname-hero-new">–</span>
+            </div>
+          </div>
+
+          <!-- Placeholder saat kosong -->
+          <div id="hero-preview-empty" style="<?= $hasHeroImage ? 'display:none' : '' ?>">
+            <div class="hero-img-preview hero-img-preview__empty" style="display:flex">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="30" height="30" rx="4"/><circle cx="12" cy="12" r="3.5"/><path d="M3 24l8-8 7 7 5-6 12 10"/></svg>
+              <span>Belum ada gambar hero</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fdiv"></div>
+
+        <!-- Kontrol: Upload + Hapus -->
+        <div class="fg">
+          <label class="lbl">Kelola Gambar Hero</label>
+          <div class="hero-img-controls">
+            <!-- Tombol Upload -->
+            <label for="f-hero-img" class="img-upload__btn" id="hero-upload-btn">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 9V1M4 4l3-3 3 3M1 11v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg>
+              <?= $hasHeroImage ? 'Ganti Gambar' : 'Upload Gambar' ?>
+            </label>
+            <input type="file" id="f-hero-img" name="hero_image" accept="image/*" class="fhidden">
+
+            <!-- Tombol Hapus (hanya tampil jika ada gambar) -->
+            <?php if ($hasHeroImage): ?>
+            <button type="button" class="btn-danger" id="hero-delete-btn">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h10M5 4V3a1 1 0 011-1h2a1 1 0 011 1v1M6 7v3M8 7v3M3 4l.8 7.2A1 1 0 004.8 12h4.4a1 1 0 001-.8L11 4"/></svg>
+              Hapus Foto Hero
+            </button>
+            <?php else: ?>
+            <button type="button" class="btn-danger" id="hero-delete-btn" disabled>
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h10M5 4V3a1 1 0 011-1h2a1 1 0 011 1v1M6 7v3M8 7v3M3 4l.8 7.2A1 1 0 004.8 12h4.4a1 1 0 001-.8L11 4"/></svg>
+              Hapus Foto Hero
+            </button>
+            <?php endif; ?>
+          </div>
+          <span class="img-upload__name" style="margin-top:2px">
+            Format: JPG, PNG, WebP · Disarankan rasio 16:9 atau 21:9 · Maks. 5 MB
+          </span>
+        </div>
+
+        <!-- Batalkan pilihan file baru -->
+        <div id="hero-cancel-new-wrap" style="display:none">
+          <button type="button" class="btn-outline" id="hero-cancel-new" style="font-size:11px;padding:6px 12px">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4L4 10M4 4l6 6"/></svg>
+            Batalkan Pilihan Gambar Baru
+          </button>
+        </div>
+
+      </div>
+    </div><!-- /card hero image -->
 
   </div><!-- /panel-hero -->
 
@@ -1177,8 +1346,8 @@ tabs.forEach(tab => {
   });
 });
 
-/* ── Image file preview (universal) ── */
-document.querySelectorAll('input[type="file"].fhidden').forEach(inp => {
+/* ── Image file preview (universal — non-hero) ── */
+document.querySelectorAll('input[type="file"].fhidden:not(#f-hero-img)').forEach(inp => {
   inp.addEventListener('change', () => {
     const file = inp.files[0];
     if (!file) return;
@@ -1199,6 +1368,130 @@ document.querySelectorAll('input[type="file"].fhidden').forEach(inp => {
     reader.readAsDataURL(file);
   });
 });
+
+/* ════════════════════════════════════════════════
+   HERO IMAGE — Logika hapus & preview
+════════════════════════════════════════════════ */
+const heroFileInput       = document.getElementById('f-hero-img');
+const heroDeleteFlag      = document.getElementById('hero-image-delete-flag');
+const heroDeleteBtn       = document.getElementById('hero-delete-btn');
+const heroUndoDelete      = document.getElementById('hero-undo-delete');
+const heroDeleteNotice    = document.getElementById('hero-delete-notice');
+const heroExistingWrap    = document.getElementById('hero-existing-wrap');
+const heroPreviewExisting = document.getElementById('hero-preview-existing');
+const heroPreviewNew      = document.getElementById('hero-preview-new');
+const heroPreviewEmpty    = document.getElementById('hero-preview-empty');
+const heroImgNew          = document.getElementById('img-hero-new');
+const fnameHeroNew        = document.getElementById('fname-hero-new');
+const heroStatusBox       = document.getElementById('hero-status-box');
+const heroEmptyBox        = document.getElementById('hero-empty-box');
+const heroUploadBtn       = document.getElementById('hero-upload-btn');
+const heroCancelNewWrap   = document.getElementById('hero-cancel-new-wrap');
+
+let heroHasExisting = <?= $hasHeroImage ? 'true' : 'false' ?>;
+let heroNewSelected  = false;
+let heroMarkedDelete = false;
+
+function updateHeroUI() {
+  if (heroNewSelected) {
+    // Tampilkan preview baru
+    if (heroPreviewNew)      heroPreviewNew.style.display      = '';
+    if (heroPreviewExisting) heroPreviewExisting.style.display = 'none';
+    if (heroPreviewEmpty)    heroPreviewEmpty.style.display    = 'none';
+    if (heroCancelNewWrap)   heroCancelNewWrap.style.display   = '';
+    if (heroDeleteBtn)       heroDeleteBtn.disabled            = true;
+    if (heroStatusBox)       heroStatusBox.style.display       = 'none';
+    if (heroEmptyBox)        heroEmptyBox.style.display        = 'none';
+    if (heroDeleteNotice)    heroDeleteNotice.style.display    = 'none';
+    heroDeleteFlag.value = '0';
+    return;
+  }
+
+  if (heroHasExisting) {
+    if (heroPreviewExisting) heroPreviewExisting.style.display = '';
+    if (heroPreviewNew)      heroPreviewNew.style.display      = 'none';
+    if (heroPreviewEmpty)    heroPreviewEmpty.style.display    = 'none';
+    if (heroCancelNewWrap)   heroCancelNewWrap.style.display   = 'none';
+    if (heroDeleteBtn)       heroDeleteBtn.disabled            = false;
+    if (heroUploadBtn)       heroUploadBtn.textContent         = 'Ganti Gambar';
+
+    if (heroMarkedDelete) {
+      if (heroDeleteNotice) heroDeleteNotice.style.display = '';
+      if (heroExistingWrap) heroExistingWrap.style.opacity = '0.4';
+      if (heroStatusBox)    heroStatusBox.style.display    = 'none';
+      if (heroEmptyBox)     heroEmptyBox.style.display     = 'none';
+      heroDeleteFlag.value = '1';
+    } else {
+      if (heroDeleteNotice) heroDeleteNotice.style.display = 'none';
+      if (heroExistingWrap) heroExistingWrap.style.opacity = '1';
+      if (heroStatusBox)    heroStatusBox.style.display    = '';
+      if (heroEmptyBox)     heroEmptyBox.style.display     = 'none';
+      heroDeleteFlag.value = '0';
+    }
+  } else {
+    // Tidak ada gambar
+    if (heroPreviewExisting) heroPreviewExisting.style.display = 'none';
+    if (heroPreviewNew)      heroPreviewNew.style.display      = 'none';
+    if (heroPreviewEmpty)    heroPreviewEmpty.style.display    = '';
+    if (heroCancelNewWrap)   heroCancelNewWrap.style.display   = 'none';
+    if (heroDeleteBtn)       heroDeleteBtn.disabled            = true;
+    if (heroUploadBtn)       heroUploadBtn.textContent         = 'Upload Gambar';
+    if (heroStatusBox)       heroStatusBox.style.display       = 'none';
+    if (heroEmptyBox)        heroEmptyBox.style.display        = '';
+    heroDeleteFlag.value = '0';
+  }
+}
+
+// File baru dipilih
+if (heroFileInput) {
+  heroFileInput.addEventListener('change', () => {
+    const file = heroFileInput.files[0];
+    if (!file) return;
+    heroNewSelected  = true;
+    heroMarkedDelete = false;
+    const reader = new FileReader();
+    reader.onload = e => {
+      if (heroImgNew)    heroImgNew.src          = e.target.result;
+      if (fnameHeroNew)  fnameHeroNew.textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+    updateHeroUI();
+  });
+}
+
+// Tombol hapus
+if (heroDeleteBtn) {
+  heroDeleteBtn.addEventListener('click', () => {
+    if (!heroHasExisting) return;
+    if (!confirm('Hapus gambar hero? Perubahan baru berlaku setelah kamu klik "Simpan Perubahan".')) return;
+    heroMarkedDelete = true;
+    heroNewSelected  = false;
+    // Reset file input agar tidak ikut ter-upload
+    if (heroFileInput) heroFileInput.value = '';
+    updateHeroUI();
+  });
+}
+
+// Batalkan hapus
+if (heroUndoDelete) {
+  heroUndoDelete.addEventListener('click', () => {
+    heroMarkedDelete = false;
+    updateHeroUI();
+  });
+}
+
+// Batalkan pilihan gambar baru
+const heroCancelBtn = document.getElementById('hero-cancel-new');
+if (heroCancelBtn) {
+  heroCancelBtn.addEventListener('click', () => {
+    heroNewSelected = false;
+    if (heroFileInput) heroFileInput.value = '';
+    updateHeroUI();
+  });
+}
+
+// Init
+updateHeroUI();
 
 /* ── Ctrl+S / Cmd+S shortcut ── */
 document.addEventListener('keydown', e => {

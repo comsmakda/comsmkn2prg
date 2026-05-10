@@ -255,10 +255,10 @@ class AdminController extends Controller
             }
         }
 
+        // ── File upload slots ──────────────────────────────────
         $fileSlots = [
             'org_logo'     => 'org_logo',
             'org_photo'    => 'org_photo',
-            'hero_image'   => 'hero_image',
             'pembina_foto' => 'pembina_foto',
         ];
         for ($i = 1; $i <= 6; $i++) {
@@ -271,12 +271,46 @@ class AdminController extends Controller
                     $data[$settingKey] = FileUploader::uploadFoto($_FILES[$fieldName], $settingKey);
                 } catch (RuntimeException $e) {
                     $this->flash('error', "Upload gagal untuk {$settingKey}: " . $e->getMessage());
-                    $this->redirect('/admin/settings');
+                    $this->redirect('/admin/settings#hero');
                 }
             }
         }
 
-        (new SettingModel())->setMany($data);
+        // ── Hero image — hapus atau ganti ─────────────────────
+        $sm = new SettingModel();
+
+        $heroImageDelete = ($_POST['hero_image_delete'] ?? '0') === '1';
+        $heroHasNewFile  = !empty($_FILES['hero_image']['name']);
+
+        if ($heroHasNewFile) {
+            // Ada file baru: hapus file lama (jika ada) lalu simpan yang baru
+            $existingHero = $sm->get('hero_image');
+            if ($existingHero) {
+                $oldPath = ROOT . '/public/uploads/' . $existingHero;
+                if (file_exists($oldPath)) {
+                    @unlink($oldPath);
+                }
+            }
+            try {
+                $data['hero_image'] = FileUploader::uploadFoto($_FILES['hero_image'], 'hero_image');
+            } catch (RuntimeException $e) {
+                $this->flash('error', 'Upload gambar hero gagal: ' . $e->getMessage());
+                $this->redirect('/admin/settings#hero');
+            }
+        } elseif ($heroImageDelete) {
+            // Tidak ada file baru, tapi admin meminta hapus gambar lama
+            $existingHero = $sm->get('hero_image');
+            if ($existingHero) {
+                $oldPath = ROOT . '/public/uploads/' . $existingHero;
+                if (file_exists($oldPath)) {
+                    @unlink($oldPath);
+                }
+            }
+            $data['hero_image'] = ''; // kosongkan value di DB
+        }
+        // else: tidak ada aksi hero → biarkan nilai lama
+
+        $sm->setMany($data);
         $this->flash('success', 'Pengaturan berhasil disimpan.');
         $this->redirect('/admin/settings');
     }
