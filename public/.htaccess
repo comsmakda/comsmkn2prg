@@ -1,8 +1,7 @@
 Options -Indexes
 
-# Redirect all requests to index.php (front controller)
 RewriteEngine On
-RewriteBase /com-smkn2-pinrang/public/
+RewriteBase /
 
 # Allow direct access to real files (assets, uploads)
 RewriteCond %{REQUEST_FILENAME} !-f
