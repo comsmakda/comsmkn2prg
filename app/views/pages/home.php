@@ -14,7 +14,7 @@ if (!empty($settings['og_image']['value'])) {
 } elseif (!empty($settings['org_photo']['value'])) {
     $og_image = UPLOAD_URL . '/' . $settings['org_photo']['value'];
 } else {
-    $og_image = BASE_URL . '/assets/img/og-image.png';
+    $og_image = BASE_URL . '/assets/img/og-image.svg';
 }
 
 $og_url      = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
@@ -36,8 +36,8 @@ $og_sitename = $og_title;
 <meta name="twitter:title"       content="<?= $og_title ?>">
 <meta name="twitter:description" content="<?= $og_description ?>">
 <meta name="twitter:image"       content="<?= htmlspecialchars($og_image) ?>">
-<link rel="icon"             type="image/png" href="<?= BASE_URL ?>/assets/img/logo-com.png">
-<link rel="apple-touch-icon"                  href="<?= BASE_URL ?>/assets/img/logo-com.png">
+<link rel="icon"             type="image/png" href="<?= BASE_URL ?>/assets/img/favicon.ico">
+<link rel="apple-touch-icon"                  href="<?= BASE_URL ?>/assets/img/favicon.ico">
 
 <style>
 /* ─── RESET & BASE ───────────────────────────────────────────── */
