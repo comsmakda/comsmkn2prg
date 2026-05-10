@@ -14,7 +14,7 @@ if (!empty($settings['og_image']['value'])) {
 } elseif (!empty($settings['org_photo']['value'])) {
     $og_image = UPLOAD_URL . '/' . $settings['org_photo']['value'];
 } else {
-    $og_image = BASE_URL . '/assets/img/og-image.jpg';
+    $og_image = BASE_URL . '/assets/img/og-image.png';
 }
 
 $og_url      = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
