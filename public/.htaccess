@@ -3,6 +3,10 @@ Options -Indexes
 RewriteEngine On
 RewriteBase /
 
+# Allow sitemap and google verification files
+RewriteRule ^sitemap\.xml$ - [L]
+RewriteRule ^google.*\.html$ - [L]
+
 # Allow direct access to real files (assets, uploads)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
