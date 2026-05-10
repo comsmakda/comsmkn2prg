@@ -36,8 +36,10 @@ $og_sitename = $og_title;
 <meta name="twitter:title"       content="<?= $og_title ?>">
 <meta name="twitter:description" content="<?= $og_description ?>">
 <meta name="twitter:image"       content="<?= htmlspecialchars($og_image) ?>">
-<link rel="icon"             type="image/png" href="<?= BASE_URL ?>/assets/img/favicon.ico">
-<link rel="apple-touch-icon"                  href="<?= BASE_URL ?>/assets/img/favicon.ico">
+<link rel="icon" type="image/x-icon"  href="<?= BASE_URL ?>/assets/img/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="<?= BASE_URL ?>/assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="<?= BASE_URL ?>/assets/img/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="<?= BASE_URL ?>/assets/img/apple-touch-icon.png">
 
 <style>
 /* ─── RESET & BASE ───────────────────────────────────────────── */
