@@ -2,7 +2,7 @@
 // config/app.php
 
 define('APP_NAME',    'COM SMKN 2 Pinrang');
-define('BASE_URL',    'http://localhost/com-smkn2-pinrang/public'); // Sesuaikan
+define('BASE_URL',    'https://comsmkn2pinrang.my.id/public'); // Sesuaikan
 define('BASE_PATH',   dirname(__DIR__));
 define('UPLOAD_PATH', BASE_PATH . '/public/uploads/photos');
 define('UPLOAD_URL',  BASE_URL  . '/uploads/photos');
