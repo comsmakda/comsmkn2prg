@@ -311,7 +311,6 @@ $og_sitename = $og_title;
   display: flex; align-items: center; justify-content: center;
   color: var(--c-sky); flex-shrink: 0;
 }
-/* Logo di mosaic card */
 .hm-logo-wrap {
   width: 38px; height: 38px; border-radius: 9px;
   overflow: hidden; flex-shrink: 0;
@@ -471,16 +470,17 @@ $og_sitename = $og_title;
 .vm-item h3 { font-family: var(--font-display); font-size: .85rem; font-weight: 700; color: #fff; margin-bottom: .3rem; }
 .vm-item p  { font-size: .79rem; color: var(--c-muted2); line-height: 1.76; }
 
-/* ─── SAMBUTAN ───────────────────────────────────────────────── */
+/* ─── SAMBUTAN ── UPDATED: format foto persegi seperti SMKN 2 Pinrang ── */
 .sambutan-section { background: var(--c-bg); }
+
 .sambutan-box {
   background: var(--c-surface2);
   border: 1px solid var(--c-border);
   border-radius: 18px;
-  padding: 2.2rem;
+  padding: 2.4rem;
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 2.2rem;
+  grid-template-columns: 280px 1fr;
+  gap: 2.4rem;
   align-items: start;
   position: relative; overflow: hidden;
   margin-top: 2.2rem;
@@ -492,38 +492,112 @@ $og_sitename = $og_title;
   background: radial-gradient(circle, rgba(14,165,233,.07) 0%, transparent 70%);
   pointer-events: none;
 }
+
+/* Kolom kiri: foto + identitas */
 .sambutan-photo-col {
-  display: flex; flex-direction: column; align-items: center;
-  gap: .9rem; text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
 }
-.sambutan-ring {
-  width: 140px; height: 140px; border-radius: 50%;
-  border: 2px solid rgba(14,165,233,.3);
-  box-shadow: 0 0 0 5px rgba(14,165,233,.06), 0 10px 30px rgba(0,0,0,.4);
-  overflow: hidden; flex-shrink: 0;
+
+/* Foto persegi/rectangular seperti SMKN 2 Pinrang */
+.sambutan-photo-frame {
+  width: 100%;
+  aspect-ratio: 3/4;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--c-border);
   background: var(--c-surface3);
-  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(14,165,233,.08);
+  position: relative;
+  flex-shrink: 0;
 }
-.sambutan-ring img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.sambutan-name  { font-family: var(--font-display); font-size: .95rem; font-weight: 800; color: #fff; letter-spacing: -.02em; }
-.sambutan-role  { font-size: .73rem; color: var(--c-sky); font-weight: 600; }
-.sambutan-masa  {
+.sambutan-photo-frame img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center top;
+  display: block;
+}
+.sambutan-photo-placeholder {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .75rem;
+  color: var(--c-muted);
+}
+.sambutan-photo-placeholder svg { opacity: .35; }
+
+/* Label identitas di bawah foto */
+.sambutan-identity {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(14,165,233,.08) 0%, rgba(99,102,241,.06) 100%);
+  border: 1px solid rgba(14,165,233,.15);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: .9rem 1rem;
+  text-align: center;
+}
+.sambutan-photo-frame + .sambutan-identity {
+  margin-top: -1px;
+  border-radius: 0 0 12px 12px;
+}
+/* Reattach identity box flush to photo */
+.sambutan-photo-col .sambutan-photo-frame { border-radius: 12px 12px 0 0; border-bottom: none; }
+
+.sambutan-name {
+  font-family: var(--font-display);
+  font-size: 1rem; font-weight: 800;
+  color: #fff; letter-spacing: -.02em;
+  margin-bottom: .25rem;
+}
+.sambutan-role {
+  font-size: .74rem; color: var(--c-sky);
+  font-weight: 600; line-height: 1.45;
+  margin-bottom: .4rem;
+}
+.sambutan-masa {
   display: inline-flex; align-items: center; gap: 4px;
   font-family: var(--font-mono); font-size: .62rem; color: var(--c-muted);
   background: rgba(14,165,233,.06); border: 1px solid rgba(14,165,233,.14);
-  border-radius: 99px; padding: 2px 9px; margin-top: 2px;
+  border-radius: 99px; padding: 2px 9px;
+}
+
+/* Kolom kanan: isi sambutan */
+.sambutan-content-col {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+}
+.sambutan-content-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  font-weight: 800; color: #fff;
+  letter-spacing: -.03em;
+  margin-bottom: 1.2rem;
+  line-height: 1.15;
+}
+.sambutan-content-title span {
+  background: linear-gradient(125deg, #38bdf8 0%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.sambutan-quote-icon {
+  color: rgba(14,165,233,.12); margin-bottom: .6rem; display: block;
 }
 .sambutan-content {
-  font-size: .93rem; color: var(--c-muted2); line-height: 1.96;
+  font-size: .91rem; color: var(--c-muted2);
+  line-height: 2;
   font-style: italic;
-  padding-left: 1rem;
+  padding-left: 1.1rem;
   border-left: 2px solid rgba(14,165,233,.22);
-  position: relative; z-index: 1;
 }
-.sambutan-quote-icon { color: rgba(14,165,233,.1); margin-bottom: .75rem; display: block; }
-.sambutan-sig { display: flex; align-items: center; gap: 10px; margin-top: 1.1rem; }
+.sambutan-sig {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 1.4rem;
+}
 .sambutan-sig-line { width: 30px; height: 1.5px; background: var(--c-sky); border-radius: 2px; }
-.sambutan-sig span { font-family: var(--font-display); font-size: .8rem; font-weight: 700; color: var(--c-sky); }
+.sambutan-sig span {
+  font-family: var(--font-display); font-size: .82rem;
+  font-weight: 700; color: var(--c-sky);
+}
 
 /* ─── RIWAYAT ────────────────────────────────────────────────── */
 .riwayat-section { background: var(--c-surface); }
@@ -820,6 +894,7 @@ $og_sitename = $og_title;
   .gallery-grid    { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 175px; }
   .gallery-item:nth-child(1),
   .gallery-item:nth-child(4) { grid-column: 1 / -1; }
+  .sambutan-box    { grid-template-columns: 220px 1fr; gap: 2rem; }
 }
 
 @media (max-width: 768px) {
@@ -844,9 +919,12 @@ $og_sitename = $og_title;
   .cta-box p       { margin-left: auto; margin-right: auto; }
   .contact-grid    { grid-template-columns: 1fr; }
   .contact-card-span { grid-column: 1 / -1; }
-  .sambutan-box    { grid-template-columns: 1fr; padding: 1.6rem; gap: 1.5rem; }
-  .sambutan-photo-col { flex-direction: row; text-align: left; gap: 1rem; align-items: center; }
-  .sambutan-ring   { width: 90px; height: 90px; flex-shrink: 0; }
+  /* Sambutan mobile: stack vertikal */
+  .sambutan-box    { grid-template-columns: 1fr; padding: 1.6rem; gap: 1.8rem; }
+  .sambutan-photo-col { flex-direction: row; align-items: flex-end; gap: 1.2rem; }
+  .sambutan-photo-frame { width: 130px; flex-shrink: 0; aspect-ratio: 3/4; }
+  .sambutan-identity { border-radius: 0 0 10px 10px; }
+  .sambutan-photo-frame { border-radius: 10px 10px 0 0; }
   .riwayat-cards   { grid-template-columns: repeat(2, 1fr); }
   .section-pad     { padding: 3.5rem 0; }
   .section-wrap    { padding: 0 1.25rem; }
@@ -871,7 +949,8 @@ $og_sitename = $og_title;
   .contact-val     { font-size: .82rem; word-break: break-all; }
   .riwayat-cards   { grid-template-columns: 1fr; }
   .sambutan-content { font-size: .86rem; }
-  .sambutan-photo-col { flex-direction: column; text-align: center; }
+  .sambutan-photo-col { flex-direction: column; align-items: center; }
+  .sambutan-photo-frame { width: 100%; max-width: 200px; }
   .section-wrap    { padding: 0 1rem; }
 }
 </style>
@@ -1101,7 +1180,7 @@ $tickerAll   = array_merge($tickerItems, $tickerItems);
 
 <div class="section-divider"></div>
 
-<!-- ══ SAMBUTAN ══ -->
+<!-- ══ SAMBUTAN ══ UPDATED: foto persegi seperti SMKN 2 Pinrang ══ -->
 <?php if (($settings['sambutan_show']['value'] ?? '1') === '1'): ?>
 <section class="sambutan-section section-pad" id="sambutan">
   <div class="section-wrap">
@@ -1112,19 +1191,26 @@ $tickerAll   = array_merge($tickerItems, $tickerItems);
     <h2 class="section-title" data-reveal data-delay="1">Kata-Kata dari Pembina</h2>
 
     <div class="sambutan-box" data-reveal data-delay="2">
+
+      <!-- Kolom kiri: foto persegi + identitas di bawah foto -->
       <div class="sambutan-photo-col">
         <?php $pembinaFoto = $settings['pembina_foto']['value'] ?? ''; ?>
-        <div class="sambutan-ring">
+        <div class="sambutan-photo-frame">
           <?php if ($pembinaFoto): ?>
-            <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($pembinaFoto) ?>" alt="Foto Pembina COM SMKN 2 Pinrang" loading="lazy">
+            <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($pembinaFoto) ?>"
+                 alt="Foto Pembina COM SMKN 2 Pinrang"
+                 loading="lazy">
           <?php else: ?>
-            <svg width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24" color="#0ea5e9">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
+            <div class="sambutan-photo-placeholder">
+              <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24" color="#0ea5e9">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
           <?php endif; ?>
         </div>
-        <div>
+        <!-- Identitas menempel di bawah foto -->
+        <div class="sambutan-identity">
           <div class="sambutan-name"><?= htmlspecialchars($settings['pembina_nama']['value'] ?? 'Nama Pembina') ?></div>
           <div class="sambutan-role"><?= htmlspecialchars($settings['pembina_jabatan']['value'] ?? 'Guru Pembina') ?></div>
           <?php if (!empty($settings['pembina_masa']['value'])): ?>
@@ -1136,8 +1222,12 @@ $tickerAll   = array_merge($tickerItems, $tickerItems);
         </div>
       </div>
 
-      <div>
-        <svg class="sambutan-quote-icon" width="36" height="36" viewBox="0 0 44 44" fill="none">
+      <!-- Kolom kanan: isi sambutan -->
+      <div class="sambutan-content-col">
+        <div class="sambutan-content-title">
+          Sambutan<br><span>Pembina</span>
+        </div>
+        <svg class="sambutan-quote-icon" width="40" height="40" viewBox="0 0 44 44" fill="none">
           <path d="M8 28c0-5.52 4.48-10 10-10V12C9.4 12 2 19.4 2 28v8h14V28H8zm22 0c0-5.52 4.48-10 10-10V12c-8.6 0-16 7.4-16 16v8h14V28h-8z" fill="rgba(14,165,233,0.15)"/>
         </svg>
         <div class="sambutan-content">
@@ -1151,6 +1241,7 @@ $tickerAll   = array_merge($tickerItems, $tickerItems);
           <span><?= htmlspecialchars($settings['pembina_nama']['value'] ?? 'Pembina') ?></span>
         </div>
       </div>
+
     </div>
   </div>
 </section>
