@@ -21,21 +21,60 @@ $og_url      = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https'
              . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 $og_sitename = $og_title;
 ?>
-<meta name="description"        content="<?= $og_description ?>">
+
+<!-- ══ SEO: PRIMARY META (PENTING untuk ranking Google) ══ -->
+<title>COM SMKN 2 Pinrang – Community Programmer SMK Negeri 2 Pinrang</title>
+<meta name="description" content="COM (Community Programmer) SMKN 2 Pinrang – Organisasi siswa bidang IT Software, IT Network, Multimedia, Desain Grafis, IoT, dan Robotik di SMK Negeri 2 Pinrang, Sulawesi Selatan. Daftar PAB sekarang!">
+<meta name="keywords" content="COM SMKN 2 Pinrang, Community Programmer SMKN 2 Pinrang, SMK Negeri 2 Pinrang, SMKN 2 Pinrang, SMK 2 Pinrang, organisasi programmer Pinrang, IT SMK Pinrang, komunitas coding Pinrang, PAB COM Pinrang">
+<meta name="author" content="COM SMKN 2 Pinrang">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="geo.region" content="ID-SN">
+<meta name="geo.placename" content="Pinrang, Sulawesi Selatan">
+<link rel="canonical" href="<?= htmlspecialchars($og_url) ?>">
+
+<!-- ══ SEO: OPEN GRAPH ══ -->
 <meta property="og:type"        content="website">
 <meta property="og:url"         content="<?= htmlspecialchars($og_url) ?>">
-<meta property="og:title"       content="<?= $og_title ?>">
+<meta property="og:title"       content="COM SMKN 2 Pinrang – Community Programmer">
 <meta property="og:description" content="<?= $og_description ?>">
 <meta property="og:image"       content="<?= htmlspecialchars($og_image) ?>">
 <meta property="og:image:width"  content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt"   content="<?= $og_title ?>">
-<meta property="og:site_name"   content="<?= $og_sitename ?>">
+<meta property="og:image:alt"   content="COM SMKN 2 Pinrang">
+<meta property="og:site_name"   content="COM SMKN 2 Pinrang">
 <meta property="og:locale"      content="id_ID">
+
+<!-- ══ SEO: TWITTER CARD ══ -->
 <meta name="twitter:card"        content="summary_large_image">
-<meta name="twitter:title"       content="<?= $og_title ?>">
+<meta name="twitter:title"       content="COM SMKN 2 Pinrang – Community Programmer">
 <meta name="twitter:description" content="<?= $og_description ?>">
 <meta name="twitter:image"       content="<?= htmlspecialchars($og_image) ?>">
+
+<!-- ══ SEO: STRUCTURED DATA (JSON-LD) ══ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "COM SMKN 2 Pinrang – Community Programmer",
+  "alternateName": ["COM SMKN 2 Pinrang", "Community Programmer SMKN 2 Pinrang", "COM SMK Negeri 2 Pinrang"],
+  "description": "Organisasi siswa bidang IT Software, IT Network, Multimedia, Desain Grafis, IoT, dan Robotik di SMK Negeri 2 Pinrang, Sulawesi Selatan.",
+  "url": "<?= htmlspecialchars($og_url) ?>",
+  "logo": "<?= htmlspecialchars($og_image) ?>",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Pinrang",
+    "addressRegion": "Sulawesi Selatan",
+    "addressCountry": "ID"
+  },
+  "parentOrganization": {
+    "@type": "EducationalOrganization",
+    "name": "SMK Negeri 2 Pinrang",
+    "alternateName": ["SMKN 2 Pinrang", "SMK 2 Pinrang"]
+  }
+}
+</script>
+
+<!-- ══ FAVICONS ══ -->
 <link rel="icon" type="image/x-icon"  href="<?= BASE_URL ?>/assets/img/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="<?= BASE_URL ?>/assets/img/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="<?= BASE_URL ?>/assets/img/favicon-16x16.png">
@@ -103,6 +142,62 @@ $og_sitename = $og_title;
   gap: 3rem;
   align-items: center;
 }
+
+/* ─── HERO BRAND IDENTITY (BARU) ────────────────────────────── */
+.hero-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 1.4rem;
+  opacity: 0;
+  transform: translateY(16px);
+}
+.hero-brand-logo {
+  width: 58px; height: 58px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 6px 24px rgba(14,165,233,.35);
+  position: relative;
+  overflow: hidden;
+}
+.hero-brand-logo::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.18) 0%, transparent 60%);
+}
+.hero-brand-logo img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+}
+.hero-brand-logo-fallback {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -.06em;
+  position: relative; z-index: 1;
+}
+.hero-brand-text {}
+.hero-brand-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+}
+.hero-brand-sub {
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  color: var(--c-sky);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
 .hero-badge {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 5px 14px;
@@ -113,6 +208,8 @@ $og_sitename = $og_title;
   font-size: .65rem; color: var(--c-sky);
   letter-spacing: .08em; text-transform: uppercase;
   margin-bottom: 1.2rem;
+  opacity: 0;
+  transform: translateY(16px);
 }
 .hero-badge-dot {
   width: 6px; height: 6px; border-radius: 50%;
@@ -151,6 +248,41 @@ $og_sitename = $og_title;
   line-height: 1.88; max-width: 480px;
   margin-bottom: 2rem;
 }
+
+/* ─── HERO SAMBUTAN BOX (BARU) ──────────────────────────────── */
+.hero-sambutan {
+  background: rgba(14,165,233,.06);
+  border: 1px solid rgba(14,165,233,.18);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.8rem;
+  position: relative;
+  opacity: 0;
+  transform: translateY(16px);
+}
+.hero-sambutan::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: linear-gradient(to bottom, var(--c-sky), var(--c-indigo));
+  border-radius: 2px 0 0 2px;
+}
+.hero-sambutan-label {
+  font-family: var(--font-mono);
+  font-size: .58rem;
+  color: var(--c-sky);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: .4rem;
+  display: flex; align-items: center; gap: 5px;
+}
+.hero-sambutan-text {
+  font-size: .83rem;
+  color: var(--c-muted2);
+  line-height: 1.72;
+  font-style: italic;
+}
+
 .hero-actions {
   display: flex; gap: 10px; flex-wrap: wrap;
   margin-bottom: 2rem;
@@ -234,6 +366,15 @@ $og_sitename = $og_title;
   display: flex; align-items: center; justify-content: center;
   color: var(--c-sky); flex-shrink: 0;
 }
+/* Logo di mosaic card ─ */
+.hm-logo-wrap {
+  width: 38px; height: 38px; border-radius: 9px;
+  overflow: hidden; flex-shrink: 0;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  display: flex; align-items: center; justify-content: center;
+}
+.hm-logo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.hm-logo-fallback { font-family: var(--font-display); font-size: .9rem; font-weight: 900; color: #fff; }
 .hm-num { font-family: var(--font-display); font-size: 1.8rem; font-weight: 900; color: var(--c-sky); line-height: 1; display: block; margin-bottom: 3px; }
 .hm-label { font-size: .66rem; color: var(--c-muted); text-transform: uppercase; letter-spacing: .08em; }
 .hm-title { font-family: var(--font-display); font-size: .92rem; font-weight: 800; color: #fff; margin-bottom: .25rem; }
@@ -743,6 +884,8 @@ $og_sitename = $og_title;
   .hero-desc       { margin-left: auto; margin-right: auto; }
   .hero-actions    { justify-content: center; }
   .hero-trust      { justify-content: center; }
+  .hero-brand      { justify-content: center; }
+  .hero-sambutan   { text-align: left; }
   .stats-inner     { grid-template-columns: repeat(2, 1fr); }
   .about-grid      { grid-template-columns: 1fr; gap: 1.8rem; }
   .features-grid   { grid-template-columns: 1fr; }
@@ -804,7 +947,27 @@ $og_sitename = $og_title;
 
   <div class="hero-inner">
     <div class="hero-left">
-      <div class="hero-badge" id="hero-badge" style="opacity:0;transform:translateY(16px)">
+
+      <!-- ① LOGO + NAMA COMMUNITY PROGRAMMER + COM SMKN 2 PINRANG -->
+      <div class="hero-brand" id="hero-brand">
+        <div class="hero-brand-logo">
+          <?php if ($sr('org_logo')): ?>
+            <img src="<?= UPLOAD_URL . '/' . $s('org_logo') ?>" alt="Logo COM SMKN 2 Pinrang">
+          <?php elseif ($sr('org_photo')): ?>
+            <img src="<?= UPLOAD_URL . '/' . $s('org_photo') ?>" alt="Logo COM SMKN 2 Pinrang">
+          <?php else: ?>
+            <span class="hero-brand-logo-fallback">COM</span>
+          <?php endif; ?>
+        </div>
+        <div class="hero-brand-text">
+          <!-- ② Nama Community Programmer -->
+          <div class="hero-brand-name">Community Programmer</div>
+          <!-- ③ COM SMKN 2 PINRANG -->
+          <div class="hero-brand-sub">COM · SMKN 2 Pinrang</div>
+        </div>
+      </div>
+
+      <div class="hero-badge" id="hero-badge">
         <span class="hero-badge-dot"></span>
         <?= $s('hero_badge_text', 'Organisasi Resmi · SMKN 2 Pinrang') ?>
       </div>
@@ -827,6 +990,20 @@ $og_sitename = $og_title;
       <?php if ($sr('org_description')): ?>
       <p class="hero-desc" id="hero-desc" style="opacity:0;transform:translateY(16px)"><?= $s('org_description') ?></p>
       <?php endif; ?>
+
+      <!-- ④ SAMBUTAN / SELAMAT DATANG -->
+      <div class="hero-sambutan" id="hero-sambutan">
+        <div class="hero-sambutan-label">
+          <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Selamat Datang
+        </div>
+        <div class="hero-sambutan-text">
+          <?= htmlspecialchars(
+            $settings['hero_sambutan']['value']
+            ?? 'Selamat datang di website resmi COM (Community Programmer) SMKN 2 Pinrang — wadah pengembangan siswa di bidang IT Software, IT Network, Multimedia, Desain Grafis, IoT, dan Robotik. Bersama kami, wujudkan potensi terbaikmu!'
+          ) ?>
+        </div>
+      </div>
 
       <div class="hero-actions" id="hero-actions" style="opacity:0;transform:translateY(16px)">
         <?php if (empty($_SESSION['user_id'])): ?>
@@ -867,12 +1044,20 @@ $og_sitename = $og_title;
           <span class="hm-num"><?= $s('stat_years', '5+') ?></span>
           <span class="hm-label">Tahun Berdiri</span>
         </div>
-        <!-- Row 2 wide -->
+        <!-- Row 2 wide – dengan logo -->
         <div class="hm-card hm-card--wide">
-          <div class="hm-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <?php if ($sr('org_logo') || $sr('org_photo')): ?>
+          <div class="hm-logo-wrap">
+            <img src="<?= UPLOAD_URL . '/' . $s($sr('org_logo') ? 'org_logo' : 'org_photo') ?>" alt="Logo COM">
+          </div>
+          <?php else: ?>
+          <div class="hm-logo-wrap">
+            <span class="hm-logo-fallback">COM</span>
+          </div>
+          <?php endif; ?>
           <div>
-            <div class="hm-title"><?= $s('org_name', defined('APP_NAME') ? APP_NAME : 'COM') ?></div>
-            <div class="hm-sub">Platform Digital Organisasi Siswa SMKN 2 Pinrang</div>
+            <div class="hm-title">Community Programmer</div>
+            <div class="hm-sub">COM · SMKN 2 Pinrang — Platform Digital Organisasi Siswa</div>
           </div>
         </div>
         <!-- Row 3 -->
@@ -898,7 +1083,7 @@ $og_sitename = $og_title;
 
 <!-- ══ TICKER ══ -->
 <?php
-$tickerRaw   = $sr('ticker_items', 'COM Academy|Penerimaan Anggota Baru|Tech Talk & Workshop|Creative Festival');
+$tickerRaw   = $sr('ticker_items', 'COM Academy|Penerimaan Anggota Baru|Tech Talk & Workshop|Creative Festival|COM SMKN 2 Pinrang|Community Programmer');
 $tickerItems = array_filter(array_map('trim', explode('|', $tickerRaw)));
 $tickerAll   = array_merge($tickerItems, $tickerItems);
 ?>
@@ -953,7 +1138,7 @@ $tickerAll   = array_merge($tickerItems, $tickerItems);
     <div class="about-grid">
       <div class="about-img-wrap" data-reveal data-delay="1">
         <?php if ($sr('org_photo')): ?>
-          <img src="<?= UPLOAD_URL . '/' . $s('org_photo') ?>" alt="Foto Organisasi" loading="lazy">
+          <img src="<?= UPLOAD_URL . '/' . $s('org_photo') ?>" alt="Foto Organisasi COM SMKN 2 Pinrang" loading="lazy">
         <?php else: ?>
           <div class="about-img-placeholder">
             <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" color="#0ea5e9"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -1006,7 +1191,7 @@ $tickerAll   = array_merge($tickerItems, $tickerItems);
         <?php $pembinaFoto = $settings['pembina_foto']['value'] ?? ''; ?>
         <div class="sambutan-ring">
           <?php if ($pembinaFoto): ?>
-            <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($pembinaFoto) ?>" alt="Foto Pembina" loading="lazy">
+            <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($pembinaFoto) ?>" alt="Foto Pembina COM SMKN 2 Pinrang" loading="lazy">
           <?php else: ?>
             <svg width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24" color="#0ea5e9">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -1223,7 +1408,7 @@ $featIcons = [
       ?>
       <div class="gallery-item">
         <?php if ($img): ?>
-          <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($img) ?>" alt="<?= $label ?>" loading="lazy">
+          <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($img) ?>" alt="<?= $label ?> - COM SMKN 2 Pinrang" loading="lazy">
         <?php else: ?>
           <div class="gallery-ph">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -1364,12 +1549,14 @@ $featIcons = [
 
   /* ── Hero entrance ── */
   var heroItems = [
-    { id: 'hero-badge',   delay: 80  },
-    { id: 'hero-title',   delay: 190 },
-    { id: 'hero-tagline', delay: 300 },
-    { id: 'hero-desc',    delay: 390 },
-    { id: 'hero-actions', delay: 480 },
-    { id: 'hero-trust',   delay: 570 },
+    { id: 'hero-brand',    delay: 60  },
+    { id: 'hero-badge',    delay: 160 },
+    { id: 'hero-title',    delay: 260 },
+    { id: 'hero-tagline',  delay: 350 },
+    { id: 'hero-desc',     delay: 420 },
+    { id: 'hero-sambutan', delay: 490 },
+    { id: 'hero-actions',  delay: 570 },
+    { id: 'hero-trust',    delay: 650 },
   ];
   heroItems.forEach(function (item) {
     var el = document.getElementById(item.id);
