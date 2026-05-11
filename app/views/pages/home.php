@@ -143,61 +143,6 @@ $og_sitename = $og_title;
   align-items: center;
 }
 
-/* ─── HERO BRAND IDENTITY (BARU) ────────────────────────────── */
-.hero-brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 1.4rem;
-  opacity: 0;
-  transform: translateY(16px);
-}
-.hero-brand-logo {
-  width: 58px; height: 58px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 6px 24px rgba(14,165,233,.35);
-  position: relative;
-  overflow: hidden;
-}
-.hero-brand-logo::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,.18) 0%, transparent 60%);
-}
-.hero-brand-logo img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  border-radius: 14px;
-}
-.hero-brand-logo-fallback {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -.06em;
-  position: relative; z-index: 1;
-}
-.hero-brand-text {}
-.hero-brand-name {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -.02em;
-  line-height: 1.1;
-}
-.hero-brand-sub {
-  font-family: var(--font-mono);
-  font-size: .62rem;
-  color: var(--c-sky);
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-
 .hero-badge {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 5px 14px;
@@ -249,7 +194,7 @@ $og_sitename = $og_title;
   margin-bottom: 2rem;
 }
 
-/* ─── HERO SAMBUTAN BOX (BARU) ──────────────────────────────── */
+/* ─── HERO SAMBUTAN BOX ──────────────────────────────────────── */
 .hero-sambutan {
   background: rgba(14,165,233,.06);
   border: 1px solid rgba(14,165,233,.18);
@@ -366,7 +311,7 @@ $og_sitename = $og_title;
   display: flex; align-items: center; justify-content: center;
   color: var(--c-sky); flex-shrink: 0;
 }
-/* Logo di mosaic card ─ */
+/* Logo di mosaic card */
 .hm-logo-wrap {
   width: 38px; height: 38px; border-radius: 9px;
   overflow: hidden; flex-shrink: 0;
@@ -884,7 +829,6 @@ $og_sitename = $og_title;
   .hero-desc       { margin-left: auto; margin-right: auto; }
   .hero-actions    { justify-content: center; }
   .hero-trust      { justify-content: center; }
-  .hero-brand      { justify-content: center; }
   .hero-sambutan   { text-align: left; }
   .stats-inner     { grid-template-columns: repeat(2, 1fr); }
   .about-grid      { grid-template-columns: 1fr; gap: 1.8rem; }
@@ -948,25 +892,6 @@ $og_sitename = $og_title;
   <div class="hero-inner">
     <div class="hero-left">
 
-      <!-- ① LOGO + NAMA COMMUNITY PROGRAMMER + COM SMKN 2 PINRANG -->
-      <div class="hero-brand" id="hero-brand">
-        <div class="hero-brand-logo">
-          <?php if ($sr('org_logo')): ?>
-            <img src="<?= UPLOAD_URL . '/' . $s('org_logo') ?>" alt="Logo COM SMKN 2 Pinrang">
-          <?php elseif ($sr('org_photo')): ?>
-            <img src="<?= UPLOAD_URL . '/' . $s('org_photo') ?>" alt="Logo COM SMKN 2 Pinrang">
-          <?php else: ?>
-            <span class="hero-brand-logo-fallback">COM</span>
-          <?php endif; ?>
-        </div>
-        <div class="hero-brand-text">
-          <!-- ② Nama Community Programmer -->
-          <div class="hero-brand-name">Community Programmer</div>
-          <!-- ③ COM SMKN 2 PINRANG -->
-          <div class="hero-brand-sub">COM · SMKN 2 Pinrang</div>
-        </div>
-      </div>
-
       <div class="hero-badge" id="hero-badge">
         <span class="hero-badge-dot"></span>
         <?= $s('hero_badge_text', 'Organisasi Resmi · SMKN 2 Pinrang') ?>
@@ -991,7 +916,7 @@ $og_sitename = $og_title;
       <p class="hero-desc" id="hero-desc" style="opacity:0;transform:translateY(16px)"><?= $s('org_description') ?></p>
       <?php endif; ?>
 
-      <!-- ④ SAMBUTAN / SELAMAT DATANG -->
+      <!-- SAMBUTAN / SELAMAT DATANG -->
       <div class="hero-sambutan" id="hero-sambutan">
         <div class="hero-sambutan-label">
           <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -1549,14 +1474,13 @@ $featIcons = [
 
   /* ── Hero entrance ── */
   var heroItems = [
-    { id: 'hero-brand',    delay: 60  },
-    { id: 'hero-badge',    delay: 160 },
-    { id: 'hero-title',    delay: 260 },
-    { id: 'hero-tagline',  delay: 350 },
-    { id: 'hero-desc',     delay: 420 },
-    { id: 'hero-sambutan', delay: 490 },
-    { id: 'hero-actions',  delay: 570 },
-    { id: 'hero-trust',    delay: 650 },
+    { id: 'hero-badge',    delay: 80  },
+    { id: 'hero-title',    delay: 180 },
+    { id: 'hero-tagline',  delay: 280 },
+    { id: 'hero-desc',     delay: 360 },
+    { id: 'hero-sambutan', delay: 440 },
+    { id: 'hero-actions',  delay: 530 },
+    { id: 'hero-trust',    delay: 610 },
   ];
   heroItems.forEach(function (item) {
     var el = document.getElementById(item.id);
