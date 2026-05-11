@@ -1,7 +1,7 @@
 <?php
 // config/app.php
 
-define('APP_NAME',    'SMKN 2 PINRANG');
+define('APP_NAME',    'COM SMKN 2 PINRANG');
 define('BASE_URL',    'https://comsmkn2pinrang.my.id'); // hapus trailing slash
 define('BASE_PATH',   dirname(__DIR__));
 define('UPLOAD_PATH', BASE_PATH . '/public/uploads/photos');
