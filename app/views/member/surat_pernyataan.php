@@ -74,6 +74,15 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 .sp-bar__label { font-size: 11.5px; color: var(--color-text-3); font-weight: 500; }
 .sp-scroll { overflow-x: auto; padding: 32px 24px; background: #7f8ea3; }
 
+/* Tambahan: pastikan surat-inner punya padding saat print (bukan di preview) */
+@media screen {
+  #surat-preview { padding: 32px 48px 52px 48px; }
+}
+@media print {
+  #surat-preview { padding: 0 !important; }
+  .surat-inner   { padding: 0 !important; }
+}
+
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* ═══════════════════════════════════════════════════════════
@@ -405,29 +414,44 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PRINT
+   PRINT  –  fixed blank-page bug
 ═══════════════════════════════════════════════════════════ */
 @media print {
-  @page { size: A4 portrait; margin: 18mm 20mm 22mm 25mm; }
-
-  body * { visibility: hidden; }
-  #surat-preview, #surat-preview * { visibility: visible; }
-  #surat-preview {
-    position: fixed; inset: 0;
-    box-shadow: none;
-    width: 100%;
-    padding: 0;
+  @page {
+    size: A4 portrait;
+    margin: 15mm 18mm 18mm 20mm;
   }
-  #surat-preview::before,
-  #surat-preview::after { display: none; }
-  .sp-shell, .sp-bar, .sp-scroll, .sp-header { display: none !important; }
 
-  .seksi-judul,
-  .jadwal-table th,
-  .kop-divider-thick,
-  .kop-divider-thin {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  /* 1. Sembunyikan UI shell saja — JANGAN sembunyikan body */
+  .sp-header { display: none !important; }
+  .sp-bar    { display: none !important; }
+
+  /* 2. Hilangkan chrome/background dari wrapper scroll */
+  .sp-page  { max-width: 100% !important; margin: 0 !important; }
+  .sp-shell { border: none !important; border-radius: 0 !important; box-shadow: none !important; }
+  .sp-scroll {
+    padding: 0 !important;
+    background: #fff !important;
+    overflow: visible !important;
+  }
+
+  /* 3. Reset surat preview agar mengalir normal */
+  #surat-preview {
+    width: 100% !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* 4. Hapus bingkai dekoratif (absolute positioning = masalah di print) */
+  #surat-preview::before,
+  #surat-preview::after { display: none !important; }
+
+  /* 5. Paksa warna latar ikut tercetak */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
 
@@ -724,23 +748,47 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 function downloadPDF() {
+  var el   = document.getElementById('surat-preview');
   var btn  = document.querySelector('.btn-primary');
   var orig = btn.innerHTML;
+
+  if (!el) { alert('Elemen surat tidak ditemukan.'); return; }
+
   btn.disabled = true;
   btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px;animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>&nbsp;Menyiapkan...';
 
+  /* Sembunyikan bingkai dekoratif sementara agar tidak muncul di PDF */
+  el.style.setProperty('--border-hide', 'none');
+
+  var opt = {
+    margin      : [10, 12, 10, 12],
+    filename    : '<?= addslashes($filenamePdf) ?>',
+    image       : { type: 'jpeg', quality: 0.97 },
+    html2canvas : {
+      scale           : 2,
+      useCORS         : true,
+      allowTaint      : true,
+      backgroundColor : '#ffffff',
+      logging         : false,
+      removeContainer : true
+    },
+    jsPDF       : { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak   : { mode: ['css', 'legacy'] }
+  };
+
   html2pdf()
-    .set({
-      margin     : [16, 16, 16, 16],
-      filename   : '<?= addslashes($filenamePdf) ?>',
-      image      : { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' },
-      jsPDF      : { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak  : { mode: ['avoid-all', 'css', 'legacy'] }
-    })
-    .from(document.getElementById('surat-preview'))
+    .set(opt)
+    .from(el)
     .save()
-    .then(function ()  { btn.disabled = false; btn.innerHTML = orig; })
-    .catch(function (e){ console.error(e); btn.disabled = false; btn.innerHTML = orig; });
+    .then(function () {
+      btn.disabled = false;
+      btn.innerHTML = orig;
+    })
+    .catch(function (e) {
+      console.error('PDF error:', e);
+      alert('Gagal membuat PDF. Gunakan tombol Cetak sebagai alternatif.');
+      btn.disabled = false;
+      btn.innerHTML = orig;
+    });
 }
 </script>
