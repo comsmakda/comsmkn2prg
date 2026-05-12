@@ -1,32 +1,25 @@
 Options -Indexes
-
 RewriteEngine On
 RewriteBase /
 
-# Allow favicon and static assets
+# Static files - langsung akses
 RewriteRule ^favicon\.ico$ - [L]
-RewriteRule ^favicon-.*\.png$ - [L]
-RewriteRule ^apple-touch-icon.*\.png$ - [L]
-
-# Allow sitemap and google verification files
 RewriteRule ^sitemap\.xml$ - [L]
 RewriteRule ^google.*\.html$ - [L]
+RewriteRule ^robots\.txt$ - [L]
 
-# Allow direct access to real files (assets, uploads)
+# Allow real files/dirs
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Route everything else through index.php
+# Route ke index.php
 RewriteRule ^(.*)$ index.php [QSA,L]
 
-# Security headers
 <IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
   Header set X-Frame-Options "SAMEORIGIN"
-  Header set X-XSS-Protection "1; mode=block"
 </IfModule>
 
-# Prevent access to sensitive directories
 <FilesMatch "\.(sql|md|env|log)$">
   Order Allow,Deny
   Deny from all
