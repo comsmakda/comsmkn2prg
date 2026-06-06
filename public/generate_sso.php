@@ -23,21 +23,36 @@ $expired = date('Y-m-d H:i:s', strtotime('+5 minutes'));
 $ip      = $_SERVER['REMOTE_ADDR'] ?? null;
 
 // Simpan ke tabel surat_auth_tokens (di database yang sama)
-// Sesuaikan dengan cara koneksi DB web utama Anda
 $pdo = new PDO(
     'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
     DB_USER, DB_PASS,
     [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
 );
 
-// Hags token lama milik user ini yang belum dipakai
+// Hapus token lama milik user ini yang belum dipakai
 $pdo->prepare("DELETE FROM surat_auth_tokens WHERE user_id = ? AND used = 0")->execute([$userId]);
 
 // Insert token baru
 $pdo->prepare("INSERT INTO surat_auth_tokens (user_id, token, ip_address, expired_at) VALUES (?,?,?,?)")
     ->execute([$userId, $token, $ip, $expired]);
 
-// Redirect ke surat-app dengan token
+// ============================================================
+// Sanitasi $destination — hanya izinkan path relatif
+// Mencegah: open redirect & bug URL double-domain
+// ============================================================
 $destination = $_GET['to'] ?? '/';
+
+// Buang semua karakter kecuali huruf, angka, /, -, _, .
+$destination = preg_replace('#[^a-zA-Z0-9/_\-.]#', '', $destination);
+
+// Pastikan selalu diawali / dan bukan // (protocol-relative URL)
+if (empty($destination) || $destination[0] !== '/') {
+    $destination = '/';
+}
+if (strpos($destination, '//') === 0) {
+    $destination = '/';
+}
+
+// Redirect ke surat-app dengan token
 header('Location: https://surat.comsmkn2pinrang.my.id' . $destination . '?sso_token=' . $token);
 exit;
