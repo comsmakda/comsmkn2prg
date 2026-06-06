@@ -823,12 +823,13 @@ svg    { display: block; }
               'icon'  => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2.5" width="12" height="12" rx="1.5"/><path d="M2 6.5h12M5.5 1v3.5M10.5 1v3.5"/><path d="M5 9.5h1M7.5 9.5h1M10 9.5h1M5 12h1M7.5 12h1"/></svg>',
             ],
             [
-              'href'    => '/generate_sso.php',
-              'query'   => '?to=/',
-              'label'   => 'Surat Digital',
-              'icon'    => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v3h3"/><path d="M5 7h6M5 9.5h6M5 12h4"/></svg>',
-              'badge'   => 'SSO',
-              'external'=> true,
+              // ✅ FIX: href berisi path relatif saja — BASE_URL TIDAK dipakai untuk external
+              // generate_sso.php ada di root web utama, dipanggil via path absolut
+              'href'     => BASE_URL . '/generate_sso.php',
+              'label'    => 'Surat Digital',
+              'icon'     => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v3h3"/><path d="M5 7h6M5 9.5h6M5 12h4"/></svg>',
+              'badge'    => 'SSO',
+              'external' => true,
             ],
           ],
           'Sistem' => [
@@ -851,9 +852,13 @@ svg    { display: block; }
           <span class="nav-group__label"><?= htmlspecialchars($group) ?></span>
           <?php foreach ($items as $item):
             $isExternal = !empty($item['external']);
-            $fullHref   = $isExternal
-              ? htmlspecialchars($item['href'] . ($item['query'] ?? ''))
+
+            // ✅ FIX: Untuk external, href sudah lengkap (sudah ada BASE_URL di definisi array).
+            //         Untuk internal, tambahkan BASE_URL di depan path relatif.
+            $fullHref = $isExternal
+              ? htmlspecialchars($item['href'])
               : BASE_URL . htmlspecialchars($item['href']);
+
             $active = !$isExternal && str_starts_with($current, $item['href']);
             $cls    = $active ? ' is-active' : '';
             $aria   = $active ? ' aria-current="page"' : '';
