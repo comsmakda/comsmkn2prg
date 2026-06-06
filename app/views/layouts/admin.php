@@ -47,27 +47,27 @@
   --tx-hint:      #1c2a3a;
 
   /* Accent — electric blue */
-  --ac:       #63a1ff;
+  --ac:        #63a1ff;
   --ac-bright: #85b8ff;
-  --ac-dim:   rgba(99,161,255,0.09);
-  --ac-glow:  rgba(99,161,255,0.15);
+  --ac-dim:    rgba(99,161,255,0.09);
+  --ac-glow:   rgba(99,161,255,0.15);
 
   /* Semantic */
-  --ok:    #34d399;
+  --ok:     #34d399;
   --ok-dim: rgba(52,211,153,0.08);
-  --ok-bd: rgba(52,211,153,0.22);
+  --ok-bd:  rgba(52,211,153,0.22);
 
-  --er:    #f87171;
+  --er:     #f87171;
   --er-dim: rgba(248,113,113,0.08);
-  --er-bd: rgba(248,113,113,0.22);
+  --er-bd:  rgba(248,113,113,0.22);
 
-  --wa:    #fbbf24;
+  --wa:     #fbbf24;
   --wa-dim: rgba(251,191,36,0.08);
-  --wa-bd: rgba(251,191,36,0.22);
+  --wa-bd:  rgba(251,191,36,0.22);
 
-  --in:    #60a5fa;
+  --in:     #60a5fa;
   --in-dim: rgba(96,165,250,0.08);
-  --in-bd: rgba(96,165,250,0.22);
+  --in-bd:  rgba(96,165,250,0.22);
 
   /* Radius */
   --r-xs: 4px;
@@ -228,7 +228,6 @@ svg    { display: block; }
   overflow:        hidden;
 }
 
-/* If logo image is present, show it; fallback to SVG icon */
 .sidebar__logo {
   width:      100%;
   height:     100%;
@@ -337,8 +336,8 @@ svg    { display: block; }
 }
 
 .nav-item__icon {
-  width:      16px;
-  height:     16px;
+  width:       16px;
+  height:      16px;
   flex-shrink: 0;
   color:       var(--tx-muted);
   transition:  color var(--t-fast) var(--ease);
@@ -347,6 +346,22 @@ svg    { display: block; }
 .nav-item.is-active .nav-item__icon { color: var(--ac); }
 
 .nav-item__label { flex: 1; line-height: 1.2; }
+
+/* ── Nav item badge (e.g. "SSO") ── */
+.nav-item__badge {
+  font-family:    var(--font-mono);
+  font-size:      8.5px;
+  font-weight:    500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color:          var(--wa);
+  background:     var(--wa-dim);
+  border:         1px solid var(--wa-bd);
+  border-radius:  var(--r-xs);
+  padding:        1px 6px;
+  flex-shrink:    0;
+  line-height:    1.5;
+}
 
 /* ── Footer ── */
 .sidebar__footer {
@@ -543,10 +558,10 @@ svg    { display: block; }
 
 /* ── Search ── */
 .topbar__search {
-  flex:      1;
-  max-width: 300px;
+  flex:        1;
+  max-width:   300px;
   margin-left: auto;
-  position:  relative;
+  position:    relative;
 }
 .topbar__search input {
   width:         100%;
@@ -807,6 +822,14 @@ svg    { display: block; }
               'label' => 'Absensi',
               'icon'  => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2.5" width="12" height="12" rx="1.5"/><path d="M2 6.5h12M5.5 1v3.5M10.5 1v3.5"/><path d="M5 9.5h1M7.5 9.5h1M10 9.5h1M5 12h1M7.5 12h1"/></svg>',
             ],
+            [
+              'href'    => '/generate_sso.php',
+              'query'   => '?to=/',
+              'label'   => 'Surat Digital',
+              'icon'    => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v3h3"/><path d="M5 7h6M5 9.5h6M5 12h4"/></svg>',
+              'badge'   => 'SSO',
+              'external'=> true,
+            ],
           ],
           'Sistem' => [
             [
@@ -827,16 +850,24 @@ svg    { display: block; }
         <div class="nav-section">
           <span class="nav-group__label"><?= htmlspecialchars($group) ?></span>
           <?php foreach ($items as $item):
-            $active = str_starts_with($current, $item['href']);
+            $isExternal = !empty($item['external']);
+            $fullHref   = $isExternal
+              ? htmlspecialchars($item['href'] . ($item['query'] ?? ''))
+              : BASE_URL . htmlspecialchars($item['href']);
+            $active = !$isExternal && str_starts_with($current, $item['href']);
             $cls    = $active ? ' is-active' : '';
             $aria   = $active ? ' aria-current="page"' : '';
+            $target = $isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
           ?>
           <a
-            href="<?= BASE_URL . htmlspecialchars($item['href']) ?>"
-            class="nav-item<?= $cls ?>"<?= $aria ?>
+            href="<?= $fullHref ?>"
+            class="nav-item<?= $cls ?>"<?= $aria ?><?= $target ?>
           >
             <span class="nav-item__icon" aria-hidden="true"><?= $item['icon'] ?></span>
             <span class="nav-item__label"><?= htmlspecialchars($item['label']) ?></span>
+            <?php if (!empty($item['badge'])): ?>
+              <span class="nav-item__badge"><?= htmlspecialchars($item['badge']) ?></span>
+            <?php endif; ?>
           </a>
           <?php endforeach; ?>
         </div>
@@ -1002,7 +1033,8 @@ svg    { display: block; }
     sidebar.classList.contains('is-open') ? closeSidebar() : openSidebar();
   };
 
-  sidebar.querySelectorAll('.nav-item').forEach(function (el) {
+  /* Close sidebar on nav click (mobile only, skip external links) */
+  sidebar.querySelectorAll('.nav-item:not([target="_blank"])').forEach(function (el) {
     el.addEventListener('click', function () {
       if (window.innerWidth < 768) closeSidebar();
     });

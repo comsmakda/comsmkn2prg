@@ -5,7 +5,7 @@
 // ============================================================
 
 // Sesuaikan path config web utama Anda
-require_once __DIR__ . '/config/config.php'; // config web utama (yang sudah ada)
+require_once __DIR__ . '/config/database.php'; // config web utama (yang sudah ada)
 // Pastikan DB_* constants ada, atau gunakan koneksi existing Anda
 
 // Pastikan user sudah login di web utama

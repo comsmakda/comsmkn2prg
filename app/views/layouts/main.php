@@ -429,7 +429,7 @@
   <a href="<?= BASE_URL ?>/#programs" class="mob-link">Program <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
   <a href="<?= BASE_URL ?>/#gallery"  class="mob-link">Galeri <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
   <a href="<?= BASE_URL ?>/#contact"  class="mob-link">Kontak <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
-  <a href="/generate_sso.php?to=/">🗂 Surat Digital</a>
+ 
   <div class="mob-sep"></div>
   <div class="mob-actions">
     <?php if (empty($_SESSION['user_id'])): ?>
