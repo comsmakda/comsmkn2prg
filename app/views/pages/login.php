@@ -499,6 +499,7 @@
           <form method="POST" action="<?= BASE_URL ?>/login" id="form-member" novalidate autocomplete="on" style="display:block">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
             <input type="hidden" name="login_type" value="member">
+            <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($redirectTo ?? '') ?>">
             <div id="panel-member" class="panel active" role="tabpanel" aria-labelledby="tab-member">
               <div class="field-group">
                 <label class="field-label" for="nia">Nomor Induk Anggota (NIA)</label>
@@ -534,6 +535,7 @@
           <form method="POST" action="<?= BASE_URL ?>/login" id="form-admin" novalidate autocomplete="on" style="display:none">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
             <input type="hidden" name="login_type" value="admin">
+            <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($redirectTo ?? '') ?>">
             <div id="panel-admin" class="panel active" role="tabpanel" aria-labelledby="tab-admin">
               <div class="field-group">
                 <label class="field-label" for="email">Alamat Email</label>
