@@ -5,7 +5,7 @@
 // ============================================================
 
 // Sesuaikan path config web utama Anda
-require_once __DIR__ . '/config/database.php'; // config web utama (yang sudah ada)
+require_once __DIR__ . '/../config/database.php'; // config web utama (yang sudah ada)
 // Pastikan DB_* constants ada, atau gunakan koneksi existing Anda
 
 // Pastikan user sudah login di web utama
@@ -30,7 +30,7 @@ $pdo = new PDO(
     [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
 );
 
-// Hapus token lama milik user ini yang belum dipakai
+// Hags token lama milik user ini yang belum dipakai
 $pdo->prepare("DELETE FROM surat_auth_tokens WHERE user_id = ? AND used = 0")->execute([$userId]);
 
 // Insert token baru
