@@ -34,6 +34,16 @@ $router->get('/logout',         [AuthController::class, 'logout']);
 $router->get('/pab',            [PabController::class, 'index']);
 $router->post('/pab/register',  [PabController::class, 'register']);
 
+// ── Public: Berita ────────────────────────────────────────────
+$router->get('/berita',                         [BeritaController::class, 'index']);
+$router->get('/berita/:slug',                   [BeritaController::class, 'show']);
+$router->post('/berita/:slug/komentar',         [BeritaController::class, 'postKomentar']);
+$router->post('/berita/:id/like',               [BeritaController::class, 'like']);
+
+// ── Public: Galeri ────────────────────────────────────────────
+$router->get('/galeri',                         [GaleriController::class, 'index']);
+$router->get('/galeri/:slug',                   [GaleriController::class, 'show']);
+
 // ── Admin routes ─────────────────────────────────────────────
 $router->get('/admin/dashboard',                        [AdminController::class, 'dashboard']);
 
@@ -73,6 +83,29 @@ $router->post('/admin/riwayat/store',               [AdminController::class, 'ri
 $router->get('/admin/riwayat/:id/edit',             [AdminController::class, 'riwayatEdit']);
 $router->post('/admin/riwayat/:id/update',          [AdminController::class, 'riwayatUpdate']);
 $router->post('/admin/riwayat/:id/delete',          [AdminController::class, 'riwayatDelete']);
+
+// Berita
+$router->get('/admin/berita',                           [AdminController::class, 'berita']);
+$router->get('/admin/berita/create',                    [AdminController::class, 'beritaCreate']);
+$router->post('/admin/berita/store',                    [AdminController::class, 'beritaStore']);
+$router->get('/admin/berita/komentar',                  [AdminController::class, 'beritaKomentar']);
+$router->post('/admin/berita/komentar/:id/approve',     [AdminController::class, 'beritaKomentarApprove']);
+$router->post('/admin/berita/komentar/:id/reject',      [AdminController::class, 'beritaKomentarReject']);
+$router->post('/admin/berita/komentar/:id/delete',      [AdminController::class, 'beritaKomentarDelete']);
+$router->get('/admin/berita/:id/edit',                  [AdminController::class, 'beritaEdit']);
+$router->post('/admin/berita/:id/update',               [AdminController::class, 'beritaUpdate']);
+$router->post('/admin/berita/:id/delete',               [AdminController::class, 'beritaDelete']);
+
+// Galeri
+$router->get('/admin/galeri',                           [AdminController::class, 'galeri']);
+$router->get('/admin/galeri/create',                    [AdminController::class, 'galeriCreate']);
+$router->post('/admin/galeri/store',                    [AdminController::class, 'galeriStore']);
+$router->post('/admin/galeri/foto/:id/delete',  [AdminController::class, 'galeriDeleteFoto']);
+$router->get('/admin/galeri/:id/edit',                  [AdminController::class, 'galeriEdit']);
+$router->post('/admin/galeri/:id/update',               [AdminController::class, 'galeriUpdate']);
+$router->post('/admin/galeri/:id/delete',               [AdminController::class, 'galeriDelete']);
+$router->get('/admin/galeri/:id/foto',                  [AdminController::class, 'galeriFoto']);
+$router->post('/admin/galeri/:id/upload',        [AdminController::class, 'galeriUploadFoto']);
 
 // ── Member routes ─────────────────────────────────────────────
 $router->get('/member/dashboard',                       [MemberController::class, 'dashboard']);

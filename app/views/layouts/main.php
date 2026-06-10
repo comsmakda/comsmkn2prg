@@ -105,9 +105,9 @@
     .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
     .nav-brand-logo {
       width: 34px; height: 34px; object-fit: contain; display: block; flex-shrink: 0;
-      transition: opacity .2s;
+      transition: opacity .2s, transform .3s cubic-bezier(.22,1,.36,1);
     }
-    .nav-brand:hover .nav-brand-logo { opacity: .85; }
+    .nav-brand:hover .nav-brand-logo { opacity: .85; transform: rotate(-5deg) scale(1.05); }
     .nav-brand-name {
       font-family: var(--font-display); font-weight: 800; font-size: .95rem;
       color: #fff; letter-spacing: -.025em; line-height: 1; display: block;
@@ -133,6 +133,153 @@
       content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
       width: 14px; height: 2px; border-radius: 2px; background: var(--c-sky);
     }
+
+    /* ─── DROPDOWN (hover-based) ─── */
+    .nav-dd {
+      position: relative;
+    }
+
+    /* Bridge area so mouse can move from toggle to menu without flickering */
+    .nav-dd::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      height: 12px;
+      background: transparent;
+    }
+
+    .nav-dd-toggle {
+      display: flex; align-items: center; gap: 4px;
+      font-size: .78rem; font-weight: 500; color: var(--c-muted2);
+      background: none; border: none; cursor: pointer;
+      padding: 6px 12px; border-radius: 7px;
+      transition: color .18s, background .18s;
+      font-family: var(--font-body);
+      letter-spacing: -.01em;
+      user-select: none;
+    }
+    .nav-dd-toggle:hover,
+    .nav-dd:hover .nav-dd-toggle { color: #fff; background: rgba(255,255,255,.04); }
+
+    .nav-dd-toggle .dd-chevron {
+      transition: transform .25s cubic-bezier(.22,1,.36,1);
+      flex-shrink: 0;
+    }
+    .nav-dd:hover .nav-dd-toggle .dd-chevron { transform: rotate(180deg); }
+
+    /* The menu — hidden by default, shown on hover via CSS */
+    .nav-dd-menu {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px) scale(.97);
+      min-width: 220px;
+      background: rgba(6,11,20,.97);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--c-border);
+      border-top: 1px solid rgba(14,165,233,.18);
+      border-radius: 12px;
+      padding: .5rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03) inset;
+      z-index: 300;
+      transition:
+        opacity .22s cubic-bezier(.22,1,.36,1),
+        transform .22s cubic-bezier(.22,1,.36,1),
+        visibility .22s;
+    }
+
+    /* Show on hover — both toggle hover AND menu hover */
+    .nav-dd:hover .nav-dd-menu {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    /* Decorative top glow line */
+    .nav-dd-menu::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: 20px; right: 20px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(14,165,233,.5), transparent);
+      border-radius: 1px;
+    }
+
+    .dd-header {
+      padding: 6px 12px 4px;
+      font-family: var(--font-mono);
+      font-size: .55rem;
+      color: var(--c-muted);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+
+    .dd-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 8px;
+      font-size: .8rem; font-weight: 500; color: var(--c-muted2);
+      text-decoration: none;
+      transition: color .15s, background .15s, transform .18s;
+      position: relative;
+      overflow: hidden;
+    }
+    .dd-item::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(14,165,233,.06), transparent);
+      opacity: 0;
+      transition: opacity .18s;
+      border-radius: 8px;
+    }
+    .dd-item:hover { color: #fff; background: rgba(255,255,255,.05); transform: translateX(2px); }
+    .dd-item:hover::before { opacity: 1; }
+
+    .dd-item-icon {
+      width: 30px; height: 30px; flex-shrink: 0;
+      background: rgba(14,165,233,.08);
+      border: 1px solid rgba(14,165,233,.14);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content:center;
+      color: var(--c-sky);
+      transition: background .18s, border-color .18s, transform .18s;
+    }
+    .dd-item:hover .dd-item-icon {
+      background: rgba(14,165,233,.15);
+      border-color: rgba(14,165,233,.3);
+      transform: scale(1.08);
+    }
+
+    .dd-item-text { display: flex; flex-direction: column; gap: 1px; }
+    .dd-item-label { font-size: .79rem; font-weight: 600; color: inherit; line-height: 1; }
+    .dd-item-desc  { font-size: .67rem; color: var(--c-muted); line-height: 1; }
+    .dd-item:hover .dd-item-desc { color: var(--c-muted2); }
+
+    .dd-sep { height: 1px; background: var(--c-border); margin: .35rem .5rem; }
+
+    .dd-footer {
+      padding: 6px 10px 2px;
+      display: flex; align-items: center; gap: 5px;
+      font-family: var(--font-mono); font-size: .58rem; color: var(--c-muted);
+    }
+    .dd-footer-dot { width: 5px; height: 5px; border-radius: 50%; background: #22c55e; animation: fp 2.4s ease-in-out infinite; }
+
+    /* Mobile sub-menu */
+    .mob-sub { padding-left: 1rem; display: none; }
+    .mob-sub.open { display: block; }
+    .mob-sub-item {
+      display: flex; align-items: center; gap: 7px;
+      font-size: .84rem; color: var(--c-muted2);
+      text-decoration: none; padding: .55rem .75rem; border-radius: 7px;
+      transition: color .15s, background .15s;
+    }
+    .mob-sub-item:hover { color: #fff; background: rgba(255,255,255,.04); }
 
     .nav-actions { display: flex; align-items: center; gap: 7px; }
     .nav-btn-ghost {
@@ -230,7 +377,6 @@
 
     .footer-inner { max-width:1240px; margin:0 auto; padding:0 1.5rem 2.5rem; position:relative; z-index:1; }
 
-    /* grid */
     .f-grid {
       display:grid; grid-template-columns:2.1fr 1fr 1fr 1.1fr;
       gap:3rem; padding:3.5rem 0 3rem; border-bottom:1px solid var(--c-border);
@@ -238,7 +384,6 @@
     @media(max-width:900px) { .f-grid { grid-template-columns:1fr 1fr; gap:2.5rem; } }
     @media(max-width:520px) { .f-grid { grid-template-columns:1fr; gap:2rem; } }
 
-    /* brand */
     .fb-row { display:flex; align-items:center; gap:9px; text-decoration:none; margin-bottom:.9rem; width:fit-content; }
     .fb-logo { width:36px; height:36px; object-fit:contain; display:block; flex-shrink:0; transition:opacity .18s; }
     .fb-row:hover .fb-logo { opacity:.85; }
@@ -271,7 +416,6 @@
     }
     .fb-nl-btn:hover { background: var(--c-sky-light); transform:translateY(-1px); }
 
-    /* col head */
     .fc-head { display:flex; align-items:center; gap:8px; margin-bottom:1rem; }
     .fc-head h4 { font-family:var(--font-mono); font-size:.62rem; font-weight:500; text-transform:uppercase; letter-spacing:.13em; color: var(--c-sky); white-space:nowrap; }
     .fc-line { flex:1; height:1px; background:linear-gradient(90deg,rgba(14,165,233,.22),transparent); }
@@ -286,7 +430,6 @@
     .fc-ul li a:hover { color: var(--c-text); gap:9px; }
     .fc-ul li a:hover::before { width:8px; background: var(--c-sky); }
 
-    /* contact */
     .fc-contacts { display:flex; flex-direction:column; gap:2px; }
     .fc-ci {
       display:flex; align-items:flex-start; gap:9px; padding:8px 9px; border-radius:8px;
@@ -303,7 +446,6 @@
     .fc-ci-val a { color: var(--c-muted2); text-decoration:none; transition:color .18s; }
     .fc-ci-val a:hover { color: var(--c-sky); }
 
-    /* bottom */
     .f-bottom { padding-top:1.75rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
     .f-copy { font-size:.74rem; color: var(--c-muted); }
     .f-bottom-r { display:flex; align-items:center; gap:12px; }
@@ -321,7 +463,6 @@
     @keyframes fp { 0%,100%{opacity:1} 50%{opacity:.3} }
     #footer-clock { color: var(--c-sky); }
 
-    /* back top */
     #back-top {
       position:fixed; right:1.5rem; bottom:2rem; z-index:150;
       width:40px; height:40px; background: var(--c-surface2); border:1px solid var(--c-border2);
@@ -333,7 +474,6 @@
     #back-top.show { opacity:1; transform:translateY(0) scale(1); }
     #back-top:hover { background: var(--c-sky); color:#fff; transform:translateY(-3px) scale(1.04); box-shadow:0 10px 24px rgba(14,165,233,.3); }
 
-    /* reveal */
     [data-reveal] { opacity:0; transform:translateY(16px); transition: opacity .5s ease, transform .5s ease; }
     [data-reveal]._vis { opacity:1; transform:translateY(0); }
   </style>
@@ -390,8 +530,42 @@
       <a href="<?= BASE_URL ?>/#about"    class="nav-link">Tentang</a>
       <a href="<?= BASE_URL ?>/#features" class="nav-link">Layanan</a>
       <a href="<?= BASE_URL ?>/#programs" class="nav-link">Program</a>
-      <a href="<?= BASE_URL ?>/#gallery"  class="nav-link">Galeri</a>
-      <a href="<?= BASE_URL ?>/#contact"  class="nav-link">Kontak</a>
+
+      <!-- Dropdown: Konten — hover only, no JS click needed -->
+      <div class="nav-dd" id="dd-konten">
+        <button class="nav-dd-toggle" type="button" aria-haspopup="true" aria-expanded="false">
+          Konten
+          <svg class="dd-chevron" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-dd-menu" role="menu">
+          <div class="dd-header">Konten &amp; Media</div>
+          <a href="<?= BASE_URL ?>/berita" class="dd-item" role="menuitem">
+            <div class="dd-item-icon">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="dd-item-text">
+              <span class="dd-item-label">Berita &amp; Artikel</span>
+              <span class="dd-item-desc">Info &amp; pengumuman terbaru</span>
+            </div>
+          </a>
+          <div class="dd-sep"></div>
+          <a href="<?= BASE_URL ?>/galeri" class="dd-item" role="menuitem">
+            <div class="dd-item-icon">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="dd-item-text">
+              <span class="dd-item-label">Galeri Foto</span>
+              <span class="dd-item-desc">Dokumentasi kegiatan COM</span>
+            </div>
+          </a>
+          <div class="dd-footer">
+            <span class="dd-footer-dot"></span>
+            Diperbarui secara berkala
+          </div>
+        </div>
+      </div>
+
+      <a href="<?= BASE_URL ?>/#contact" class="nav-link">Kontak</a>
     </div>
 
     <div class="nav-actions">
@@ -418,7 +592,7 @@
   </div>
 </nav>
 
-<!-- Mobile drawer -->
+<!-- ══ MOBILE DRAWER ══ -->
 <div class="mobile-drawer" id="mobile-drawer">
   <a href="<?= BASE_URL ?>/" class="mob-link">
     Home
@@ -427,9 +601,28 @@
   <a href="<?= BASE_URL ?>/#about"    class="mob-link">Tentang Kami <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
   <a href="<?= BASE_URL ?>/#features" class="mob-link">Layanan <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
   <a href="<?= BASE_URL ?>/#programs" class="mob-link">Program <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
-  <a href="<?= BASE_URL ?>/#gallery"  class="mob-link">Galeri <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
-  <a href="<?= BASE_URL ?>/#contact"  class="mob-link">Kontak <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
- 
+
+  <!-- Konten sub-menu mobile -->
+  <div>
+    <button onclick="this.nextElementSibling.classList.toggle('open')"
+            style="width:100%;display:flex;align-items:center;justify-content:space-between;font-size:.88rem;font-weight:600;color:var(--c-muted2);background:none;border:none;cursor:pointer;padding:.68rem .75rem;border-radius:8px;font-family:var(--font-body)">
+      Konten
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="mob-sub">
+      <a href="<?= BASE_URL ?>/berita" class="mob-sub-item">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Berita &amp; Artikel
+      </a>
+      <a href="<?= BASE_URL ?>/galeri" class="mob-sub-item">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Galeri Foto
+      </a>
+    </div>
+  </div>
+
+  <a href="<?= BASE_URL ?>/#contact" class="mob-link">Kontak <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
+
   <div class="mob-sep"></div>
   <div class="mob-actions">
     <?php if (empty($_SESSION['user_id'])): ?>
@@ -456,8 +649,6 @@
 <!-- ══ FOOTER ══ -->
 <footer class="site-footer">
   <div class="footer-inner">
-
-    <!-- Grid -->
     <div class="f-grid">
 
       <!-- Brand -->
@@ -511,7 +702,8 @@
           <li><a href="<?= BASE_URL ?>/#about">Tentang Kami</a></li>
           <li><a href="<?= BASE_URL ?>/#features">Platform Digital</a></li>
           <li><a href="<?= BASE_URL ?>/#programs">Program Kegiatan</a></li>
-          <li><a href="<?= BASE_URL ?>/#gallery">Galeri</a></li>
+          <li><a href="<?= BASE_URL ?>/berita">Berita &amp; Artikel</a></li>
+          <li><a href="<?= BASE_URL ?>/galeri">Galeri Foto</a></li>
           <li><a href="<?= BASE_URL ?>/#contact">Hubungi Kami</a></li>
         </ul>
       </div>
@@ -574,7 +766,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </footer>
 
@@ -584,6 +775,7 @@
 
 <script>
 (function(){
+  /* ── Clock ── */
   function tick(){
     const d=new Date(), u=new Date(d.getTime()+7*3600000);
     const t=[u.getUTCHours(),u.getUTCMinutes(),u.getUTCSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
@@ -591,6 +783,7 @@
   }
   tick(); setInterval(tick,1000);
 
+  /* ── Scroll: hide/show nav ── */
   const nav=document.getElementById('nav'); let ly=0;
   window.addEventListener('scroll',()=>{
     const y=window.scrollY;
@@ -599,6 +792,7 @@
     ly=y;
   },{passive:true});
 
+  /* ── Mobile drawer ── */
   const btn=document.getElementById('hamburger'),drw=document.getElementById('mobile-drawer');
   btn.addEventListener('click',()=>{
     btn.classList.toggle('open'); drw.classList.toggle('open');
@@ -609,10 +803,19 @@
     document.body.style.overflow='';
   }));
 
+  /* ── Back to top ── */
   const bt=document.getElementById('back-top');
   window.addEventListener('scroll',()=>bt.classList.toggle('show',window.scrollY>500),{passive:true});
   bt.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 
+  /* ── Dropdown: update aria-expanded on hover for accessibility ── */
+  document.querySelectorAll('.nav-dd').forEach(dd => {
+    const toggle = dd.querySelector('.nav-dd-toggle');
+    dd.addEventListener('mouseenter', () => toggle && toggle.setAttribute('aria-expanded','true'));
+    dd.addEventListener('mouseleave', () => toggle && toggle.setAttribute('aria-expanded','false'));
+  });
+
+  /* ── Active nav link ── */
   const path = window.location.pathname.replace(/\/+$/,'');
   const base = '<?= rtrim(BASE_URL, '/') ?>';
   const isHome = (path === base || path === base + '/');
@@ -633,11 +836,13 @@
     },{threshold:0.35}).observe(s);
   });
 
+  /* ── Reveal on scroll ── */
   const rv=new IntersectionObserver(entries=>{
     entries.forEach((e,i)=>{ if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('_vis'),i*65); rv.unobserve(e.target); } });
   },{threshold:0.1});
   document.querySelectorAll('[data-reveal]').forEach(el=>rv.observe(el));
 
+  /* ── Newsletter ── */
   const nb=document.getElementById('nl-btn'),ni=document.getElementById('nl-inp');
   if(nb&&ni) nb.addEventListener('click',()=>{
     if(!ni.value.trim()) return;

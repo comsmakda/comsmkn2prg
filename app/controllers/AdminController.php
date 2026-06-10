@@ -1,8 +1,14 @@
 <?php
 // app/controllers/AdminController.php
 
+require_once APP_PATH . '/models/BeritaModel.php';
+require_once APP_PATH . '/models/GaleriModel.php';
+
 class AdminController extends Controller
 {
+    // ================================================================
+    //  DASHBOARD
+    // ================================================================
     public function dashboard(): void
     {
         $this->requireAdmin();
@@ -12,11 +18,17 @@ class AdminController extends Controller
             'pending_pab'    => (int)$db->query("SELECT COUNT(*) FROM pab_registrations WHERE status='pending'")->fetchColumn(),
             'pending_manual' => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='pending'")->fetchColumn(),
             'total_sesi'     => (int)$db->query("SELECT COUNT(*) FROM attendance_sessions")->fetchColumn(),
+            'total_berita'   => (int)$db->query("SELECT COUNT(*) FROM berita WHERE status='published'")->fetchColumn(),
+            'pending_komentar' => (int)$db->query("SELECT COUNT(*) FROM berita_komentar WHERE status='pending'")->fetchColumn(),
+            'total_album'    => (int)$db->query("SELECT COUNT(*) FROM galeri_album WHERE status='published'")->fetchColumn(),
         ];
         $flash = $this->getFlash();
         $this->view('admin/dashboard', compact('stats', 'flash'), 'admin');
     }
 
+    // ================================================================
+    //  ANGGOTA
+    // ================================================================
     public function anggota(): void
     {
         $this->requireAdmin();
@@ -49,9 +61,9 @@ class AdminController extends Controller
         $langsung = isset($_POST['aktivasi_langsung']);
 
         $errors = [];
-        if (strlen($nama) < 3)    $errors[] = 'Nama minimal 3 karakter.';
-        if (empty($kelas))         $errors[] = 'Kelas wajib diisi.';
-        if (strlen($password) < 6) $errors[] = 'Password minimal 6 karakter.';
+        if (strlen($nama) < 3)     $errors[] = 'Nama minimal 3 karakter.';
+        if (empty($kelas))          $errors[] = 'Kelas wajib diisi.';
+        if (strlen($password) < 6)  $errors[] = 'Password minimal 6 karakter.';
 
         if ($errors) {
             $this->flash('error', implode('<br>', $errors));
@@ -159,6 +171,9 @@ class AdminController extends Controller
         $this->redirect('/admin/anggota');
     }
 
+    // ================================================================
+    //  PAB
+    // ================================================================
     public function pab(): void
     {
         $this->requireAdmin();
@@ -203,6 +218,9 @@ class AdminController extends Controller
         $this->redirect('/admin/pab');
     }
 
+    // ================================================================
+    //  SETTINGS
+    // ================================================================
     public function settings(): void
     {
         $this->requireAdmin();
@@ -255,7 +273,6 @@ class AdminController extends Controller
             }
         }
 
-        // ── File upload slots ──────────────────────────────────
         $fileSlots = [
             'org_logo'     => 'org_logo',
             'org_photo'    => 'org_photo',
@@ -276,20 +293,15 @@ class AdminController extends Controller
             }
         }
 
-        // ── Hero image — hapus atau ganti ─────────────────────
-        $sm = new SettingModel();
-
+        $sm              = new SettingModel();
         $heroImageDelete = ($_POST['hero_image_delete'] ?? '0') === '1';
         $heroHasNewFile  = !empty($_FILES['hero_image']['name']);
 
         if ($heroHasNewFile) {
-            // Ada file baru: hapus file lama (jika ada) lalu simpan yang baru
             $existingHero = $sm->get('hero_image');
             if ($existingHero) {
                 $oldPath = ROOT . '/public/uploads/' . $existingHero;
-                if (file_exists($oldPath)) {
-                    @unlink($oldPath);
-                }
+                if (file_exists($oldPath)) @unlink($oldPath);
             }
             try {
                 $data['hero_image'] = FileUploader::uploadFoto($_FILES['hero_image'], 'hero_image');
@@ -298,23 +310,22 @@ class AdminController extends Controller
                 $this->redirect('/admin/settings#hero');
             }
         } elseif ($heroImageDelete) {
-            // Tidak ada file baru, tapi admin meminta hapus gambar lama
             $existingHero = $sm->get('hero_image');
             if ($existingHero) {
                 $oldPath = ROOT . '/public/uploads/' . $existingHero;
-                if (file_exists($oldPath)) {
-                    @unlink($oldPath);
-                }
+                if (file_exists($oldPath)) @unlink($oldPath);
             }
-            $data['hero_image'] = ''; // kosongkan value di DB
+            $data['hero_image'] = '';
         }
-        // else: tidak ada aksi hero → biarkan nilai lama
 
         $sm->setMany($data);
         $this->flash('success', 'Pengaturan berhasil disimpan.');
         $this->redirect('/admin/settings');
     }
 
+    // ================================================================
+    //  ABSENSI
+    // ================================================================
     public function absensi(): void
     {
         $this->requireAdmin();
@@ -370,6 +381,9 @@ class AdminController extends Controller
         $this->redirect('/admin/absensi');
     }
 
+    // ================================================================
+    //  PROFIL ADMIN
+    // ================================================================
     public function profil(): void
     {
         $this->requireAdmin();
@@ -459,7 +473,6 @@ class AdminController extends Controller
         }
 
         $_SESSION['user_name'] = $nama;
-
         $this->flash('success', 'Profil berhasil diperbarui.');
         $this->redirect('/admin/profil');
     }
@@ -476,6 +489,9 @@ class AdminController extends Controller
         $this->redirect('/login');
     }
 
+    // ================================================================
+    //  RIWAYAT PENGURUS
+    // ================================================================
     public function riwayat(): void
     {
         $this->requireAdmin();
@@ -617,5 +633,409 @@ class AdminController extends Controller
 
         $this->flash('success', 'Data pengurus berhasil dihapus.');
         $this->redirect('/admin/riwayat');
+    }
+
+    // ================================================================
+    //  BERITA
+    // ================================================================
+    public function berita(): void
+    {
+        $this->requireAdmin();
+        $bm     = new BeritaModel();
+        $page   = max(1, (int)($_GET['page'] ?? 1));
+        $search = trim($_GET['q'] ?? '');
+        $limit  = 15;
+        $total  = $bm->countAll($search);
+        $pages  = max(1, (int)ceil($total / $limit));
+        $page   = min($page, $pages);
+        $items  = $bm->getAll($page, $limit, $search);
+        $pendingKomen = $bm->countKomentar('pending');
+        $flash  = $this->getFlash();
+        $csrf   = $this->csrfToken();
+        $this->view('admin/berita', compact('items', 'page', 'pages', 'total', 'search', 'pendingKomen', 'flash', 'csrf'), 'admin');
+    }
+
+    public function beritaCreate(): void
+    {
+        $this->requireAdmin();
+        $bm           = new BeritaModel();
+        $kategoriList = $bm->getKategori();
+        $flash        = $this->getFlash();
+        $csrf         = $this->csrfToken();
+        $this->view('admin/berita_form', compact('kategoriList', 'flash', 'csrf'), 'admin');
+    }
+
+    public function beritaStore(): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $bm   = new BeritaModel();
+        $data = $this->_beritaProcessForm();
+        if ($data === null) {
+            $this->redirect('/admin/berita/create');
+        }
+
+        $bm->create($data);
+        $this->flash('success', 'Berita berhasil disimpan.');
+        $this->redirect('/admin/berita');
+    }
+
+    public function beritaEdit(string $id): void
+    {
+        $this->requireAdmin();
+        $bm     = new BeritaModel();
+        $berita = $bm->findById((int)$id);
+        if (!$berita) {
+            $this->flash('error', 'Berita tidak ditemukan.');
+            $this->redirect('/admin/berita');
+        }
+        $kategoriList = $bm->getKategori();
+        $flash        = $this->getFlash();
+        $csrf         = $this->csrfToken();
+        $this->view('admin/berita_form', compact('berita', 'kategoriList', 'flash', 'csrf'), 'admin');
+    }
+
+    public function beritaUpdate(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $bm   = new BeritaModel();
+        $data = $this->_beritaProcessForm((int)$id);
+        if ($data === null) {
+            $this->redirect('/admin/berita/' . $id . '/edit');
+        }
+
+        $bm->update((int)$id, $data);
+        $this->flash('success', 'Berita berhasil diperbarui.');
+        $this->redirect('/admin/berita');
+    }
+
+    public function beritaDelete(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $bm     = new BeritaModel();
+        $berita = $bm->findById((int)$id);
+        if ($berita && $berita['thumbnail']) {
+            $path = UPLOAD_PATH . '/' . $berita['thumbnail'];
+            if (file_exists($path)) @unlink($path);
+        }
+        $bm->delete((int)$id);
+        $this->flash('success', 'Berita berhasil dihapus.');
+        $this->redirect('/admin/berita');
+    }
+
+    // ── Komentar Berita ──────────────────────────────────────────────
+    public function beritaKomentar(): void
+    {
+        $this->requireAdmin();
+        $bm      = new BeritaModel();
+        $page    = max(1, (int)($_GET['page'] ?? 1));
+        $items   = $bm->getAllKomentar($page, 20);
+        $pending = $bm->countKomentar('pending');
+        $flash   = $this->getFlash();
+        $csrf    = $this->csrfToken();
+        $this->view('admin/berita_komentar', compact('items', 'page', 'pending', 'flash', 'csrf'), 'admin');
+    }
+
+    public function beritaKomentarApprove(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+        (new BeritaModel())->updateKomentarStatus((int)$id, 'approved');
+        $this->flash('success', 'Komentar disetujui.');
+        $this->redirect('/admin/berita/komentar');
+    }
+
+    public function beritaKomentarReject(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+        (new BeritaModel())->updateKomentarStatus((int)$id, 'rejected');
+        $this->flash('success', 'Komentar ditolak.');
+        $this->redirect('/admin/berita/komentar');
+    }
+
+    public function beritaKomentarDelete(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+        (new BeritaModel())->deleteKomentar((int)$id);
+        $this->flash('success', 'Komentar dihapus.');
+        $this->redirect('/admin/berita/komentar');
+    }
+
+    // ── Helper privat: proses form berita ───────────────────────────
+    private function _beritaProcessForm(?int $id = null): ?array
+    {
+        $bm        = new BeritaModel();
+        $judul     = htmlspecialchars(trim($_POST['judul'] ?? ''), ENT_QUOTES);
+        $konten    = $_POST['konten'] ?? '';
+        $ringkasan = htmlspecialchars(trim($_POST['ringkasan'] ?? ''), ENT_QUOTES);
+        $katId     = (int)($_POST['kategori_id'] ?? 0);
+        $status    = in_array($_POST['status'] ?? '', ['draft', 'published']) ? $_POST['status'] : 'draft';
+
+        if (!$judul || !$konten) {
+            $this->flash('error', 'Judul dan konten wajib diisi.');
+            return null;
+        }
+
+        $thumbnail = null;
+        if (!empty($_FILES['thumbnail']['name'])) {
+            try {
+                if ($id) {
+                    $old = $bm->findById($id);
+                    if ($old && $old['thumbnail'] && file_exists(UPLOAD_PATH . '/' . $old['thumbnail'])) {
+                        @unlink(UPLOAD_PATH . '/' . $old['thumbnail']);
+                    }
+                }
+                $thumbnail = FileUploader::uploadFoto($_FILES['thumbnail'], 'berita');
+            } catch (RuntimeException $e) {
+                $this->flash('error', 'Upload thumbnail gagal: ' . $e->getMessage());
+                return null;
+            }
+        } elseif ($id) {
+            $old       = $bm->findById($id);
+            $thumbnail = $old['thumbnail'] ?? null;
+        }
+
+        return [
+            'judul'       => $judul,
+            'konten'      => $konten,
+            'ringkasan'   => $ringkasan,
+            'kategori_id' => $katId ?: null,
+            'status'      => $status,
+            'thumbnail'   => $thumbnail,
+            'penulis_id'  => (int)$_SESSION['user_id'],
+        ];
+    }
+
+    // ================================================================
+    //  GALERI
+    // ================================================================
+    public function galeri(): void
+    {
+        $this->requireAdmin();
+        $gm    = new GaleriModel();
+        $page  = max(1, (int)($_GET['page'] ?? 1));
+        $limit = 15;
+        $total = $gm->countAllAlbums();
+        $pages = max(1, (int)ceil($total / $limit));
+        $albums = $gm->getAllAlbums($page, $limit);
+        $flash = $this->getFlash();
+        $csrf  = $this->csrfToken();
+        $this->view('admin/galeri', compact('albums', 'page', 'pages', 'total', 'flash', 'csrf'), 'admin');
+    }
+
+    public function galeriCreate(): void
+    {
+        $this->requireAdmin();
+        $flash = $this->getFlash();
+        $csrf  = $this->csrfToken();
+        $this->view('admin/galeri_form', compact('flash', 'csrf'), 'admin');
+    }
+
+    public function galeriStore(): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $judul     = htmlspecialchars(trim($_POST['judul'] ?? ''), ENT_QUOTES);
+        $deskripsi = htmlspecialchars(trim($_POST['deskripsi'] ?? ''), ENT_QUOTES);
+        $status    = in_array($_POST['status'] ?? '', ['published', 'draft']) ? $_POST['status'] : 'published';
+        $urutan    = max(0, (int)($_POST['urutan'] ?? 0));
+
+        if (strlen($judul) < 2) {
+            $this->flash('error', 'Judul album wajib diisi.');
+            $this->redirect('/admin/galeri/create');
+        }
+
+        $cover = null;
+        if (!empty($_FILES['cover']['name'])) {
+            try {
+                $cover = FileUploader::uploadFoto($_FILES['cover'], 'galeri_cover');
+            } catch (RuntimeException $e) {
+                $this->flash('error', $e->getMessage());
+                $this->redirect('/admin/galeri/create');
+            }
+        }
+
+        $gm      = new GaleriModel();
+        $albumId = $gm->createAlbum([
+            'judul'      => $judul,
+            'deskripsi'  => $deskripsi,
+            'cover'      => $cover,
+            'status'     => $status,
+            'urutan'     => $urutan,
+            'created_by' => (int)$_SESSION['user_id'],
+        ]);
+
+        $this->flash('success', 'Album berhasil dibuat. Silakan tambahkan foto.');
+        $this->redirect('/admin/galeri/' . $albumId . '/foto');
+    }
+
+    public function galeriEdit(string $id): void
+    {
+        $this->requireAdmin();
+        $gm    = new GaleriModel();
+        $album = $gm->findAlbumById((int)$id);
+        if (!$album) {
+            $this->flash('error', 'Album tidak ditemukan.');
+            $this->redirect('/admin/galeri');
+        }
+        $flash = $this->getFlash();
+        $csrf  = $this->csrfToken();
+        $this->view('admin/galeri_form', compact('album', 'flash', 'csrf'), 'admin');
+    }
+
+    public function galeriUpdate(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $gm    = new GaleriModel();
+        $album = $gm->findAlbumById((int)$id);
+        if (!$album) {
+            $this->flash('error', 'Album tidak ditemukan.');
+            $this->redirect('/admin/galeri');
+        }
+
+        $judul     = htmlspecialchars(trim($_POST['judul'] ?? ''), ENT_QUOTES);
+        $deskripsi = htmlspecialchars(trim($_POST['deskripsi'] ?? ''), ENT_QUOTES);
+        $status    = in_array($_POST['status'] ?? '', ['published', 'draft']) ? $_POST['status'] : 'published';
+        $urutan    = max(0, (int)($_POST['urutan'] ?? 0));
+
+        if (strlen($judul) < 2) {
+            $this->flash('error', 'Judul album wajib diisi.');
+            $this->redirect('/admin/galeri/' . $id . '/edit');
+        }
+
+        $cover = $album['cover'];
+        if (!empty($_FILES['cover']['name'])) {
+            try {
+                if ($cover && file_exists(UPLOAD_PATH . '/' . $cover)) @unlink(UPLOAD_PATH . '/' . $cover);
+                $cover = FileUploader::uploadFoto($_FILES['cover'], 'galeri_cover');
+            } catch (RuntimeException $e) {
+                $this->flash('error', $e->getMessage());
+                $this->redirect('/admin/galeri/' . $id . '/edit');
+            }
+        }
+
+        $gm->updateAlbum((int)$id, [
+            'judul'     => $judul,
+            'deskripsi' => $deskripsi,
+            'cover'     => $cover,
+            'status'    => $status,
+            'urutan'    => $urutan,
+        ]);
+
+        $this->flash('success', 'Album berhasil diperbarui.');
+        $this->redirect('/admin/galeri');
+    }
+
+    public function galeriDelete(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $gm    = new GaleriModel();
+        $album = $gm->findAlbumById((int)$id);
+        if ($album) {
+            $fotos = $gm->getFotoByAlbum((int)$id);
+            foreach ($fotos as $f) {
+                $p = UPLOAD_PATH . '/' . $f['file'];
+                if (file_exists($p)) @unlink($p);
+            }
+            if ($album['cover'] && file_exists(UPLOAD_PATH . '/' . $album['cover'])) {
+                @unlink(UPLOAD_PATH . '/' . $album['cover']);
+            }
+            $gm->deleteAlbum((int)$id);
+        }
+
+        $this->flash('success', 'Album dan semua foto berhasil dihapus.');
+        $this->redirect('/admin/galeri');
+    }
+
+    // ── Foto Album ───────────────────────────────────────────────────
+    public function galeriFoto(string $id): void
+    {
+        $this->requireAdmin();
+        $gm    = new GaleriModel();
+        $album = $gm->findAlbumById((int)$id);
+        if (!$album) {
+            $this->flash('error', 'Album tidak ditemukan.');
+            $this->redirect('/admin/galeri');
+        }
+        $fotos = $gm->getFotoByAlbum((int)$id);
+        $flash = $this->getFlash();
+        $csrf  = $this->csrfToken();
+        $this->view('admin/galeri_foto', compact('album', 'fotos', 'flash', 'csrf'), 'admin');
+    }
+
+    public function galeriUploadFoto(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $gm    = new GaleriModel();
+        $album = $gm->findAlbumById((int)$id);
+        if (!$album) {
+            $this->flash('error', 'Album tidak ditemukan.');
+            $this->redirect('/admin/galeri');
+        }
+
+        $files  = $_FILES['fotos'] ?? [];
+        $count  = 0;
+        $errors = [];
+
+        if (!empty($files['name']) && is_array($files['name'])) {
+            foreach ($files['name'] as $i => $name) {
+                if (empty($name) || $files['error'][$i] !== UPLOAD_ERR_OK) continue;
+                $single = [
+                    'name'     => $files['name'][$i],
+                    'type'     => $files['type'][$i],
+                    'tmp_name' => $files['tmp_name'][$i],
+                    'error'    => $files['error'][$i],
+                    'size'     => $files['size'][$i],
+                ];
+                try {
+                    $filename = FileUploader::uploadFoto($single, 'galeri_foto');
+                    $judul    = htmlspecialchars(trim($_POST['judul_foto'][$i] ?? ''), ENT_QUOTES);
+                    $gm->addFoto((int)$id, $filename, $judul ?: null, $i);
+                    $count++;
+                } catch (RuntimeException $e) {
+                    $errors[] = $e->getMessage();
+                }
+            }
+        }
+
+        if ($errors) {
+            $this->flash('warning', $count . ' foto berhasil. Gagal: ' . implode(', ', $errors));
+        } else {
+            $this->flash('success', "{$count} foto berhasil diupload.");
+        }
+
+        $this->redirect('/admin/galeri/' . $id . '/foto');
+    }
+
+    public function galeriDeleteFoto(string $fotoId): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $gm      = new GaleriModel();
+        $foto    = $gm->getFotoById((int)$fotoId);
+        $albumId = $foto['album_id'] ?? null;
+
+        $file = $gm->deleteFoto((int)$fotoId);
+        if ($file && file_exists(UPLOAD_PATH . '/' . $file)) {
+            @unlink(UPLOAD_PATH . '/' . $file);
+        }
+
+        $this->flash('success', 'Foto berhasil dihapus.');
+        $this->redirect('/admin/galeri/' . $albumId . '/foto');
     }
 }
