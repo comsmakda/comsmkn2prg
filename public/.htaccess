@@ -1,6 +1,6 @@
 Options -Indexes
 RewriteEngine On
-RewriteBase /com-smkn2-pinrang/public
+RewriteBase /
 
 # Static files - langsung akses
 RewriteRule ^favicon\.ico$ - [L]
