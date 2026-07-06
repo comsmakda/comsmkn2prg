@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 // ── Bootstrap ────────────────────────────────────────────────
 define('ROOT', dirname(__DIR__));
+define('APP_PATH', ROOT . '/app');
 
 require ROOT . '/config/app.php';
 require ROOT . '/config/database.php';
