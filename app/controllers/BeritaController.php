@@ -12,6 +12,18 @@ class BeritaController extends Controller
         $this->bm = new BeritaModel();
     }
 
+    /* ── helper: identifier unik per browser (session-based) ── */
+    private function getVisitorId(): string
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+        if (empty($_SESSION['visitor_id'])) {
+            $_SESSION['visitor_id'] = bin2hex(random_bytes(16));
+        }
+        return $_SESSION['visitor_id'];
+    }
+
     /* ── GET /berita ── */
     public function index(): void
     {
@@ -53,15 +65,47 @@ class BeritaController extends Controller
 
         $this->bm->incrementView($berita['id']);
 
-        $ip         = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'];
-        $isLiked    = $this->bm->isLiked($berita['id'], $ip);
+        $visitorId  = $this->getVisitorId();
+        $isLiked    = $this->bm->isLiked($berita['id'], $visitorId);
         $totalLikes = $this->bm->getLikesCount($berita['id']);
         $komentar   = $this->bm->getApprovedKomentar($berita['id']);
         $related    = $this->bm->getRelated($berita['id'], $berita['kategori_id'] ? (int)$berita['kategori_id'] : null);
         $settings   = (new SettingModel())->getAll();
         $flash      = $this->getFlash();
 
-        $this->view('pages/berita_detail', compact('berita', 'komentar', 'related', 'isLiked', 'totalLikes', 'settings', 'flash'), 'main');
+        /* ── Open Graph / Twitter Card untuk preview link (WA, FB, dll) ── */
+        $ogTitle = $berita['judul'];
+        $ogDesc  = $berita['ringkasan']
+            ? $berita['ringkasan']
+            : trim(mb_substr(strip_tags($berita['konten']), 0, 160)) . '…';
+
+        // Pastikan absolut. Ganti UPLOAD_URL/BASE_URL di config kalau belum full https://...
+        $ogImage = $berita['thumbnail']
+            ? rtrim(UPLOAD_URL, '/') . '/' . $berita['thumbnail']
+            : rtrim(BASE_URL, '/') . '/assets/img/og-default.jpg';
+
+        $ogUrl = rtrim(BASE_URL, '/') . '/berita/' . $berita['slug'];
+
+        $extra_head = '
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="' . htmlspecialchars($ogTitle, ENT_QUOTES) . '">
+    <meta property="og:description" content="' . htmlspecialchars($ogDesc, ENT_QUOTES) . '">
+    <meta property="og:image" content="' . htmlspecialchars($ogImage, ENT_QUOTES) . '">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="' . htmlspecialchars($ogUrl, ENT_QUOTES) . '">
+    <meta property="og:site_name" content="' . htmlspecialchars($settings['org_name']['value'] ?? APP_NAME, ENT_QUOTES) . '">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="' . htmlspecialchars($ogTitle, ENT_QUOTES) . '">
+    <meta name="twitter:description" content="' . htmlspecialchars($ogDesc, ENT_QUOTES) . '">
+    <meta name="twitter:image" content="' . htmlspecialchars($ogImage, ENT_QUOTES) . '">
+';
+
+        $this->view('pages/berita_detail', compact(
+            'berita', 'komentar', 'related', 'isLiked', 'totalLikes',
+            'settings', 'flash', 'extra_head'
+        ), 'main');
     }
 
     /* ── POST /berita/{slug}/komentar ── */
@@ -91,8 +135,8 @@ class BeritaController extends Controller
     public function like(string $id): void
     {
         header('Content-Type: application/json');
-        $ip     = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'];
-        $result = $this->bm->toggleLike((int)$id, $ip);
+        $visitorId = $this->getVisitorId();
+        $result    = $this->bm->toggleLike((int)$id, $visitorId);
         echo json_encode($result);
         exit;
     }

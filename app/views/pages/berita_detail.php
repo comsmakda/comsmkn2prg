@@ -1,8 +1,7 @@
 <?php
 // app/views/pages/berita_detail.php
 // Variabel: $berita, $komentar, $related, $isLiked, $totalLikes, $flash
-$shareUrl   = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
-            . '://' . $_SERVER['HTTP_HOST'] . BASE_URL . '/berita/' . $berita['slug'];
+$shareUrl   = rtrim(BASE_URL, '/') . '/berita/' . $berita['slug'];
 $shareTitle = urlencode($berita['judul']);
 ?>
 <style>

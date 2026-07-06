@@ -96,8 +96,8 @@
 
   <div class="brt-grid">
     <?php foreach ($items as $b):
-      $bUrl     = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on' ? 'https' : 'http')
-                . '://' . $_SERVER['HTTP_HOST'] . BASE_URL . '/berita/' . $b['slug'];
+      $bUrl     = rtrim(BASE_URL, '/') . '/berita/' . $b['slug'];
+$bUrlEnc  = urlencode($bUrl);
       $bUrlEnc  = urlencode($bUrl);
       $bTitle   = urlencode($b['judul']);
       $bShareId = 'sp-' . $b['id'];

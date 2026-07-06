@@ -223,15 +223,15 @@ class BeritaModel {
         $this->db->prepare('DELETE FROM berita_komentar WHERE id=?')->execute([$id]);
     }
 
-    /* ── likes ── */
-    public function toggleLike(int $beritaId, string $ip): array {
+    /* ── likes (identifier = session ID unik per browser, bukan cuma IP) ── */
+    public function toggleLike(int $beritaId, string $identifier): array {
         $q = $this->db->prepare('SELECT id FROM berita_likes WHERE berita_id=? AND ip_address=?');
-        $q->execute([$beritaId, $ip]);
+        $q->execute([$beritaId, $identifier]);
         if ($q->fetch()) {
-            $this->db->prepare('DELETE FROM berita_likes WHERE berita_id=? AND ip_address=?')->execute([$beritaId, $ip]);
+            $this->db->prepare('DELETE FROM berita_likes WHERE berita_id=? AND ip_address=?')->execute([$beritaId, $identifier]);
             $liked = false;
         } else {
-            $this->db->prepare('INSERT INTO berita_likes (berita_id,ip_address) VALUES (?,?)')->execute([$beritaId, $ip]);
+            $this->db->prepare('INSERT INTO berita_likes (berita_id,ip_address) VALUES (?,?)')->execute([$beritaId, $identifier]);
             $liked = true;
         }
         $q2 = $this->db->prepare('SELECT COUNT(*) FROM berita_likes WHERE berita_id=?');
@@ -239,9 +239,9 @@ class BeritaModel {
         return ['liked' => $liked, 'total' => (int)$q2->fetchColumn()];
     }
 
-    public function isLiked(int $beritaId, string $ip): bool {
+    public function isLiked(int $beritaId, string $identifier): bool {
         $q = $this->db->prepare('SELECT id FROM berita_likes WHERE berita_id=? AND ip_address=?');
-        $q->execute([$beritaId, $ip]);
+        $q->execute([$beritaId, $identifier]);
         return (bool)$q->fetch();
     }
 
