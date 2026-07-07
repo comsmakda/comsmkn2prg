@@ -112,12 +112,12 @@ $shareTitle = urlencode($berita['judul']);
 .bd-cover:hover img { transform: scale(1.02); }
 
 /* ── Article body ── */
-.bd-body {
-  font-size: .92rem;
-  color: var(--c-muted2);
-  line-height: 1.9;
-  margin-bottom: 2.5rem;
-  overflow-wrap: break-word;
+.bd-body p {
+  margin-bottom: 1.1rem;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
 }
 .bd-body h2 {
   font-family: var(--font-display);
