@@ -7,7 +7,6 @@ $og_description = "Bergabunglah bersama komunitas programmer SMKN 2 Pinrang! Daf
 $og_url         = BASE_URL . "/pab";
 $og_image       = BASE_URL . "/assets/img/logo-com.png";
 
-/* Inject ke <head> jika layout mendukung $extra_head atau ob_start */
 if (!isset($extra_head)) $extra_head = '';
 $extra_head .= '
 <meta property="og:type"         content="website">
@@ -42,7 +41,6 @@ $extra_head .= '
   overflow: hidden;
 }
 
-/* Subtle background decoration */
 .pab-wrap::before {
   content: '';
   position: fixed;
@@ -74,18 +72,9 @@ $extra_head .= '
 }
 
 /* ── Header ── */
-.pab-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
+.pab-header { text-align: center; margin-bottom: 2rem; }
 
-/* ── Logo ── */
-.pab-logo-wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1.25rem;
-}
+.pab-logo-wrap { display: flex; justify-content: center; align-items: center; margin-bottom: 1.25rem; }
 .pab-logo {
   height: 88px;
   width: auto;
@@ -93,100 +82,76 @@ $extra_head .= '
   filter: drop-shadow(0 0 20px rgba(14,165,233,.3)) drop-shadow(0 4px 12px rgba(0,0,0,.4));
   animation: logo-float 4s ease-in-out infinite;
 }
-@keyframes logo-float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-5px); }
-}
+@keyframes logo-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
 
-/* ── Tagline ajakan ── */
-.pab-tagline {
-  font-size: .82rem;
-  color: var(--c-muted2);
-  line-height: 1.75;
-  margin-bottom: .75rem;
-  letter-spacing: .01em;
-}
-.pab-tagline strong {
-  color: var(--c-sky);
-  font-weight: 600;
-}
+.pab-tagline { font-size:.82rem; color:var(--c-muted2); line-height:1.75; margin-bottom:.75rem; letter-spacing:.01em; }
+.pab-tagline strong { color: var(--c-sky); font-weight:600; }
 
 .pab-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 14px;
+  display: inline-flex; align-items:center; gap:8px;
+  padding:5px 14px;
   background: rgba(14,165,233,.08);
   border: 1px solid rgba(14,165,233,.22);
   border-radius: 99px;
   font-family: var(--font-mono);
-  font-size: .67rem;
-  color: var(--c-sky);
-  letter-spacing: .07em;
-  text-transform: uppercase;
+  font-size: .67rem; color: var(--c-sky);
+  letter-spacing:.07em; text-transform:uppercase;
   margin-bottom: 1rem;
 }
-.pab-badge-pulse {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--c-cyan);
-  animation: pulse-glow 2s ease-in-out infinite;
-  flex-shrink: 0;
-}
-@keyframes pulse-glow {
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,211,238,.4); }
-  50%       { opacity: .7; box-shadow: 0 0 0 5px rgba(34,211,238,0); }
-}
+.pab-badge-pulse { width:6px; height:6px; border-radius:50%; background:var(--c-cyan); animation:pulse-glow 2s ease-in-out infinite; flex-shrink:0; }
+@keyframes pulse-glow { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,211,238,.4)} 50%{opacity:.7;box-shadow:0 0 0 5px rgba(34,211,238,0)} }
+
 .pab-title {
   font-family: var(--font-display);
   font-size: clamp(1.7rem, 4vw, 2.4rem);
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -.035em;
-  line-height: 1.1;
-  margin-bottom: .65rem;
+  font-weight: 900; color:#fff;
+  letter-spacing:-.035em; line-height:1.1;
+  margin-bottom:.65rem;
 }
 .pab-title .t-grad {
   background: linear-gradient(130deg, var(--c-sky-light) 0%, var(--c-indigo) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
 }
-.pab-info {
-  font-size: .87rem;
-  color: var(--c-muted2);
-  line-height: 1.7;
-  margin-bottom: .5rem;
-}
+.pab-info { font-size:.87rem; color:var(--c-muted2); line-height:1.7; margin-bottom:.5rem; }
 .pab-deadline {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: .68rem;
-  color: #fbbf24;
-  background: rgba(251,191,36,.08);
-  border: 1px solid rgba(251,191,36,.2);
-  border-radius: 99px;
-  padding: 4px 12px;
-  margin-top: .25rem;
+  display:inline-flex; align-items:center; gap:6px;
+  font-family: var(--font-mono); font-size:.68rem; color:#fbbf24;
+  background: rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.2);
+  border-radius:99px; padding:4px 12px; margin-top:.25rem;
 }
 
 /* ── Alert ── */
 .pab-alert {
-  border-radius: 12px;
-  padding: .9rem 1.1rem;
-  font-size: .84rem;
-  margin-bottom: 1.25rem;
-  border: 1px solid;
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
+  border-radius:12px; padding:.9rem 1.1rem; font-size:.84rem;
+  margin-bottom:1.25rem; border:1px solid;
+  display:flex; align-items:flex-start; gap:9px;
 }
-.pab-alert-icon { flex-shrink: 0; margin-top: 1px; }
-.pab-alert.success { background: rgba(34,197,94,.07); border-color: rgba(34,197,94,.25); color: #4ade80; }
-.pab-alert.error   { background: rgba(239,68,68,.07);  border-color: rgba(239,68,68,.25);  color: #f87171; }
-.pab-alert.info    { background: rgba(14,165,233,.07); border-color: rgba(14,165,233,.22); color: var(--c-sky); }
+.pab-alert-icon { flex-shrink:0; margin-top:1px; }
+.pab-alert.success { background: rgba(34,197,94,.07); border-color: rgba(34,197,94,.25); color:#4ade80; }
+.pab-alert.error   { background: rgba(239,68,68,.07);  border-color: rgba(239,68,68,.25);  color:#f87171; }
+.pab-alert.info    { background: rgba(14,165,233,.07); border-color: rgba(14,165,233,.22); color:var(--c-sky); }
+
+/* ── Persyaratan (info card sebelum form) ── */
+.pab-req {
+  background: var(--c-surface2);
+  border: 1px solid var(--c-border);
+  border-radius: 16px;
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1.25rem;
+}
+.pab-req-title {
+  display:flex; align-items:center; gap:8px;
+  font-family: var(--font-display);
+  font-size:.85rem; font-weight:700; color:#fff;
+  margin-bottom:.75rem;
+}
+.pab-req-title svg { color: var(--c-sky); flex-shrink:0; }
+.pab-req-list { display:flex; flex-direction:column; gap:.55rem; }
+.pab-req-item {
+  display:flex; align-items:flex-start; gap:9px;
+  font-size:.78rem; color:var(--c-muted2); line-height:1.55;
+}
+.pab-req-item svg { flex-shrink:0; margin-top:2px; color:#4ade80; }
 
 /* ── Card ── */
 .pab-card {
@@ -199,295 +164,161 @@ $extra_head .= '
 .pab-card-head {
   padding: 1.4rem 1.8rem;
   border-bottom: 1px solid var(--c-border);
-  display: flex;
-  align-items: center;
-  gap: .75rem;
+  display:flex; align-items:center; gap:.75rem;
   background: rgba(14,165,233,.03);
 }
 .pab-card-head-icon {
-  width: 36px; height: 36px;
-  border-radius: 9px;
+  width:36px; height:36px; border-radius:9px;
   background: rgba(14,165,233,.1);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--c-sky);
-  flex-shrink: 0;
+  display:flex; align-items:center; justify-content:center;
+  color: var(--c-sky); flex-shrink:0;
 }
-.pab-card-head h2 {
-  font-family: var(--font-display);
-  font-size: .97rem;
-  font-weight: 700;
-  color: #fff;
-}
-.pab-card-head span {
-  font-family: var(--font-mono);
-  font-size: .64rem;
-  color: var(--c-muted);
-  letter-spacing: .05em;
-}
+.pab-card-head h2 { font-family: var(--font-display); font-size:.97rem; font-weight:700; color:#fff; }
+.pab-card-head span { font-family: var(--font-mono); font-size:.64rem; color:var(--c-muted); letter-spacing:.05em; }
 .pab-card-body { padding: 1.8rem; }
 
 /* ── Closed state ── */
-.pab-closed {
-  text-align: center;
-  padding: 3rem 1.8rem;
-}
+.pab-closed { text-align:center; padding:3rem 1.8rem; }
 .pab-closed-icon {
-  width: 64px; height: 64px;
+  width:64px; height:64px;
   background: rgba(239,68,68,.07);
-  border: 1px solid rgba(239,68,68,.2);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 1.25rem;
-  color: #f87171;
+  border:1px solid rgba(239,68,68,.2);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 1.25rem; color:#f87171;
 }
-.pab-closed h2 {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: .5rem;
-}
-.pab-closed p {
-  font-size: .84rem;
-  color: var(--c-muted2);
-  line-height: 1.75;
-}
+.pab-closed h2 { font-family: var(--font-display); font-size:1.2rem; font-weight:700; color:#fff; margin-bottom:.5rem; }
+.pab-closed p { font-size:.84rem; color:var(--c-muted2); line-height:1.75; }
 
 /* ── Form fields ── */
-.pab-form { display: flex; flex-direction: column; gap: 1.1rem; }
-
-.pab-field { display: flex; flex-direction: column; gap: .45rem; }
-.pab-label {
-  font-size: .8rem;
-  font-weight: 600;
-  color: var(--c-text);
-  letter-spacing: -.01em;
-}
-.pab-label span { color: #f87171; margin-left: 2px; }
+.pab-form { display:flex; flex-direction:column; gap:1.1rem; }
+.pab-field { display:flex; flex-direction:column; gap:.45rem; }
+.pab-label { font-size:.8rem; font-weight:600; color:var(--c-text); letter-spacing:-.01em; }
+.pab-label span { color:#f87171; margin-left:2px; }
+.pab-hint { font-family: var(--font-mono); font-size:.63rem; color:var(--c-muted); letter-spacing:.02em; }
 
 .pab-input {
-  width: 100%;
+  width:100%;
   background: var(--c-surface3);
-  border: 1px solid var(--c-border);
-  border-radius: 10px;
-  padding: .7rem .95rem;
-  font-size: .88rem;
-  color: var(--c-text);
+  border:1px solid var(--c-border);
+  border-radius:10px;
+  padding:.7rem .95rem;
+  font-size:.88rem; color:var(--c-text);
   font-family: var(--font-body, inherit);
-  outline: none;
+  outline:none;
   transition: border-color .2s, box-shadow .2s;
-  appearance: none;
+  appearance:none;
 }
 .pab-input::placeholder { color: var(--c-muted); }
 .pab-input:hover  { border-color: var(--c-border2); }
 .pab-input:focus  { border-color: var(--c-sky); box-shadow: 0 0 0 3px rgba(14,165,233,.12); }
 
-/* Two-col grid for kelas + no_hp */
-.pab-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
+.pab-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
 
-/* Password row */
-.pab-pass-hint {
-  font-family: var(--font-mono);
-  font-size: .65rem;
-  color: var(--c-muted);
-  margin-top: 3px;
-  letter-spacing: .02em;
-}
+.pab-pass-hint { font-family: var(--font-mono); font-size:.65rem; color:var(--c-muted); margin-top:3px; letter-spacing:.02em; }
 
-/* Divider */
 .pab-divider {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  color: var(--c-muted);
-  font-size: .72rem;
-  font-family: var(--font-mono);
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  margin: .25rem 0;
+  display:flex; align-items:center; gap:.75rem;
+  color:var(--c-muted); font-size:.72rem;
+  font-family: var(--font-mono); letter-spacing:.06em; text-transform:uppercase;
+  margin:.25rem 0;
 }
-.pab-divider::before,
-.pab-divider::after { content: ''; flex: 1; height: 1px; background: var(--c-border); }
+.pab-divider::before, .pab-divider::after { content:''; flex:1; height:1px; background:var(--c-border); }
 
 /* ── Dropzone ── */
 .pab-dropzone {
-  width: 100%;
-  border: 1.5px dashed var(--c-border);
-  border-radius: 12px;
+  width:100%;
+  border:1.5px dashed var(--c-border);
+  border-radius:12px;
   background: var(--c-surface3);
-  cursor: pointer;
+  cursor:pointer;
   transition: border-color .2s, background .2s;
-  overflow: hidden;
-  position: relative;
-  min-height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow:hidden; position:relative;
+  min-height:120px;
+  display:flex; align-items:center; justify-content:center;
 }
-.pab-dropzone:hover,
-.pab-dropzone.drag-over { border-color: var(--c-sky); background: rgba(14,165,233,.04); }
+.pab-dropzone:hover, .pab-dropzone.drag-over { border-color: var(--c-sky); background: rgba(14,165,233,.04); }
 .pab-dropzone-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: .4rem;
-  padding: 1.5rem;
-  text-align: center;
-  pointer-events: none;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:.4rem; padding:1.5rem; text-align:center; pointer-events:none;
 }
 .pab-dropzone-icon {
-  width: 40px; height: 40px;
-  border-radius: 10px;
+  width:40px; height:40px; border-radius:10px;
   background: rgba(14,165,233,.09);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--c-sky);
-  margin-bottom: .2rem;
+  display:flex; align-items:center; justify-content:center;
+  color: var(--c-sky); margin-bottom:.2rem;
   transition: background .2s;
 }
 .pab-dropzone:hover .pab-dropzone-icon { background: rgba(14,165,233,.16); }
-.pab-dropzone-label {
-  font-size: .83rem;
-  font-weight: 600;
-  color: var(--c-text);
-}
-.pab-dropzone-sub {
-  font-family: var(--font-mono);
-  font-size: .64rem;
-  color: var(--c-muted);
-  letter-spacing: .04em;
-}
-#pab-preview {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  display: none;
-}
-#pab-preview.show { display: block; }
+.pab-dropzone-label { font-size:.83rem; font-weight:600; color:var(--c-text); }
+.pab-dropzone-sub { font-family: var(--font-mono); font-size:.64rem; color:var(--c-muted); letter-spacing:.04em; }
+#pab-preview { width:100%; height:140px; object-fit:cover; display:none; }
+#pab-preview.show { display:block; }
 .pab-preview-reset {
-  position: absolute;
-  top: 8px; right: 8px;
-  width: 28px; height: 28px;
-  border-radius: 50%;
+  position:absolute; top:8px; right:8px;
+  width:28px; height:28px; border-radius:50%;
   background: rgba(0,0,0,.55);
-  border: 1px solid rgba(255,255,255,.15);
-  display: none;
-  align-items: center; justify-content: center;
-  cursor: pointer; color: #fff;
-  z-index: 2;
+  border:1px solid rgba(255,255,255,.15);
+  display:none; align-items:center; justify-content:center;
+  cursor:pointer; color:#fff; z-index:2;
   transition: background .2s;
 }
 .pab-preview-reset:hover { background: rgba(239,68,68,.6); }
-.pab-preview-reset.show { display: flex; }
+.pab-preview-reset.show { display:flex; }
+.pab-file-error {
+  display:none;
+  align-items:center; gap:6px;
+  font-size:.72rem; color:#f87171;
+  margin-top:.2rem;
+}
+.pab-file-error.show { display:flex; }
 
 /* ── Submit button ── */
 .pab-submit {
-  width: 100%;
-  padding: .85rem;
-  background: var(--c-sky);
-  color: #fff;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: .93rem;
-  border: none;
-  border-radius: 11px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  width:100%; padding:.85rem;
+  background: var(--c-sky); color:#fff;
+  font-family: var(--font-display); font-weight:700; font-size:.93rem;
+  border:none; border-radius:11px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:8px;
   transition: all .25s cubic-bezier(.22,1,.36,1);
   box-shadow: 0 4px 20px rgba(14,165,233,.28);
-  letter-spacing: -.01em;
-  margin-top: .3rem;
+  letter-spacing:-.01em; margin-top:.3rem;
 }
-.pab-submit:hover {
-  background: var(--c-sky-light);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(14,165,233,.36);
-}
+.pab-submit:hover { background: var(--c-sky-light); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(14,165,233,.36); }
 .pab-submit:active { transform: translateY(0); }
-.pab-submit:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.pab-submit:disabled { opacity:.55; cursor:not-allowed; transform:none; }
 
-/* ── Footer link ── */
-.pab-back {
-  text-align: center;
-  margin-top: 1.5rem;
+.pab-privacy-note {
+  font-size:.68rem; color:var(--c-muted); text-align:center; line-height:1.6;
+  margin-top:.4rem;
 }
+
+/* ── Footer link (satu-satunya, tidak diduplikasi) ── */
+.pab-back { text-align:center; margin-top:1.5rem; }
 .pab-back a {
-  font-size: .82rem;
-  color: var(--c-muted);
-  text-decoration: none;
+  font-size:.82rem; color:var(--c-muted); text-decoration:none;
   transition: color .2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+  display:inline-flex; align-items:center; gap:5px;
 }
 .pab-back a:hover { color: var(--c-text); }
 
 /* Step indicator */
-.pab-steps {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  margin-bottom: 1.6rem;
-}
-.pab-step {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  position: relative;
-}
-.pab-step::after {
-  content: '';
-  position: absolute;
-  top: 14px;
-  left: 50%;
-  width: 100%;
-  height: 1px;
-  background: var(--c-border);
-}
-.pab-step:last-child::after { display: none; }
+.pab-steps { display:flex; align-items:center; gap:0; margin-bottom:1.6rem; }
+.pab-step { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; position:relative; }
+.pab-step::after { content:''; position:absolute; top:14px; left:50%; width:100%; height:1px; background:var(--c-border); }
+.pab-step:last-child::after { display:none; }
 .pab-step-dot {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: var(--c-surface3);
-  border: 1px solid var(--c-border);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-mono);
-  font-size: .68rem;
-  color: var(--c-muted);
-  position: relative;
-  z-index: 1;
-  transition: all .3s;
+  width:28px; height:28px; border-radius:50%;
+  background: var(--c-surface3); border:1px solid var(--c-border);
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-mono); font-size:.68rem; color:var(--c-muted);
+  position:relative; z-index:1; transition: all .3s;
 }
-.pab-step.active .pab-step-dot {
-  background: var(--c-sky);
-  border-color: var(--c-sky);
-  color: #fff;
-  box-shadow: 0 0 0 4px rgba(14,165,233,.15);
-}
-.pab-step.done .pab-step-dot {
-  background: rgba(34,197,94,.12);
-  border-color: rgba(34,197,94,.4);
-  color: #4ade80;
-}
-.pab-step-label {
-  font-family: var(--font-mono);
-  font-size: .6rem;
-  color: var(--c-muted);
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
+.pab-step.active .pab-step-dot { background: var(--c-sky); border-color: var(--c-sky); color:#fff; box-shadow: 0 0 0 4px rgba(14,165,233,.15); }
+.pab-step.done .pab-step-dot { background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.4); color:#4ade80; }
+.pab-step-label { font-family: var(--font-mono); font-size:.6rem; color:var(--c-muted); letter-spacing:.05em; text-transform:uppercase; white-space:nowrap; }
 .pab-step.active .pab-step-label { color: var(--c-sky); }
-.pab-step.done  .pab-step-label  { color: #4ade80; }
+.pab-step.done  .pab-step-label  { color:#4ade80; }
 
 /* ── Responsive ── */
 @media (max-width: 480px) {
@@ -498,6 +329,7 @@ $extra_head .= '
   .pab-steps { display: none; }
   .pab-title { font-size: 1.6rem; }
   .pab-logo { height: 68px; }
+  .pab-req { padding: 1rem 1.1rem; }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -507,9 +339,8 @@ $extra_head .= '
   <div class="pab-container">
 
     <!-- ── Header ── -->
-    <div class="pab-header">
+    <header class="pab-header">
 
-      <!-- Logo -->
       <div class="pab-logo-wrap">
         <img
           src="<?= BASE_URL ?>/assets/img/logo-com.png"
@@ -520,13 +351,11 @@ $extra_head .= '
           onerror="this.style.display='none'">
       </div>
 
-      <!-- Badge -->
       <div class="pab-badge">
         <span class="pab-badge-pulse"></span>
         Penerimaan Anggota Baru
       </div>
 
-      <!-- Judul -->
       <h1 class="pab-title">
         <?php
           $name  = $settings['org_name']['value'] ?? APP_NAME;
@@ -538,7 +367,6 @@ $extra_head .= '
         ?>
       </h1>
 
-      <!-- Tagline ajakan -->
       <p class="pab-tagline">
         Bergabunglah bersama <strong>Komunitas Programmer SMKN 2 Pinrang</strong>.<br>
         Jadilah bagian dari generasi teknologi berikutnya!
@@ -556,7 +384,7 @@ $extra_head .= '
           </span>
         </div>
       <?php endif; ?>
-    </div>
+    </header>
 
     <!-- ── Flash alert ── -->
     <?php if (!empty($flash)): ?>
@@ -566,10 +394,34 @@ $extra_head .= '
           ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'
           : '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
       ?>
-      <div class="pab-alert <?= $alertType ?>">
+      <div class="pab-alert <?= $alertType ?>" role="alert">
         <svg class="pab-alert-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><?= $alertIcon ?></svg>
         <?= $flash['msg'] ?>
       </div>
+    <?php endif; ?>
+
+    <?php if ($isOpen): ?>
+    <!-- ── Persyaratan pendaftaran (agar siswa lebih paham sebelum mengisi form) ── -->
+    <section class="pab-req" aria-labelledby="pab-req-title">
+      <div class="pab-req-title" id="pab-req-title">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Yang Perlu Disiapkan
+      </div>
+      <div class="pab-req-list">
+        <div class="pab-req-item">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Nama lengkap, kelas, dan nomor HP aktif yang bisa dihubungi.</span>
+        </div>
+        <div class="pab-req-item">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Password akun portal (minimal 6 karakter) untuk login setelah mendaftar.</span>
+        </div>
+        <div class="pab-req-item">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Pas foto terbaru format JPG/PNG/WEBP, ukuran maksimal 2 MB.</span>
+        </div>
+      </div>
+    </section>
     <?php endif; ?>
 
     <!-- ── Card ── -->
@@ -583,10 +435,6 @@ $extra_head .= '
           </div>
           <h2>Pendaftaran Ditutup</h2>
           <p>Saat ini pendaftaran PAB sedang tidak dibuka.<br>Pantau terus informasi selanjutnya melalui media sosial kami.</p>
-          <a href="<?= BASE_URL ?>/" style="display:inline-flex;align-items:center;gap:6px;margin-top:1.5rem;font-size:.83rem;color:var(--c-sky);text-decoration:none;font-weight:600;">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-            Kembali ke beranda
-          </a>
         </div>
 
       <?php else: ?>
@@ -621,7 +469,7 @@ $extra_head .= '
           </div>
 
           <form method="POST" action="<?= BASE_URL ?>/pab/register"
-                enctype="multipart/form-data" class="pab-form" id="pab-form">
+                enctype="multipart/form-data" class="pab-form" id="pab-form" novalidate>
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
 
             <!-- Nama -->
@@ -637,15 +485,17 @@ $extra_head .= '
               <div class="pab-field">
                 <label class="pab-label" for="pab-kelas">Kelas <span>*</span></label>
                 <input id="pab-kelas" type="text" name="kelas" required
-                       class="pab-input" placeholder="XI RPL 1">
+                       class="pab-input" placeholder="Contoh: XI RPL 1">
               </div>
               <div class="pab-field">
                 <label class="pab-label" for="pab-hp">Nomor HP <span>*</span></label>
                 <input id="pab-hp" type="tel" name="no_hp" required
                        class="pab-input" placeholder="08xxxxxxxxxx"
-                       autocomplete="tel">
+                       autocomplete="tel" pattern="[0-9]{10,15}"
+                       inputmode="numeric">
               </div>
             </div>
+            <span class="pab-hint">Pastikan nomor HP aktif — panitia akan menghubungi lewat WhatsApp.</span>
 
             <!-- Divider -->
             <div class="pab-divider">Akun Portal</div>
@@ -663,7 +513,7 @@ $extra_head .= '
                   <svg id="eye-icon" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
               </div>
-              <span class="pab-pass-hint">Minimal 6 karakter — gunakan kombinasi huruf dan angka</span>
+              <span class="pab-pass-hint">Password ini digunakan untuk login ke portal komunitas — jangan lupa dicatat.</span>
             </div>
 
             <!-- Konfirmasi Password -->
@@ -671,11 +521,12 @@ $extra_head .= '
               <label class="pab-label" for="pab-pass2">Konfirmasi Password <span>*</span></label>
               <div style="position:relative">
                 <input id="pab-pass2" type="password" name="password_confirmation" required
-                       class="pab-input" placeholder="Ulangi password"
+                       class="pab-input" placeholder="Ulangi password yang sama"
                        autocomplete="new-password" style="padding-right:2.8rem">
                 <span id="pass-match-icon"
                       style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);display:none;"></span>
               </div>
+              <span class="pab-hint" id="pass-match-text"></span>
             </div>
 
             <!-- Divider -->
@@ -702,6 +553,10 @@ $extra_head .= '
                        accept="image/jpeg,image/png,image/webp"
                        class="hidden" required style="display:none">
               </div>
+              <span class="pab-file-error" id="pab-file-error">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span id="pab-file-error-text">Ukuran foto maksimal 2 MB.</span>
+              </span>
             </div>
 
             <!-- Submit -->
@@ -710,12 +565,16 @@ $extra_head .= '
               Kirim Pendaftaran
             </button>
 
+            <p class="pab-privacy-note">
+              Dengan mengirim formulir ini, kamu menyetujui data digunakan hanya untuk keperluan seleksi anggota.
+            </p>
+
           </form>
         </div><!-- .pab-card-body -->
       <?php endif; ?>
     </div><!-- .pab-card -->
 
-    <!-- Back link -->
+    <!-- Satu-satunya link kembali ke beranda -->
     <div class="pab-back">
       <a href="<?= BASE_URL ?>/">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
@@ -738,6 +597,7 @@ $extra_head .= '
     toggleBtn.addEventListener('click', function () {
       var isHidden = passInput.type === 'password';
       passInput.type = isHidden ? 'text' : 'password';
+      toggleBtn.setAttribute('aria-label', isHidden ? 'Sembunyikan password' : 'Tampilkan password');
       eyeIcon.innerHTML = isHidden
         ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
         : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
@@ -745,11 +605,13 @@ $extra_head .= '
   }
 
   /* ── Password match indicator ── */
-  var pass2Input = document.getElementById('pab-pass2');
-  var matchIcon  = document.getElementById('pass-match-icon');
+  var pass2Input   = document.getElementById('pab-pass2');
+  var matchIcon    = document.getElementById('pass-match-icon');
+  var matchText    = document.getElementById('pass-match-text');
   function checkMatch() {
     if (!passInput || !pass2Input || !pass2Input.value) {
       matchIcon.style.display = 'none';
+      if (matchText) matchText.textContent = '';
       return;
     }
     var ok = passInput.value === pass2Input.value;
@@ -757,6 +619,10 @@ $extra_head .= '
     matchIcon.innerHTML = ok
       ? '<svg width="16" height="16" fill="none" stroke="#4ade80" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
       : '<svg width="16" height="16" fill="none" stroke="#f87171" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    if (matchText) {
+      matchText.textContent = ok ? 'Password cocok.' : 'Password belum sama.';
+      matchText.style.color = ok ? '#4ade80' : '#f87171';
+    }
   }
   if (pass2Input) {
     pass2Input.addEventListener('input', checkMatch);
@@ -764,18 +630,35 @@ $extra_head .= '
   }
 
   /* ── Dropzone / file upload ── */
-  var dropzone  = document.getElementById('pab-dropzone');
-  var fileInput = document.getElementById('pab-foto');
-  var preview   = document.getElementById('pab-preview');
-  var dzInner   = document.getElementById('pab-dz-inner');
-  var resetBtn  = document.getElementById('pab-reset-photo');
+  var dropzone   = document.getElementById('pab-dropzone');
+  var fileInput  = document.getElementById('pab-foto');
+  var preview    = document.getElementById('pab-preview');
+  var dzInner    = document.getElementById('pab-dz-inner');
+  var resetBtn   = document.getElementById('pab-reset-photo');
+  var fileError  = document.getElementById('pab-file-error');
+  var fileErrTxt = document.getElementById('pab-file-error-text');
+
+  function showFileError(msg) {
+    if (fileError && fileErrTxt) {
+      fileErrTxt.textContent = msg;
+      fileError.classList.add('show');
+    }
+  }
+  function hideFileError() {
+    if (fileError) fileError.classList.remove('show');
+  }
 
   function showPreview(file) {
-    if (!file || !file.type.startsWith('image/')) return;
-    if (file.size > 2 * 1024 * 1024) {
-      alert('Ukuran foto maksimal 2 MB.');
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showFileError('File harus berupa gambar (JPG, PNG, atau WEBP).');
       return;
     }
+    if (file.size > 2 * 1024 * 1024) {
+      showFileError('Ukuran foto maksimal 2 MB.');
+      return;
+    }
+    hideFileError();
     var reader = new FileReader();
     reader.onload = function (e) {
       preview.src = e.target.result;
@@ -792,6 +675,7 @@ $extra_head .= '
     dzInner.style.display = '';
     resetBtn.classList.remove('show');
     fileInput.value = '';
+    hideFileError();
   }
 
   if (dropzone) {
