@@ -74,6 +74,11 @@
       border-bottom: 1px solid var(--c-border);
       position: fixed; top: 0; left: 0; right: 0; z-index: 210;
       display: flex; align-items: center;
+      overflow: hidden;
+      transition: height .35s cubic-bezier(.22,1,.36,1), opacity .3s ease, border-color .3s ease;
+    }
+    #topbar.collapsed {
+      height: 0; opacity: 0; border-bottom-color: transparent; pointer-events: none;
     }
     .topbar-inner {
       max-width: 1240px; margin: 0 auto; width: 100%; padding: 0 1.5rem;
@@ -99,19 +104,46 @@
     .tb-sep { width: 1px; height: 10px; background: var(--c-border); }
     @media(max-width: 640px) { #topbar { display: none; } }
 
-    /* ─── NAVBAR ─── */
+    /* ─── NAVBAR ───
+       Selalu tetap terlihat (fixed) saat scroll — tidak lagi disembunyikan.
+       Saat halaman di-scroll: topbar mengecil ke 0 dan navbar "naik" mengisi
+       posisinya (top:0), plus efek glass/blur + shadow + garis aksen tipis
+       supaya terasa lebih premium & tidak polos, namun tetap balance dengan
+       warna netral Design System. */
     #nav {
       position: fixed; top: var(--top-h); left: 0; right: 0; z-index: 200;
       height: var(--nav-h);
       background: var(--c-white);
       border-bottom: 1px solid var(--c-border);
       box-shadow: 0 1px 0 rgba(15,23,42,.02);
-      transition: box-shadow .3s ease, transform .3s cubic-bezier(.22,1,.36,1);
+      transition:
+        top .35s cubic-bezier(.22,1,.36,1),
+        box-shadow .35s ease,
+        background .35s ease,
+        border-color .35s ease,
+        backdrop-filter .35s ease;
     }
     @media(max-width: 640px) { #nav { top: 0; } }
-    #nav.scrolled {
-      box-shadow: 0 12px 32px -18px rgba(15,23,42,.18), 0 2px 10px rgba(15,23,42,.05);
+
+    #nav::after {
+      content: '';
+      position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(14,116,144,.35), rgba(6,182,212,.28), transparent);
+      opacity: 0;
+      transition: opacity .35s ease;
+      pointer-events: none;
     }
+
+    #nav.pinned { top: 0; }
+
+    #nav.scrolled {
+      background: rgba(255,255,255,.86);
+      backdrop-filter: saturate(180%) blur(14px);
+      -webkit-backdrop-filter: saturate(180%) blur(14px);
+      border-color: rgba(230,235,241,.75);
+      box-shadow: 0 16px 40px -20px rgba(15,23,42,.20), 0 3px 12px rgba(15,23,42,.06);
+    }
+    #nav.scrolled::after { opacity: 1; }
 
     .nav-wrap {
       max-width: 1240px; margin: 0 auto; height: var(--nav-h);
@@ -277,7 +309,7 @@
       padding: .75rem 1.25rem 1.25rem;
       display: flex; flex-direction: column; gap: 1px;
       transform: translateY(-110%); opacity:0;
-      transition: transform .35s cubic-bezier(.22,1,.36,1), opacity .28s;
+      transition: transform .35s cubic-bezier(.22,1,.36,1), opacity .28s, top .35s cubic-bezier(.22,1,.36,1);
       pointer-events: none;
     }
     @media(max-width:640px) { .mobile-drawer { top: var(--nav-h); } }
@@ -731,13 +763,16 @@
   }
   tick(); setInterval(tick,1000);
 
-  /* ── Scroll: hide/show nav ── */
-  const nav=document.getElementById('nav'); let ly=0;
+  /* ── Scroll: navbar tetap terlihat (fixed), topbar mengecil,
+        navbar naik ke top:0 + efek glass/shadow untuk kesan premium ── */
+  const nav=document.getElementById('nav');
+  const topbar=document.getElementById('topbar');
   window.addEventListener('scroll',()=>{
     const y=window.scrollY;
-    nav.classList.toggle('scrolled',y>24);
-    nav.style.transform=(y>200&&y>ly)?'translateY(-100%)':'translateY(0)';
-    ly=y;
+    nav.classList.toggle('scrolled', y>24);
+    const collapsed = y>120;
+    if (topbar) topbar.classList.toggle('collapsed', collapsed);
+    nav.classList.toggle('pinned', collapsed);
   },{passive:true});
 
   /* ── Mobile drawer ── */
