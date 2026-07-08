@@ -45,7 +45,7 @@
     /* ═══ PAGE ═══ */
     .page { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
 
-    /* ═══ LEFT PANEL ═══ */
+    /* ═══ LEFT PANEL (illustration + brand) ═══ */
     .left-panel {
       background: var(--c-surface);
       border-right: 1px solid var(--c-border);
@@ -96,6 +96,8 @@
     .brand-icon i { color: var(--c-sky); font-size: 22px; }
     .brand-name { font-size: 19px; font-weight: 800; color: #fff; letter-spacing: -.45px; }
     .brand-tagline { font-size: 10.5px; color: var(--c-muted2); display: block; margin-top: 2px; letter-spacing: .08em; text-transform: uppercase; }
+
+    /* ─── center block: headline + illustration mock + stats ─── */
     .left-content { position: relative; z-index: 1; }
     .left-badge {
       display: inline-flex; align-items: center; gap: 7px; padding: 4px 13px;
@@ -112,28 +114,57 @@
       50%      { opacity:.7; box-shadow:0 0 0 5px rgba(34,211,238,0); }
     }
     .left-headline {
-      font-size: clamp(1.9rem,2.8vw,2.7rem); font-weight: 900; color: #fff;
-      line-height: 1.1; letter-spacing: -.045em; margin-bottom: 1rem;
+      font-size: clamp(1.7rem,2.6vw,2.4rem); font-weight: 900; color: #fff;
+      line-height: 1.1; letter-spacing: -.045em; margin-bottom: .6rem;
     }
-    .left-headline .t-grad,
     .t-grad {
       background: linear-gradient(130deg, var(--c-sky-light) 0%, var(--c-indigo) 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    .left-desc { font-size: .875rem; color: var(--c-muted2); line-height: 1.85; max-width: 320px; }
-    .feature-list { display: flex; flex-direction: column; gap: 12px; margin-top: 2.2rem; }
-    .feature-item { display: flex; align-items: center; gap: 12px; }
-    .feature-dot {
-      width: 34px; height: 34px; border-radius: 9px;
-      background: rgba(14,165,233,.08); border: 1px solid rgba(14,165,233,.15);
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .2s;
+    .left-desc { font-size: .84rem; color: var(--c-muted2); line-height: 1.8; max-width: 340px; margin-bottom: 1.8rem; }
+
+    /* illustration mock — floating cards over a shield glyph, PMB-style hero */
+    .illustration-wrap {
+      position: relative; height: 210px; margin-bottom: 1.8rem;
+      display: flex; align-items: center; justify-content: center;
     }
-    .feature-item:hover .feature-dot { background: rgba(14,165,233,.16); }
-    .feature-dot i { color: var(--c-sky); font-size: 15px; }
-    .feature-text { font-size: .825rem; color: var(--c-muted2); }
+    .illus-shield {
+      width: 128px; height: 128px; border-radius: 32px;
+      background: linear-gradient(150deg, rgba(14,165,233,.14), rgba(99,102,241,.1));
+      border: 1px solid rgba(14,165,233,.22);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 20px 50px rgba(14,165,233,.12);
+      animation: illus-float 6s ease-in-out infinite;
+    }
+    .illus-shield i { font-size: 52px; color: var(--c-sky-light); }
+    @keyframes illus-float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+    .illus-card {
+      position: absolute; display: flex; align-items: center; gap: 10px;
+      background: rgba(8,14,24,.9); backdrop-filter: blur(6px);
+      border: 1px solid var(--c-border2); border-radius: var(--radius-md);
+      padding: 9px 14px; box-shadow: 0 14px 34px rgba(0,0,0,.35);
+    }
+    .illus-card i { font-size: 18px; color: var(--c-sky); }
+    .illus-card strong { display: block; font-size: .8rem; font-weight: 800; color: #fff; }
+    .illus-card span { display: block; font-size: .65rem; color: var(--c-muted2); }
+    .illus-card-1 { top: 4px; left: -6px; animation: illus-float 7s ease-in-out infinite; }
+    .illus-card-2 { bottom: 4px; right: -10px; animation: illus-float 8s ease-in-out infinite reverse; }
+
+    .trust-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+    .trust-stat {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(14,165,233,.07); border: 1px solid rgba(14,165,233,.16);
+      border-radius: 99px; padding: 5px 12px;
+      font-size: .72rem; color: var(--c-sky); font-weight: 600;
+    }
+    .trust-stat i { font-size: 13px; }
+
     .left-footer { position: relative; z-index: 1; font-size: .72rem; color: var(--c-muted); letter-spacing: .04em; }
 
-    /* ═══ RIGHT PANEL ═══ */
+    /* ═══ RIGHT PANEL (form) ═══ */
     .right-panel {
       display: flex; align-items: center; justify-content: center;
       background: var(--c-bg); padding: 2.5rem 2rem; position: relative;
@@ -149,9 +180,9 @@
     }
     @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
-    .login-header { margin-bottom: 2rem; }
+    .login-header { margin-bottom: 1.4rem; }
     .login-greeting { font-size: 1.65rem; font-weight: 900; color: #fff; letter-spacing: -.04em; }
-    .login-sub { font-size: .83rem; color: var(--c-muted2); margin-top: 5px; }
+    .login-sub { font-size: .83rem; color: var(--c-muted2); margin-top: 6px; line-height: 1.7; }
 
     /* Flash */
     .flash {
@@ -168,7 +199,7 @@
     /* Tabs */
     .tab-bar {
       display: flex; background: var(--c-surface2); border: 1px solid var(--c-border);
-      border-radius: var(--radius-md); padding: 4px; gap: 4px; margin-bottom: 1.75rem;
+      border-radius: var(--radius-md); padding: 4px; gap: 4px; margin-bottom: 1.5rem;
     }
     .tab-btn {
       flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
@@ -206,12 +237,32 @@
     .panel { display: none; }
     .panel.active { display: block; }
 
+    /* Remember-me row (PMB-style "Ingat Saya") */
+    .remember-row { display: flex; align-items: center; justify-content: space-between; margin: -.2rem 0 1.1rem; }
+    .check-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+    .check-wrap input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .check-box {
+      width: 17px; height: 17px; border-radius: 5px; border: 1px solid var(--c-border2);
+      background: var(--c-surface2); display: flex; align-items: center; justify-content: center;
+      transition: background .15s, border-color .15s; flex-shrink: 0;
+    }
+    .check-box::after {
+      content: '\ea5e'; font-family: 'tabler-icons' !important; font-size: 12px; color: #fff;
+      opacity: 0; transform: scale(.6); transition: opacity .12s, transform .12s;
+    }
+    .check-wrap input:checked + .check-box { background: var(--c-sky); border-color: var(--c-sky); }
+    .check-wrap input:checked + .check-box::after { opacity: 1; transform: scale(1); }
+    .check-wrap input:focus-visible + .check-box { box-shadow: 0 0 0 3px rgba(14,165,233,.18); }
+    .check-label { font-size: .78rem; color: var(--c-muted2); font-weight: 500; }
+    .forgot-link { font-size: .78rem; color: var(--c-sky); font-weight: 600; text-decoration: none; }
+    .forgot-link:hover { text-decoration: underline; }
+
     /* Submit */
     .submit-btn {
       width: 100%; padding: 13px; background: var(--c-sky); color: #fff; border: none;
       border-radius: var(--radius-sm); font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: .9rem; font-weight: 800; cursor: pointer; letter-spacing: -.01em;
-      margin-top: .5rem; display: flex; align-items: center; justify-content: center; gap: 9px;
+      display: flex; align-items: center; justify-content: center; gap: 9px;
       transition: background .18s, transform .12s, box-shadow .18s;
       box-shadow: 0 4px 22px rgba(14,165,233,.25);
     }
@@ -222,8 +273,17 @@
     .submit-btn .spin { display:none; animation: spinAnim .65s linear infinite; }
     @keyframes spinAnim { to{transform:rotate(360deg)} }
 
+    /* Help note (mirrors PMB's contact/SSO helper line under the form) */
+    .help-note {
+      display: flex; align-items: flex-start; gap: 8px; margin-top: 1rem;
+      font-size: .74rem; color: var(--c-muted); line-height: 1.6;
+    }
+    .help-note i { font-size: 14px; margin-top: 1px; color: var(--c-muted); flex-shrink: 0; }
+    .help-note a { color: var(--c-sky); font-weight: 600; text-decoration: none; }
+    .help-note a:hover { text-decoration: underline; }
+
     /* Divider */
-    .divider { display: flex; align-items: center; gap: 12px; margin: 1.6rem 0 1.2rem; }
+    .divider { display: flex; align-items: center; gap: 12px; margin: 1.5rem 0 1.1rem; }
     .divider-line { flex: 1; height: 1px; background: var(--c-border); }
     .divider-text { font-size: .72rem; color: var(--c-muted); font-weight: 500; letter-spacing:.04em; }
 
@@ -283,10 +343,8 @@
         background: var(--c-bg);
       }
 
-      /* wrapper fills full height */
       .mobile-shell { display: flex; flex-direction: column; min-height: 100vh; width: 100%; }
 
-      /* ── hero strip ── */
       .mobile-hero {
         position: relative; overflow: hidden;
         padding: 2.8rem 1.5rem 2rem;
@@ -310,7 +368,6 @@
           radial-gradient(ellipse 55% 45% at 0% 110%, rgba(99,102,241,.09) 0%, transparent 55%);
         pointer-events: none;
       }
-      /* floating orb on mobile hero */
       .mobile-orb {
         position: absolute; width: 260px; height: 260px; border-radius: 50%;
         background: radial-gradient(circle, rgba(14,165,233,.07) 0%, transparent 70%);
@@ -320,7 +377,7 @@
 
       .mobile-brand {
         display: flex; align-items: center; gap: 10px;
-        position: relative; z-index: 1; margin-bottom: 1.6rem;
+        position: relative; z-index: 1; margin-bottom: 1.3rem;
       }
       .mobile-brand-icon {
         width: 38px; height: 38px; background: rgba(14,165,233,.1);
@@ -339,7 +396,7 @@
         background: rgba(14,165,233,.07); border: 1px solid rgba(14,165,233,.2);
         border-radius: 99px; font-size: .6rem; color: var(--c-sky);
         letter-spacing: .08em; text-transform: uppercase;
-        margin-bottom: 1rem; position: relative; z-index: 1;
+        margin-bottom: .9rem; position: relative; z-index: 1;
       }
       .mobile-badge-pulse {
         width: 5px; height: 5px; border-radius: 50%; background: var(--c-cyan);
@@ -348,7 +405,7 @@
 
       .mobile-headline {
         position: relative; z-index: 1;
-        font-size: 1.75rem; font-weight: 900; color: #fff;
+        font-size: 1.65rem; font-weight: 900; color: #fff;
         line-height: 1.1; letter-spacing: -.045em; margin-bottom: .5rem;
       }
       .mobile-sub {
@@ -356,34 +413,26 @@
         font-size: .8rem; color: var(--c-muted2); line-height: 1.65; max-width: 280px;
       }
       .mobile-stats {
-        display: flex; gap: 7px; margin-top: 1.3rem;
+        display: flex; gap: 7px; margin-top: 1.1rem;
         position: relative; z-index: 1; flex-wrap: wrap;
       }
-      .mobile-stat {
-        display: flex; align-items: center; gap: 5px;
-        background: rgba(14,165,233,.07); border: 1px solid rgba(14,165,233,.16);
-        border-radius: 99px; padding: 4px 11px;
-        font-size: .7rem; color: var(--c-sky); font-weight: 600;
-      }
-      .mobile-stat i { font-size: 12px; }
 
-      /* ── form area ── */
       .mobile-form-area {
-        flex: 1; padding: 1.8rem 1.25rem 2.5rem;
+        flex: 1; padding: 1.6rem 1.25rem 2.3rem;
         display: flex; flex-direction: column;
       }
       .login-box { max-width: 100%; animation: none; }
-      .login-header { margin-bottom: 1.5rem; }
-      .login-greeting { font-size: 1.25rem; }
+      .login-header { margin-bottom: 1.3rem; }
+      .login-greeting { font-size: 1.2rem; }
       .login-sub { font-size: .78rem; }
     }
 
     @media (max-width: 380px) {
-      .mobile-hero { padding: 2.2rem 1.1rem 1.8rem; }
-      .mobile-headline { font-size: 1.5rem; }
-      .mobile-form-area { padding: 1.5rem 1rem 2rem; }
+      .mobile-hero { padding: 2.2rem 1.1rem 1.6rem; }
+      .mobile-headline { font-size: 1.45rem; }
+      .mobile-form-area { padding: 1.4rem 1rem 1.8rem; }
       .mobile-stats { gap: 5px; }
-      .mobile-stat { font-size: .65rem; padding: 3px 9px; }
+      .trust-stat { font-size: .65rem; padding: 3px 9px; }
     }
   </style>
 </head>
@@ -391,7 +440,7 @@
 <body>
 <main class="page">
 
-  <!-- ═══ LEFT PANEL (desktop) ═══ -->
+  <!-- ═══ LEFT PANEL (desktop) — illustration + trust stats, PMB-style ═══ -->
   <aside class="left-panel">
     <div class="left-orb-1"></div>
     <div class="left-orb-2"></div>
@@ -411,24 +460,25 @@
     <div class="left-content">
       <div class="left-badge"><span class="left-badge-pulse"></span>Platform Aktif</div>
       <h1 class="left-headline">Selamat datang<br>kembali, <span class="t-grad">Anggota</span></h1>
-      <p class="left-desc">Akses informasi keanggotaan, kelola profil, dan pantau aktivitas Anda kapan saja dan di mana saja.</p>
-      <div class="feature-list">
-        <div class="feature-item">
-          <div class="feature-dot"><i class="ti ti-users"></i></div>
-          <span class="feature-text">Manajemen data anggota terpusat</span>
+
+      <div class="illustration-wrap">
+        <div class="illus-shield"><i class="ti ti-shield-lock"></i></div>
+        <div class="illus-card illus-card-1">
+          <i class="ti ti-users"></i>
+          <div><strong><?= htmlspecialchars($settings['stat_members']['value'] ?? '100+') ?></strong><span>Anggota</span></div>
         </div>
-        <div class="feature-item">
-          <div class="feature-dot"><i class="ti ti-calendar-event"></i></div>
-          <span class="feature-text">Absensi &amp; jadwal kegiatan real-time</span>
+        <div class="illus-card illus-card-2">
+          <i class="ti ti-calendar-event"></i>
+          <div><strong><?= htmlspecialchars($settings['stat_events']['value'] ?? '50+') ?></strong><span>Kegiatan</span></div>
         </div>
-        <div class="feature-item">
-          <div class="feature-dot"><i class="ti ti-chart-bar"></i></div>
-          <span class="feature-text">Laporan &amp; statistik otomatis</span>
-        </div>
-        <div class="feature-item">
-          <div class="feature-dot"><i class="ti ti-lock"></i></div>
-          <span class="feature-text">Keamanan data terenkripsi end-to-end</span>
-        </div>
+      </div>
+
+      <p class="left-desc">Masuk menggunakan Nomor Induk Anggota (NIA) untuk akun anggota, atau email untuk akun administrator. Pastikan kata sandi Anda terjaga kerahasiaannya.</p>
+
+      <div class="trust-stats">
+        <span class="trust-stat"><i class="ti ti-users"></i> <?= htmlspecialchars($settings['stat_members']['value'] ?? '100+') ?> Anggota</span>
+        <span class="trust-stat"><i class="ti ti-calendar-event"></i> <?= htmlspecialchars($settings['stat_events']['value'] ?? '50+') ?> Kegiatan</span>
+        <span class="trust-stat"><i class="ti ti-star"></i> <?= htmlspecialchars($settings['stat_awards']['value'] ?? '20+') ?> Prestasi</span>
       </div>
     </div>
 
@@ -457,9 +507,9 @@
         <h1 class="mobile-headline">Selamat datang,<br><span class="t-grad">Anggota</span></h1>
         <p class="mobile-sub">Masuk dan kelola aktivitas organisasimu dengan mudah.</p>
         <div class="mobile-stats">
-          <span class="mobile-stat"><i class="ti ti-users"></i> <?= htmlspecialchars($settings['stat_members']['value'] ?? '100+') ?> Anggota</span>
-          <span class="mobile-stat"><i class="ti ti-calendar-event"></i> <?= htmlspecialchars($settings['stat_events']['value'] ?? '50+') ?> Kegiatan</span>
-          <span class="mobile-stat"><i class="ti ti-star"></i> <?= htmlspecialchars($settings['stat_awards']['value'] ?? '20+') ?> Prestasi</span>
+          <span class="trust-stat"><i class="ti ti-users"></i> <?= htmlspecialchars($settings['stat_members']['value'] ?? '100+') ?> Anggota</span>
+          <span class="trust-stat"><i class="ti ti-calendar-event"></i> <?= htmlspecialchars($settings['stat_events']['value'] ?? '50+') ?> Kegiatan</span>
+          <span class="trust-stat"><i class="ti ti-star"></i> <?= htmlspecialchars($settings['stat_awards']['value'] ?? '20+') ?> Prestasi</span>
         </div>
       </div>
 
@@ -469,7 +519,7 @@
 
           <div class="login-header">
             <h2 class="login-greeting">Masuk ke akun</h2>
-            <p class="login-sub">Pilih tipe akun lalu masukkan kredensial Anda.</p>
+            <p class="login-sub">Pilih tipe akun, lalu masukkan kredensial dan kata sandi Anda untuk melanjutkan.</p>
           </div>
 
           <?php if (!empty($flash)): ?>
@@ -524,11 +574,20 @@
                 </button>
               </div>
             </div>
+            <div class="remember-row">
+              <label class="check-wrap">
+                <input type="checkbox" name="remember" id="remember-m" value="1">
+                <span class="check-box"></span>
+                <span class="check-label">Ingat saya</span>
+              </label>
+              <a href="<?= BASE_URL ?>/forgot-password" class="forgot-link">Lupa sandi?</a>
+            </div>
             <button type="submit" class="submit-btn" id="submit-member">
               <i class="ti ti-refresh spin"></i>
               <i class="ti ti-login btn-ico"></i>
               <span class="btn-tx">Masuk sebagai Anggota</span>
             </button>
+            <p class="help-note"><i class="ti ti-info-circle"></i><span>Belum bisa masuk? Hubungi sekretariat atau lihat menu <a href="<?= BASE_URL ?>/pab">Penerimaan Anggota Baru</a> di bawah.</span></p>
           </form>
 
           <!-- Form Admin -->
@@ -556,6 +615,14 @@
                     <i class="ti ti-eye"></i>
                   </button>
                 </div>
+              </div>
+              <div class="remember-row">
+                <label class="check-wrap">
+                  <input type="checkbox" name="remember" id="remember-a" value="1">
+                  <span class="check-box"></span>
+                  <span class="check-label">Ingat saya</span>
+                </label>
+                <a href="<?= BASE_URL ?>/forgot-password" class="forgot-link">Lupa sandi?</a>
               </div>
               <div class="flash info">
                 <i class="ti ti-shield-lock"></i>
@@ -635,9 +702,11 @@ function switchTab(type) {
   if (isMember) {
     document.getElementById('email').value      = '';
     document.getElementById('password-a').value = '';
+    document.getElementById('remember-a').checked = false;
   } else {
     document.getElementById('nia').value        = '';
     document.getElementById('password-m').value = '';
+    document.getElementById('remember-m').checked = false;
   }
   try { sessionStorage.setItem('login_tab', type); } catch(e) {}
 }
