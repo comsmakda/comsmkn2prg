@@ -8,39 +8,58 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/custom.css">
 
   <?= $extra_head ?? '' ?>
 
   <style>
     :root {
-      --c-bg:        #03070e;
-      --c-surface:   #060b14;
-      --c-surface2:  #091018;
-      --c-surface3:  #0d1620;
-      --c-border:    rgba(255,255,255,0.06);
-      --c-border2:   rgba(14,165,233,0.2);
-      --c-text:      #dde6f0;
-      --c-muted:     #435566;
-      --c-muted2:    #6e8799;
-      --c-sky:       #0ea5e9;
-      --c-sky-light: #38bdf8;
-      --c-indigo:    #6366f1;
-      --c-cyan:      #22d3ee;
-      --nav-h:       66px;
-      --top-h:       32px;
-      --font-display:'Sora', sans-serif;
-      --font-body:   'DM Sans', sans-serif;
-      --font-mono:   'DM Mono', monospace;
+      /* Base surface — sama seperti design-system.md §2 */
+      --c-page:        #eef2f6;
+      --c-white:       #ffffff;
+      --c-ink:         #0f172a;
+      --c-muted:       #64748b;
+      --c-muted2:      #94a3b8;
+      --c-border:      #e6ebf1;
+
+      /* Aksen utama — SATU warna, dipakai konsisten */
+      --c-primary:     #0e7490;
+      --c-primary-dk:  #0b5a70;
+      --c-primary-lt:  #06b6d4;
+
+      /* Status */
+      --c-amber-bg:     #fef6e2;
+      --c-amber-border: #fbe3a8;
+      --c-amber-text:   #8a5a06;
+      --c-amber-icon:   #d9910c;
+
+      --c-red-bg:      #fef2f2;
+      --c-red-border:  #fecaca;
+      --c-red-text:    #b91c1c;
+
+      --c-green-bg:    #f0fdf4;
+      --c-green-border:#bbf7d0;
+      --c-green-text:  #15803d;
+
+      /* Radius */
+      --radius-sm: 9px;
+      --radius-md: 13px;
+      --radius-lg: 22px;
+
+      --nav-h:  66px;
+      --top-h:  32px;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-body:    'Plus Jakarta Sans', sans-serif;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
       font-family: var(--font-body);
-      background: var(--c-bg);
-      color: var(--c-text);
+      background: var(--c-page);
+      color: var(--c-ink);
       min-height: 100vh;
       display: flex; flex-direction: column;
       -webkit-font-smoothing: antialiased;
@@ -51,7 +70,7 @@
     /* ─── TOPBAR ─── */
     #topbar {
       height: var(--top-h);
-      background: var(--c-surface);
+      background: var(--c-white);
       border-bottom: 1px solid var(--c-border);
       position: fixed; top: 0; left: 0; right: 0; z-index: 210;
       display: flex; align-items: center;
@@ -62,21 +81,21 @@
     }
     .topbar-left {
       display: flex; align-items: center; gap: 5px;
-      font-family: var(--font-mono); font-size: 0.62rem;
-      color: var(--c-muted); letter-spacing: 0.04em;
+      font-size: 0.68rem; font-weight: 600;
+      color: var(--c-muted2); letter-spacing: 0.03em;
     }
-    .topbar-left span.lbl { color: var(--c-muted); }
+    .topbar-left span.lbl { color: var(--c-muted2); }
     #server-clock {
-      font-family: var(--font-mono); font-size: 0.62rem;
-      color: var(--c-sky); letter-spacing: 0.06em; min-width: 52px;
+      font-size: 0.68rem; font-weight: 700;
+      color: var(--c-primary); letter-spacing: 0.03em; min-width: 52px;
     }
     .topbar-right { display: flex; align-items: center; gap: 12px; }
     .topbar-right a {
-      font-size: 0.6rem; color: var(--c-muted);
-      text-decoration: none; letter-spacing: 0.04em; transition: color 0.18s;
-      font-family: var(--font-mono); text-transform: uppercase;
+      font-size: 0.68rem; color: var(--c-muted);
+      text-decoration: none; letter-spacing: 0.02em; transition: color 0.18s;
+      font-weight: 500;
     }
-    .topbar-right a:hover { color: var(--c-muted2); }
+    .topbar-right a:hover { color: var(--c-primary); }
     .tb-sep { width: 1px; height: 10px; background: var(--c-border); }
     @media(max-width: 640px) { #topbar { display: none; } }
 
@@ -84,16 +103,14 @@
     #nav {
       position: fixed; top: var(--top-h); left: 0; right: 0; z-index: 200;
       height: var(--nav-h);
-      border-bottom: 1px solid transparent;
-      transition: background .4s ease, box-shadow .4s ease, border-color .4s ease, transform .3s cubic-bezier(.22,1,.36,1);
+      background: var(--c-white);
+      border-bottom: 1px solid var(--c-border);
+      box-shadow: 0 1px 0 rgba(15,23,42,.02);
+      transition: box-shadow .3s ease, transform .3s cubic-bezier(.22,1,.36,1);
     }
     @media(max-width: 640px) { #nav { top: 0; } }
     #nav.scrolled {
-      background: rgba(3,7,14,0.93);
-      backdrop-filter: blur(26px) saturate(180%);
-      -webkit-backdrop-filter: blur(26px) saturate(180%);
-      border-color: var(--c-border);
-      box-shadow: 0 1px 0 rgba(14,165,233,0.04), 0 12px 48px rgba(0,0,0,0.72);
+      box-shadow: 0 12px 32px -18px rgba(15,23,42,.18), 0 2px 10px rgba(15,23,42,.05);
     }
 
     .nav-wrap {
@@ -110,201 +127,142 @@
     .nav-brand:hover .nav-brand-logo { opacity: .85; transform: rotate(-5deg) scale(1.05); }
     .nav-brand-name {
       font-family: var(--font-display); font-weight: 800; font-size: .95rem;
-      color: #fff; letter-spacing: -.025em; line-height: 1; display: block;
+      color: var(--c-primary-dk); letter-spacing: -.025em; line-height: 1; display: block;
       transition: color .18s;
     }
-    .nav-brand:hover .nav-brand-name { color: var(--c-sky-light); }
+    .nav-brand:hover .nav-brand-name { color: var(--c-primary); }
     .nav-brand-sub {
-      font-family: var(--font-mono); font-size: .56rem; color: var(--c-muted2);
-      letter-spacing: .1em; text-transform: uppercase; display: block; margin-top: 3px;
+      font-size: .62rem; color: var(--c-muted2); font-weight: 600;
+      letter-spacing: .07em; text-transform: uppercase; display: block; margin-top: 3px;
     }
 
     .nav-sep { width: 1px; height: 20px; background: var(--c-border); flex-shrink: 0; }
 
     .nav-links { display: flex; align-items: center; }
     .nav-link {
-      position: relative; font-size: .78rem; font-weight: 500; color: var(--c-muted2);
-      text-decoration: none; padding: 6px 12px; border-radius: 7px;
+      position: relative; font-size: .82rem; font-weight: 600; color: var(--c-muted);
+      text-decoration: none; padding: 6px 12px; border-radius: var(--radius-sm);
       transition: color .18s, background .18s; letter-spacing: -.01em; white-space: nowrap;
     }
-    .nav-link:hover { color: #fff; background: rgba(255,255,255,.04); }
-    .nav-link.active { color: var(--c-sky); }
+    .nav-link:hover { color: var(--c-ink); background: #f4f7fa; }
+    .nav-link.active { color: var(--c-primary); }
     .nav-link.active::after {
       content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 14px; height: 2px; border-radius: 2px; background: var(--c-sky);
+      width: 14px; height: 2px; border-radius: 2px; background: var(--c-primary);
     }
+    .nav-link svg { color: var(--c-muted2); }
 
     /* ─── DROPDOWN (hover-based) ─── */
-    .nav-dd {
-      position: relative;
-    }
-
-    /* Bridge area so mouse can move from toggle to menu without flickering */
+    .nav-dd { position: relative; }
     .nav-dd::after {
-      content: '';
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      height: 12px;
-      background: transparent;
+      content: ''; position: absolute; top: 100%; left: 0; right: 0; height: 12px; background: transparent;
     }
-
     .nav-dd-toggle {
       display: flex; align-items: center; gap: 4px;
-      font-size: .78rem; font-weight: 500; color: var(--c-muted2);
+      font-size: .82rem; font-weight: 600; color: var(--c-muted);
       background: none; border: none; cursor: pointer;
-      padding: 6px 12px; border-radius: 7px;
+      padding: 6px 12px; border-radius: var(--radius-sm);
       transition: color .18s, background .18s;
       font-family: var(--font-body);
       letter-spacing: -.01em;
       user-select: none;
     }
     .nav-dd-toggle:hover,
-    .nav-dd:hover .nav-dd-toggle { color: #fff; background: rgba(255,255,255,.04); }
-
-    .nav-dd-toggle .dd-chevron {
-      transition: transform .25s cubic-bezier(.22,1,.36,1);
-      flex-shrink: 0;
-    }
+    .nav-dd:hover .nav-dd-toggle { color: var(--c-ink); background: #f4f7fa; }
+    .nav-dd-toggle .dd-chevron { transition: transform .25s cubic-bezier(.22,1,.36,1); flex-shrink: 0; }
     .nav-dd:hover .nav-dd-toggle .dd-chevron { transform: rotate(180deg); }
 
-    /* The menu — hidden by default, shown on hover via CSS */
     .nav-dd-menu {
-      visibility: hidden;
-      opacity: 0;
-      pointer-events: none;
-      position: absolute;
-      top: calc(100% + 10px);
-      left: 50%;
+      visibility: hidden; opacity: 0; pointer-events: none;
+      position: absolute; top: calc(100% + 10px); left: 50%;
       transform: translateX(-50%) translateY(-6px) scale(.97);
       min-width: 220px;
-      background: rgba(6,11,20,.97);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      background: var(--c-white);
       border: 1px solid var(--c-border);
-      border-top: 1px solid rgba(14,165,233,.18);
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       padding: .5rem;
-      box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03) inset;
+      box-shadow: 0 30px 70px -20px rgba(15,23,42,.28), 0 4px 18px rgba(15,23,42,.06);
       z-index: 300;
-      transition:
-        opacity .22s cubic-bezier(.22,1,.36,1),
-        transform .22s cubic-bezier(.22,1,.36,1),
-        visibility .22s;
+      transition: opacity .22s cubic-bezier(.22,1,.36,1), transform .22s cubic-bezier(.22,1,.36,1), visibility .22s;
     }
-
-    /* Show on hover — both toggle hover AND menu hover */
     .nav-dd:hover .nav-dd-menu {
-      visibility: visible;
-      opacity: 1;
-      pointer-events: all;
+      visibility: visible; opacity: 1; pointer-events: all;
       transform: translateX(-50%) translateY(0) scale(1);
     }
-
-    /* Decorative top glow line */
     .nav-dd-menu::before {
-      content: '';
-      position: absolute;
-      top: -1px; left: 20px; right: 20px; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(14,165,233,.5), transparent);
+      content: ''; position: absolute; top: -1px; left: 20px; right: 20px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(14,116,144,.35), transparent);
       border-radius: 1px;
     }
 
     .dd-header {
-      padding: 6px 12px 4px;
-      font-family: var(--font-mono);
-      font-size: .55rem;
-      color: var(--c-muted);
-      text-transform: uppercase;
-      letter-spacing: .12em;
+      padding: 6px 12px 4px; font-size: .62rem; color: var(--c-muted2);
+      text-transform: uppercase; letter-spacing: .1em; font-weight: 700;
     }
-
     .dd-item {
       display: flex; align-items: center; gap: 10px;
-      padding: 9px 12px; border-radius: 8px;
-      font-size: .8rem; font-weight: 500; color: var(--c-muted2);
-      text-decoration: none;
-      transition: color .15s, background .15s, transform .18s;
-      position: relative;
-      overflow: hidden;
+      padding: 9px 12px; border-radius: var(--radius-sm);
+      font-size: .84rem; font-weight: 600; color: var(--c-ink);
+      text-decoration: none; transition: color .15s, background .15s, transform .18s;
+      position: relative; overflow: hidden;
     }
-    .dd-item::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(14,165,233,.06), transparent);
-      opacity: 0;
-      transition: opacity .18s;
-      border-radius: 8px;
-    }
-    .dd-item:hover { color: #fff; background: rgba(255,255,255,.05); transform: translateX(2px); }
-    .dd-item:hover::before { opacity: 1; }
-
+    .dd-item:hover { background: #f4f7fa; transform: translateX(2px); }
     .dd-item-icon {
       width: 30px; height: 30px; flex-shrink: 0;
-      background: rgba(14,165,233,.08);
-      border: 1px solid rgba(14,165,233,.14);
+      background: rgba(14,116,144,.08);
+      border: 1px solid rgba(14,116,144,.14);
       border-radius: 7px;
-      display: flex; align-items: center; justify-content:center;
-      color: var(--c-sky);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--c-primary);
       transition: background .18s, border-color .18s, transform .18s;
+      font-size: 15px;
     }
-    .dd-item:hover .dd-item-icon {
-      background: rgba(14,165,233,.15);
-      border-color: rgba(14,165,233,.3);
-      transform: scale(1.08);
-    }
-
+    .dd-item:hover .dd-item-icon { background: rgba(14,116,144,.14); border-color: rgba(14,116,144,.3); transform: scale(1.08); }
     .dd-item-text { display: flex; flex-direction: column; gap: 1px; }
-    .dd-item-label { font-size: .79rem; font-weight: 600; color: inherit; line-height: 1; }
-    .dd-item-desc  { font-size: .67rem; color: var(--c-muted); line-height: 1; }
-    .dd-item:hover .dd-item-desc { color: var(--c-muted2); }
-
+    .dd-item-label { font-size: .84rem; font-weight: 700; color: inherit; line-height: 1; }
+    .dd-item-desc  { font-size: .7rem; color: var(--c-muted); line-height: 1.3; }
     .dd-sep { height: 1px; background: var(--c-border); margin: .35rem .5rem; }
-
     .dd-footer {
-      padding: 6px 10px 2px;
-      display: flex; align-items: center; gap: 5px;
-      font-family: var(--font-mono); font-size: .58rem; color: var(--c-muted);
+      padding: 6px 10px 2px; display: flex; align-items: center; gap: 5px;
+      font-size: .68rem; color: var(--c-muted2); font-weight: 500;
     }
-    .dd-footer-dot { width: 5px; height: 5px; border-radius: 50%; background: #22c55e; animation: fp 2.4s ease-in-out infinite; }
+    .dd-footer-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--c-green-text); animation: fp 2.4s ease-in-out infinite; }
 
     /* Mobile sub-menu */
     .mob-sub { padding-left: 1rem; display: none; }
     .mob-sub.open { display: block; }
     .mob-sub-item {
       display: flex; align-items: center; gap: 7px;
-      font-size: .84rem; color: var(--c-muted2);
-      text-decoration: none; padding: .55rem .75rem; border-radius: 7px;
+      font-size: .84rem; color: var(--c-muted); font-weight: 600;
+      text-decoration: none; padding: .55rem .75rem; border-radius: var(--radius-sm);
       transition: color .15s, background .15s;
     }
-    .mob-sub-item:hover { color: #fff; background: rgba(255,255,255,.04); }
+    .mob-sub-item:hover { color: var(--c-ink); background: #f4f7fa; }
 
     .nav-actions { display: flex; align-items: center; gap: 7px; }
     .nav-btn-ghost {
       display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px;
-      font-size: .76rem; font-weight: 600; color: var(--c-muted2);
-      border: 1px solid var(--c-border); border-radius: 7px; text-decoration: none;
-      transition: all .18s; letter-spacing: -.01em;
+      font-size: .8rem; font-weight: 700; color: var(--c-ink);
+      border: 1.5px solid var(--c-border); border-radius: var(--radius-sm); text-decoration: none;
+      transition: all .18s; letter-spacing: -.01em; background: var(--c-white);
     }
-    .nav-btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,.13); background: rgba(255,255,255,.04); }
+    .nav-btn-ghost:hover { background: #f4f7fa; border-color: #d7dee7; }
     .nav-btn-cta {
       display: inline-flex; align-items: center; gap: 5px; padding: 8px 16px;
-      font-size: .76rem; font-weight: 700; color: #fff; background: var(--c-sky);
-      border-radius: 7px; text-decoration: none; transition: all .22s cubic-bezier(.22,1,.36,1);
-      letter-spacing: -.01em; box-shadow: 0 2px 14px rgba(14,165,233,.22);
+      font-size: .8rem; font-weight: 800; color: #fff; background: var(--c-primary);
+      border-radius: var(--radius-sm); text-decoration: none; transition: background .18s, transform .12s, box-shadow .18s;
+      letter-spacing: -.01em; box-shadow: 0 8px 22px rgba(14,116,144,.25);
     }
-    .nav-btn-cta:hover { background: var(--c-sky-light); box-shadow: 0 4px 22px rgba(14,165,233,.38); transform: translateY(-1px); }
+    .nav-btn-cta:hover { background: var(--c-primary-lt); box-shadow: 0 12px 28px rgba(6,182,212,.3); transform: translateY(-2px); }
 
     .hamburger {
       display: none; flex-direction: column; gap: 4px; cursor: pointer;
-      padding: 8px; background: rgba(255,255,255,.03);
-      border: 1px solid var(--c-border); border-radius: 8px;
+      padding: 8px; background: var(--c-white);
+      border: 1.5px solid var(--c-border); border-radius: var(--radius-sm);
     }
     .hamburger span {
       display: block; width: 18px; height: 1.5px;
-      background: var(--c-muted2); border-radius: 2px;
+      background: var(--c-muted); border-radius: 2px;
       transition: all .3s cubic-bezier(.22,1,.36,1);
     }
     .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px,4px); }
@@ -313,8 +271,9 @@
 
     .mobile-drawer {
       position: fixed; top: calc(var(--nav-h) + var(--top-h)); left:0; right:0; z-index:199;
-      background: rgba(3,7,14,.98); backdrop-filter: blur(28px);
+      background: var(--c-white);
       border-bottom: 1px solid var(--c-border);
+      box-shadow: 0 24px 48px -20px rgba(15,23,42,.18);
       padding: .75rem 1.25rem 1.25rem;
       display: flex; flex-direction: column; gap: 1px;
       transform: translateY(-110%); opacity:0;
@@ -326,53 +285,47 @@
 
     .mob-link {
       display: flex; align-items: center; justify-content: space-between;
-      font-size: .88rem; font-weight: 600; color: var(--c-muted2);
-      text-decoration: none; padding: .68rem .75rem; border-radius: 8px;
+      font-size: .88rem; font-weight: 700; color: var(--c-ink);
+      text-decoration: none; padding: .68rem .75rem; border-radius: var(--radius-sm);
       transition: color .18s, background .18s;
     }
-    .mob-link:hover { color:#fff; background: rgba(255,255,255,.04); }
-    .mob-link svg { opacity:.3; transition: opacity .18s; }
-    .mob-link:hover svg { opacity:.7; }
+    .mob-link:hover { background: #f4f7fa; }
+    .mob-link svg { opacity:.35; transition: opacity .18s; color: var(--c-muted2); }
+    .mob-link:hover svg { opacity:.8; }
     .mob-sep { height:1px; background: var(--c-border); margin: .5rem 0; }
     .mob-actions { display:flex; gap:7px; }
     .mob-ghost {
-      flex:1; padding:11px; text-align:center; font-size:.81rem; font-weight:600;
-      color: var(--c-muted2); border:1px solid var(--c-border); border-radius:8px;
-      text-decoration:none; transition: all .18s;
+      flex:1; padding:11px; text-align:center; font-size:.83rem; font-weight:700;
+      color: var(--c-ink); border:1.5px solid var(--c-border); border-radius:var(--radius-sm);
+      text-decoration:none; transition: all .18s; background: var(--c-white);
     }
-    .mob-ghost:hover { color:#fff; border-color: rgba(255,255,255,.13); }
+    .mob-ghost:hover { background: #f4f7fa; }
     .mob-cta {
-      flex:1; padding:11px; text-align:center; background: var(--c-sky);
-      font-size:.81rem; font-weight:700; color:#fff; border-radius:8px;
+      flex:1; padding:11px; text-align:center; background: var(--c-primary);
+      font-size:.83rem; font-weight:800; color:#fff; border-radius:var(--radius-sm);
       text-decoration:none; transition: all .18s;
     }
-    .mob-cta:hover { background: var(--c-sky-light); }
+    .mob-cta:hover { background: var(--c-primary-lt); }
 
     @media(max-width:860px) { .nav-links,.nav-actions,.nav-sep { display:none; } .hamburger { display:flex; } }
 
     /* ─── ALERT ─── */
     .alert-wrap { max-width:1240px; margin:1rem auto; padding:0 1.5rem; }
     .alert {
-      display:flex; align-items:center; gap:9px; padding:12px 16px; border-radius:9px;
-      font-size:.85rem; font-weight:500; border:1px solid; animation: aIn .25s ease;
+      display:flex; align-items:center; gap:9px; padding:12px 16px; border-radius:var(--radius-md);
+      font-size:.85rem; font-weight:600; border:1px solid; animation: aIn .25s ease;
     }
     @keyframes aIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
-    .alert-error   { background:rgba(239,68,68,.07);  border-color:rgba(239,68,68,.2);  color:#fca5a5; }
-    .alert-success { background:rgba(34,197,94,.07);  border-color:rgba(34,197,94,.2);  color:#86efac; }
-    .alert-info    { background:rgba(14,165,233,.07); border-color:rgba(14,165,233,.2); color:#7dd3fc; }
+    .alert-error   { background: var(--c-red-bg);   border-color: var(--c-red-border);   color: var(--c-red-text); }
+    .alert-success { background: var(--c-green-bg); border-color: var(--c-green-border); color: var(--c-green-text); }
+    .alert-info    { background: var(--c-amber-bg); border-color: var(--c-amber-border); color: var(--c-amber-text); }
 
     /* ─── FOOTER ─── */
-    .site-footer { position:relative; overflow:hidden; background: var(--c-surface); border-top:1px solid var(--c-border); }
+    .site-footer { position:relative; overflow:hidden; background: var(--c-white); border-top:1px solid var(--c-border); }
     .site-footer::before {
       content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
       width:600px; height:1px;
-      background:linear-gradient(90deg, transparent, rgba(14,165,233,.45), rgba(99,102,241,.35), transparent);
-    }
-    .site-footer::after {
-      content:''; position:absolute; top:-180px; left:50%; transform:translateX(-50%);
-      width:700px; height:420px;
-      background:radial-gradient(ellipse, rgba(14,165,233,.03) 0%, transparent 68%);
-      pointer-events:none;
+      background:linear-gradient(90deg, transparent, rgba(14,116,144,.35), rgba(6,182,212,.25), transparent);
     }
 
     .footer-inner { max-width:1240px; margin:0 auto; padding:0 1.5rem 2.5rem; position:relative; z-index:1; }
@@ -387,92 +340,91 @@
     .fb-row { display:flex; align-items:center; gap:9px; text-decoration:none; margin-bottom:.9rem; width:fit-content; }
     .fb-logo { width:36px; height:36px; object-fit:contain; display:block; flex-shrink:0; transition:opacity .18s; }
     .fb-row:hover .fb-logo { opacity:.85; }
-    .fb-name { font-family:var(--font-display); font-weight:800; font-size:.9rem; color:#fff; letter-spacing:-.022em; display:block; transition:color .18s; }
-    .fb-row:hover .fb-name { color: var(--c-sky-light); }
-    .fb-sub  { font-family:var(--font-mono); font-size:.56rem; color: var(--c-muted2); letter-spacing:.09em; text-transform:uppercase; display:block; margin-top:2px; }
-    .fb-desc { font-size:.8rem; color: var(--c-muted); line-height:1.9; margin-bottom:1.4rem; max-width:290px; }
+    .fb-name { font-family:var(--font-display); font-weight:800; font-size:.9rem; color: var(--c-primary-dk); letter-spacing:-.022em; display:block; transition:color .18s; }
+    .fb-row:hover .fb-name { color: var(--c-primary); }
+    .fb-sub  { font-size:.62rem; color: var(--c-muted2); font-weight:600; letter-spacing:.07em; text-transform:uppercase; display:block; margin-top:2px; }
+    .fb-desc { font-size:.83rem; color: var(--c-muted); line-height:1.9; margin-bottom:1.4rem; max-width:290px; }
 
     .fb-socials { display:flex; gap:6px; margin-bottom:1.5rem; }
     .fb-social {
-      width:34px; height:34px; border-radius:7px; background: var(--c-surface2);
-      border:1px solid var(--c-border); display:flex; align-items:center; justify-content:center;
-      color: var(--c-muted2); text-decoration:none; transition: all .22s cubic-bezier(.22,1,.36,1);
+      width:34px; height:34px; border-radius:var(--radius-sm); background: var(--c-white);
+      border:1.5px solid var(--c-border); display:flex; align-items:center; justify-content:center;
+      color: var(--c-muted); text-decoration:none; transition: all .22s cubic-bezier(.22,1,.36,1); font-size:15px;
     }
-    .fb-social:hover { background: var(--c-surface3); border-color: var(--c-border2); color: var(--c-sky); transform:translateY(-2px); box-shadow:0 6px 16px rgba(14,165,233,.15); }
+    .fb-social:hover { background: #f4f7fa; border-color: rgba(14,116,144,.3); color: var(--c-primary); transform:translateY(-2px); box-shadow:0 6px 16px rgba(14,116,144,.12); }
 
-    .fb-nl-lbl { font-family:var(--font-mono); font-size:.6rem; color: var(--c-muted); text-transform:uppercase; letter-spacing:.1em; display:block; margin-bottom:6px; }
+    .fb-nl-lbl { font-size:.68rem; color: var(--c-muted); font-weight:700; text-transform:uppercase; letter-spacing:.08em; display:block; margin-bottom:6px; }
     .fb-nl-row { display:flex; gap:5px; }
     .fb-nl-inp {
-      flex:1; background: var(--c-surface2); border:1px solid var(--c-border); border-radius:7px;
-      padding:8px 11px; font-family:var(--font-body); font-size:.77rem; color: var(--c-text); outline:none;
-      transition: border-color .2s, box-shadow .2s;
+      flex:1; background: #fbfcfe; border:1.5px solid var(--c-border); border-radius:var(--radius-sm);
+      padding:10px 13px; font-family:var(--font-body); font-size:.82rem; color: var(--c-ink); outline:none;
+      transition: border-color .16s, box-shadow .16s, background .16s;
     }
-    .fb-nl-inp::placeholder { color: var(--c-muted); }
-    .fb-nl-inp:focus { border-color: var(--c-border2); box-shadow:0 0 0 3px rgba(14,165,233,.06); }
+    .fb-nl-inp::placeholder { color: var(--c-muted2); }
+    .fb-nl-inp:focus { border-color: var(--c-primary-lt); box-shadow:0 0 0 3px rgba(6,182,212,.12); background:#fff; }
     .fb-nl-btn {
-      padding:8px 14px; background: var(--c-sky); border:none; border-radius:7px;
-      font-family:var(--font-body); font-size:.77rem; font-weight:700; color:#fff;
+      padding:10px 16px; background: var(--c-primary); border:none; border-radius:var(--radius-sm);
+      font-family:var(--font-body); font-size:.82rem; font-weight:800; color:#fff;
       cursor:pointer; transition: all .18s; white-space:nowrap;
     }
-    .fb-nl-btn:hover { background: var(--c-sky-light); transform:translateY(-1px); }
+    .fb-nl-btn:hover { background: var(--c-primary-lt); transform:translateY(-1px); }
 
     .fc-head { display:flex; align-items:center; gap:8px; margin-bottom:1rem; }
-    .fc-head h4 { font-family:var(--font-mono); font-size:.62rem; font-weight:500; text-transform:uppercase; letter-spacing:.13em; color: var(--c-sky); white-space:nowrap; }
-    .fc-line { flex:1; height:1px; background:linear-gradient(90deg,rgba(14,165,233,.22),transparent); }
+    .fc-head h4 { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color: var(--c-primary); white-space:nowrap; }
+    .fc-line { flex:1; height:1px; background:linear-gradient(90deg,rgba(14,116,144,.25),transparent); }
 
     .fc-ul { list-style:none; }
     .fc-ul li { margin-bottom:.4rem; }
     .fc-ul li a {
-      font-size:.8rem; color: var(--c-muted); text-decoration:none;
+      font-size:.82rem; color: var(--c-muted); font-weight:500; text-decoration:none;
       display:inline-flex; align-items:center; gap:6px; transition: color .18s, gap .18s;
     }
-    .fc-ul li a::before { content:''; display:block; width:4px; height:1px; background: var(--c-muted); border-radius:1px; flex-shrink:0; transition: width .18s, background .18s; }
-    .fc-ul li a:hover { color: var(--c-text); gap:9px; }
-    .fc-ul li a:hover::before { width:8px; background: var(--c-sky); }
+    .fc-ul li a::before { content:''; display:block; width:4px; height:1px; background: var(--c-muted2); border-radius:1px; flex-shrink:0; transition: width .18s, background .18s; }
+    .fc-ul li a:hover { color: var(--c-ink); gap:9px; }
+    .fc-ul li a:hover::before { width:8px; background: var(--c-primary); }
 
     .fc-contacts { display:flex; flex-direction:column; gap:2px; }
     .fc-ci {
-      display:flex; align-items:flex-start; gap:9px; padding:8px 9px; border-radius:8px;
+      display:flex; align-items:flex-start; gap:9px; padding:8px 9px; border-radius:var(--radius-sm);
       border:1px solid transparent; transition: background .18s, border-color .18s;
     }
-    .fc-ci:hover { background: var(--c-surface2); border-color: var(--c-border); }
+    .fc-ci:hover { background: #f8fafc; border-color: var(--c-border); }
     .fc-ci-icon {
-      width:28px; height:28px; flex-shrink:0; background:rgba(14,165,233,.07);
-      border:1px solid rgba(14,165,233,.12); border-radius:6px;
-      display:flex; align-items:center; justify-content:center; color: var(--c-sky);
+      width:28px; height:28px; flex-shrink:0; background:rgba(14,116,144,.08);
+      border:1px solid rgba(14,116,144,.14); border-radius:7px;
+      display:flex; align-items:center; justify-content:center; color: var(--c-primary); font-size:13px;
     }
-    .fc-ci-lbl { font-family:var(--font-mono); font-size:.58rem; color: var(--c-muted); text-transform:uppercase; letter-spacing:.09em; display:block; margin-bottom:1px; }
-    .fc-ci-val { font-size:.78rem; color: var(--c-muted2); line-height:1.45; }
-    .fc-ci-val a { color: var(--c-muted2); text-decoration:none; transition:color .18s; }
-    .fc-ci-val a:hover { color: var(--c-sky); }
+    .fc-ci-lbl { font-size:.65rem; color: var(--c-muted2); font-weight:700; text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:1px; }
+    .fc-ci-val { font-size:.8rem; color: var(--c-muted); line-height:1.45; }
+    .fc-ci-val a { color: var(--c-muted); text-decoration:none; transition:color .18s; }
+    .fc-ci-val a:hover { color: var(--c-primary); }
 
     .f-bottom { padding-top:1.75rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
-    .f-copy { font-size:.74rem; color: var(--c-muted); }
+    .f-copy { font-size:.76rem; color: var(--c-muted); }
     .f-bottom-r { display:flex; align-items:center; gap:12px; }
     .f-policy { display:flex; gap:12px; }
-    .f-policy a { font-size:.66rem; color: var(--c-muted); text-decoration:none; font-family:var(--font-mono); letter-spacing:.04em; transition:color .18s; text-transform:uppercase; }
-    .f-policy a:hover { color: var(--c-muted2); }
+    .f-policy a { font-size:.7rem; color: var(--c-muted); text-decoration:none; font-weight:600; letter-spacing:.02em; transition:color .18s; text-transform:uppercase; }
+    .f-policy a:hover { color: var(--c-primary); }
     .f-vsep { width:1px; height:12px; background: var(--c-border); }
     .f-clock-badge {
-      display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono);
-      font-size:.62rem; color: var(--c-muted2);
-      background: var(--c-surface2); border:1px solid var(--c-border);
-      padding:4px 10px; border-radius:5px;
+      display:inline-flex; align-items:center; gap:6px; font-size:.68rem; font-weight:600; color: var(--c-muted);
+      background: #f4f7fa; border:1px solid var(--c-border);
+      padding:4px 10px; border-radius:var(--radius-sm);
     }
-    .f-clk-dot { width:5px; height:5px; border-radius:50%; background:#22c55e; flex-shrink:0; animation:fp 2.4s ease-in-out infinite; }
+    .f-clk-dot { width:5px; height:5px; border-radius:50%; background: var(--c-green-text); flex-shrink:0; animation:fp 2.4s ease-in-out infinite; }
     @keyframes fp { 0%,100%{opacity:1} 50%{opacity:.3} }
-    #footer-clock { color: var(--c-sky); }
+    #footer-clock { color: var(--c-primary); }
 
     #back-top {
       position:fixed; right:1.5rem; bottom:2rem; z-index:150;
-      width:40px; height:40px; background: var(--c-surface2); border:1px solid var(--c-border2);
-      border-radius:9px; display:flex; align-items:center; justify-content:center;
-      color: var(--c-sky); cursor:pointer;
+      width:42px; height:42px; background: var(--c-white); border:1.5px solid var(--c-border);
+      border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center;
+      color: var(--c-primary); cursor:pointer;
       opacity:0; transform:translateY(10px) scale(.92);
-      transition: all .3s cubic-bezier(.22,1,.36,1); box-shadow:0 4px 18px rgba(0,0,0,.4);
+      transition: all .3s cubic-bezier(.22,1,.36,1); box-shadow:0 12px 28px -10px rgba(15,23,42,.22);
     }
     #back-top.show { opacity:1; transform:translateY(0) scale(1); }
-    #back-top:hover { background: var(--c-sky); color:#fff; transform:translateY(-3px) scale(1.04); box-shadow:0 10px 24px rgba(14,165,233,.3); }
+    #back-top:hover { background: var(--c-primary); color:#fff; transform:translateY(-3px) scale(1.04); box-shadow:0 14px 30px rgba(14,116,144,.28); }
 
     [data-reveal] { opacity:0; transform:translateY(16px); transition: opacity .5s ease, transform .5s ease; }
     [data-reveal]._vis { opacity:1; transform:translateY(0); }
@@ -524,7 +476,7 @@
 
     <div class="nav-links">
       <a href="<?= BASE_URL ?>/" class="nav-link" data-page="home">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-1px;margin-right:3px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <i class="ti ti-home" style="font-size:13px;margin-right:3px;vertical-align:-2px"></i>
         Home
       </a>
       <a href="<?= BASE_URL ?>/#about"    class="nav-link">Tentang</a>
@@ -535,14 +487,12 @@
       <div class="nav-dd" id="dd-konten">
         <button class="nav-dd-toggle" type="button" aria-haspopup="true" aria-expanded="false">
           Konten
-          <svg class="dd-chevron" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          <i class="ti ti-chevron-down dd-chevron" style="font-size:14px"></i>
         </button>
         <div class="nav-dd-menu" role="menu">
           <div class="dd-header">Konten &amp; Media</div>
           <a href="<?= BASE_URL ?>/berita" class="dd-item" role="menuitem">
-            <div class="dd-item-icon">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            </div>
+            <div class="dd-item-icon"><i class="ti ti-news"></i></div>
             <div class="dd-item-text">
               <span class="dd-item-label">Berita &amp; Artikel</span>
               <span class="dd-item-desc">Info &amp; pengumuman terbaru</span>
@@ -550,9 +500,7 @@
           </a>
           <div class="dd-sep"></div>
           <a href="<?= BASE_URL ?>/galeri" class="dd-item" role="menuitem">
-            <div class="dd-item-icon">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            </div>
+            <div class="dd-item-icon"><i class="ti ti-photo"></i></div>
             <div class="dd-item-text">
               <span class="dd-item-label">Galeri Foto</span>
               <span class="dd-item-desc">Dokumentasi kegiatan COM</span>
@@ -571,16 +519,16 @@
     <div class="nav-actions">
       <?php if (empty($_SESSION['user_id'])): ?>
         <a href="<?= BASE_URL ?>/pab" class="nav-btn-ghost">
-          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <i class="ti ti-users" style="font-size:14px"></i>
           Daftar PAB
         </a>
         <a href="<?= BASE_URL ?>/login" class="nav-btn-cta">
-          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          <i class="ti ti-login-2" style="font-size:14px"></i>
           Masuk
         </a>
       <?php else: ?>
         <a href="<?= BASE_URL ?>/<?= $_SESSION['user_role'] === 'admin' ? 'admin' : 'member' ?>/dashboard" class="nav-btn-cta">
-          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <i class="ti ti-layout-dashboard" style="font-size:14px"></i>
           Dashboard
         </a>
       <?php endif; ?>
@@ -596,32 +544,32 @@
 <div class="mobile-drawer" id="mobile-drawer">
   <a href="<?= BASE_URL ?>/" class="mob-link">
     Home
-    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    <i class="ti ti-chevron-right"></i>
   </a>
-  <a href="<?= BASE_URL ?>/#about"    class="mob-link">Tentang Kami <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
-  <a href="<?= BASE_URL ?>/#features" class="mob-link">Layanan <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
-  <a href="<?= BASE_URL ?>/#programs" class="mob-link">Program <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
+  <a href="<?= BASE_URL ?>/#about"    class="mob-link">Tentang Kami <i class="ti ti-chevron-right"></i></a>
+  <a href="<?= BASE_URL ?>/#features" class="mob-link">Layanan <i class="ti ti-chevron-right"></i></a>
+  <a href="<?= BASE_URL ?>/#programs" class="mob-link">Program <i class="ti ti-chevron-right"></i></a>
 
   <!-- Konten sub-menu mobile -->
   <div>
     <button onclick="this.nextElementSibling.classList.toggle('open')"
-            style="width:100%;display:flex;align-items:center;justify-content:space-between;font-size:.88rem;font-weight:600;color:var(--c-muted2);background:none;border:none;cursor:pointer;padding:.68rem .75rem;border-radius:8px;font-family:var(--font-body)">
+            style="width:100%;display:flex;align-items:center;justify-content:space-between;font-size:.88rem;font-weight:700;color:var(--c-ink);background:none;border:none;cursor:pointer;padding:.68rem .75rem;border-radius:var(--radius-sm);font-family:var(--font-body)">
       Konten
-      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      <i class="ti ti-chevron-down"></i>
     </button>
     <div class="mob-sub">
       <a href="<?= BASE_URL ?>/berita" class="mob-sub-item">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <i class="ti ti-news"></i>
         Berita &amp; Artikel
       </a>
       <a href="<?= BASE_URL ?>/galeri" class="mob-sub-item">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <i class="ti ti-photo"></i>
         Galeri Foto
       </a>
     </div>
   </div>
 
-  <a href="<?= BASE_URL ?>/#contact" class="mob-link">Kontak <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
+  <a href="<?= BASE_URL ?>/#contact" class="mob-link">Kontak <i class="ti ti-chevron-right"></i></a>
 
   <div class="mob-sep"></div>
   <div class="mob-actions">
@@ -638,7 +586,7 @@
 <?php if (!empty($flash)): ?>
 <div class="alert-wrap">
   <div class="alert alert-<?= $flash['type'] ?>">
-    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <i class="ti ti-alert-circle" style="font-size:16px"></i>
     <?= $flash['msg'] ?>
   </div>
 </div>
@@ -668,22 +616,22 @@
         <div class="fb-socials">
           <?php if (!empty($settings['social_instagram']['value'])): ?>
           <a href="https://instagram.com/<?= htmlspecialchars($settings['social_instagram']['value']) ?>" class="fb-social" target="_blank" rel="noopener" title="Instagram">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            <i class="ti ti-brand-instagram"></i>
           </a>
           <?php endif; ?>
           <?php if (!empty($settings['social_tiktok']['value'])): ?>
           <a href="https://tiktok.com/@<?= htmlspecialchars($settings['social_tiktok']['value']) ?>" class="fb-social" target="_blank" rel="noopener" title="TikTok">
-            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.77 1.52V6.75a4.85 4.85 0 0 1-1-.06z"/></svg>
+            <i class="ti ti-brand-tiktok"></i>
           </a>
           <?php endif; ?>
           <?php if (!empty($settings['social_youtube']['value'])): ?>
           <a href="<?= htmlspecialchars($settings['social_youtube']['value']) ?>" class="fb-social" target="_blank" rel="noopener" title="YouTube">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22.54 6.42A2.78 2.78 0 0 0 20.6 4.47C18.88 4 12 4 12 4s-6.88 0-8.6.47A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.4 19.53C5.12 20 12 20 12 20s6.88 0 8.6-.47a2.78 2.78 0 0 0 1.94-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+            <i class="ti ti-brand-youtube"></i>
           </a>
           <?php endif; ?>
           <?php if (!empty($settings['contact_phone']['value'])): ?>
           <a href="https://wa.me/<?= preg_replace('/\D/','',$settings['contact_phone']['value']) ?>" class="fb-social" target="_blank" rel="noopener" title="WhatsApp">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <i class="ti ti-brand-whatsapp"></i>
           </a>
           <?php endif; ?>
         </div>
@@ -728,25 +676,25 @@
         <div class="fc-contacts">
           <?php if (!empty($settings['social_instagram']['value'])): ?>
           <div class="fc-ci">
-            <div class="fc-ci-icon"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+            <div class="fc-ci-icon"><i class="ti ti-brand-instagram"></i></div>
             <div><span class="fc-ci-lbl">Instagram</span><span class="fc-ci-val"><a href="https://instagram.com/<?= htmlspecialchars($settings['social_instagram']['value']) ?>" target="_blank" rel="noopener">@<?= htmlspecialchars($settings['social_instagram']['value']) ?></a></span></div>
           </div>
           <?php endif; ?>
           <?php if (!empty($settings['social_tiktok']['value'])): ?>
           <div class="fc-ci">
-            <div class="fc-ci-icon"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.77 1.52V6.75a4.85 4.85 0 0 1-1-.06z"/></svg></div>
+            <div class="fc-ci-icon"><i class="ti ti-brand-tiktok"></i></div>
             <div><span class="fc-ci-lbl">TikTok</span><span class="fc-ci-val"><a href="https://tiktok.com/@<?= htmlspecialchars($settings['social_tiktok']['value']) ?>" target="_blank" rel="noopener">@<?= htmlspecialchars($settings['social_tiktok']['value']) ?></a></span></div>
           </div>
           <?php endif; ?>
           <?php if (!empty($settings['contact_email']['value'])): ?>
           <div class="fc-ci">
-            <div class="fc-ci-icon"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+            <div class="fc-ci-icon"><i class="ti ti-mail"></i></div>
             <div><span class="fc-ci-lbl">Email</span><span class="fc-ci-val"><a href="mailto:<?= htmlspecialchars($settings['contact_email']['value']) ?>"><?= htmlspecialchars($settings['contact_email']['value']) ?></a></span></div>
           </div>
           <?php endif; ?>
           <?php if (!empty($settings['contact_address']['value'])): ?>
           <div class="fc-ci">
-            <div class="fc-ci-icon"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <div class="fc-ci-icon"><i class="ti ti-map-pin"></i></div>
             <div><span class="fc-ci-lbl">Alamat</span><span class="fc-ci-val"><?= htmlspecialchars($settings['contact_address']['value']) ?></span></div>
           </div>
           <?php endif; ?>
@@ -770,7 +718,7 @@
 </footer>
 
 <button id="back-top" aria-label="Kembali ke atas">
-  <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+  <i class="ti ti-arrow-up" style="font-size:16px"></i>
 </button>
 
 <script>
@@ -846,7 +794,7 @@
   const nb=document.getElementById('nl-btn'),ni=document.getElementById('nl-inp');
   if(nb&&ni) nb.addEventListener('click',()=>{
     if(!ni.value.trim()) return;
-    nb.textContent='Terkirim ✓'; nb.style.background='#22c55e'; ni.value='';
+    nb.textContent='Terkirim ✓'; nb.style.background='#15803d'; ni.value='';
     setTimeout(()=>{ nb.textContent='Ikuti'; nb.style.background=''; },2800);
   });
 })();
