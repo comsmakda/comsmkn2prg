@@ -56,7 +56,7 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.edit-wrap { max-width: 680px; }
+.edit-wrap { max-width: 1040px; }
 
 /* ── Back link ── */
 .edit-back {
@@ -72,8 +72,15 @@
 .edit-back:hover { color: var(--ac); }
 .edit-back i { font-size: 14px; }
 
-/* ── Page header (samakan dgn .dh dashboard) ── */
-.edit-ph { margin-bottom: 22px; }
+/* ── Page header ── */
+.edit-ph {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
 .edit-ph__eyebrow {
   display: inline-flex;
   align-items: center;
@@ -105,7 +112,22 @@
 }
 .edit-ph__sub strong { color: var(--tx-primary); font-weight: 700; }
 
-/* ── Flash alert (§5.5) ── */
+.edit-ph__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  background: var(--green-d);
+  border: 1px solid rgba(21,128,61,.22);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--green);
+  flex-shrink: 0;
+}
+.edit-ph__status i { font-size: 14px; }
+
+/* ── Flash alert ── */
 .flash {
   display: flex;
   align-items: flex-start;
@@ -123,44 +145,18 @@
 .flash--warning { background: var(--amber-d); border-color: rgba(217,145,12,.22); color: var(--amber); }
 .flash--info    { background: var(--blue-d);  border-color: rgba(14,116,144,.22); color: var(--blue); }
 
-/* ── NIA badge (kecil, aksen, konsisten dgn kpi style) ── */
-.nia-badge {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 16px;
-  background: var(--ac-dim);
-  border: 1px solid var(--bd-accent);
-  border-radius: var(--r-lg);
-  margin-bottom: 18px;
+/* ── Layout 2 kolom: form (kiri) + sidebar (kanan) ── */
+.edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
 }
-.nia-badge__icon {
-  width: 36px; height: 36px;
-  border-radius: var(--r-sm);
-  background: var(--ac-glow);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ac);
-  flex-shrink: 0;
-}
-.nia-badge__icon i { font-size: 16px; }
-.nia-badge__val {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--c-primary-dk, #0b5a70);
-  letter-spacing: 0.01em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-.nia-badge__lbl {
-  font-size: 10.5px;
-  color: var(--tx-muted);
-  margin-top: 3px;
-  font-weight: 500;
+@media (max-width: 860px) {
+  .edit-grid { grid-template-columns: 1fr; }
 }
 
-/* ── Panel (identik dgn .panel dashboard) ── */
+/* ── Panel dasar ── */
 .edit-panel {
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
@@ -190,7 +186,7 @@
   gap: 20px;
 }
 
-/* ── Section label (mengikuti .sec-label dashboard, versi ringkas) ── */
+/* ── Section label ── */
 .form-section { display: flex; flex-direction: column; gap: 14px; }
 .form-section + .form-section {
   padding-top: 18px;
@@ -228,7 +224,7 @@
   color: var(--tx-muted);
 }
 
-/* Input base (§5.2 — icon SELALU di kanan) */
+/* Input base (icon SELALU di kanan) */
 .finput {
   font-family: var(--font-ui);
   font-size: 13.5px;
@@ -264,109 +260,7 @@
 }
 .finput-ico i { font-size: 15px; }
 
-/* ── Foto section ── */
-.foto-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.foto-preview { flex-shrink: 0; }
-.foto-preview__img {
-  width: 72px; height: 72px;
-  border-radius: var(--r-lg);
-  object-fit: cover;
-  border: 1px solid var(--bd-subtle);
-  display: block;
-}
-.foto-preview__fallback {
-  width: 72px; height: 72px;
-  border-radius: var(--r-lg);
-  background: var(--ac-dim);
-  border: 1px solid var(--bd-accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--ac);
-  text-transform: uppercase;
-}
-.foto-preview__cap {
-  font-size: 10px;
-  color: var(--tx-muted);
-  margin-top: 6px;
-  text-align: center;
-  font-weight: 500;
-}
-
-.foto-upload { flex: 1; min-width: 220px; }
-.foto-upload__label {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--tx-primary);
-  margin-bottom: 8px;
-  display: block;
-}
-.foto-dropzone {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 22px;
-  background: var(--bg-elevated);
-  border: 1.5px dashed var(--bd-default);
-  border-radius: var(--r-lg);
-  cursor: pointer;
-  transition:
-    border-color var(--t-base) var(--ease),
-    background   var(--t-base) var(--ease);
-  position: relative;
-}
-.foto-dropzone:hover,
-.foto-dropzone.drag-over {
-  border-color: var(--ac-lt);
-  background: var(--ac-dim);
-}
-.foto-dropzone input[type="file"] {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-}
-.foto-dropzone__ico {
-  width: 34px; height: 34px;
-  border-radius: var(--r-sm);
-  background: var(--bg-overlay);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--tx-muted);
-}
-.foto-dropzone__ico i { font-size: 16px; }
-.foto-dropzone__text {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--tx-secondary);
-  text-align: center;
-}
-.foto-dropzone__hint {
-  font-size: 10.5px;
-  color: var(--tx-muted);
-  text-align: center;
-}
-.foto-dropzone__chosen {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--ac);
-  display: none;
-  text-align: center;
-}
-
-/* ── Footer / actions ── */
+/* ── Footer / actions (form kiri) ── */
 .edit-panel__foot {
   padding: 15px 20px;
   border-top: 1px solid var(--bd-subtle);
@@ -424,8 +318,237 @@
 .btn-save .ti-loader-2 { animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ═══════════════════════════════════════
+   SIDEBAR (kolom kanan)
+═══════════════════════════════════════ */
+.edit-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 16px;
+}
+
+/* Kartu foto profil */
+.side-photo {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+.side-photo__frame {
+  position: relative;
+  width: 112px;
+  height: 112px;
+}
+.side-photo__img {
+  width: 112px; height: 112px;
+  border-radius: var(--r-xl);
+  object-fit: cover;
+  border: 1px solid var(--bd-subtle);
+  display: block;
+}
+.side-photo__fallback {
+  width: 112px; height: 112px;
+  border-radius: var(--r-xl);
+  background: var(--ac-dim);
+  border: 1px solid var(--bd-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--ac);
+  text-transform: uppercase;
+}
+.side-photo__badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--ac);
+  border: 3px solid var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.side-photo__badge i { font-size: 13px; }
+
+.side-photo__name {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--tx-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.side-photo__meta {
+  font-size: 11.5px;
+  color: var(--tx-muted);
+  font-weight: 500;
+}
+
+/* Dropzone upload — full width di sidebar */
+.foto-upload { width: 100%; }
+.foto-upload__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--tx-primary);
+  margin-bottom: 8px;
+  display: block;
+  text-align: left;
+}
+.foto-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 14px;
+  background: var(--bg-elevated);
+  border: 1.5px dashed var(--bd-default);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition:
+    border-color var(--t-base) var(--ease),
+    background   var(--t-base) var(--ease);
+  position: relative;
+}
+.foto-dropzone:hover,
+.foto-dropzone.drag-over {
+  border-color: var(--ac-lt);
+  background: var(--ac-dim);
+}
+.foto-dropzone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+.foto-dropzone__ico {
+  width: 32px; height: 32px;
+  border-radius: var(--r-sm);
+  background: var(--bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tx-muted);
+}
+.foto-dropzone__ico i { font-size: 15px; }
+.foto-dropzone__text {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--tx-secondary);
+  text-align: center;
+}
+.foto-dropzone__hint {
+  font-size: 10px;
+  color: var(--tx-muted);
+  text-align: center;
+}
+.foto-dropzone__chosen {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ac);
+  display: none;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* Kartu NIA */
+.side-nia {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 16px;
+}
+.side-nia__icon {
+  width: 38px; height: 38px;
+  border-radius: var(--r-sm);
+  background: var(--ac-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ac);
+  flex-shrink: 0;
+}
+.side-nia__icon i { font-size: 17px; }
+.side-nia__val {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--c-primary-dk, #0b5a70);
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.side-nia__lbl {
+  font-size: 10.5px;
+  color: var(--tx-muted);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* Kartu info ringkas */
+.side-info__list {
+  display: flex;
+  flex-direction: column;
+}
+.side-info__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 20px;
+}
+.side-info__row + .side-info__row {
+  border-top: 1px solid var(--bd-subtle);
+}
+.side-info__k {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--tx-secondary);
+  font-weight: 600;
+}
+.side-info__k i { font-size: 14px; color: var(--tx-muted); }
+.side-info__v {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tx-primary);
+  text-align: right;
+}
+
+/* Kartu bantuan / tip */
+.side-tip {
+  padding: 16px 18px;
+  background: var(--ac-dim);
+  border: 1px solid var(--bd-accent);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.side-tip__icon {
+  color: var(--ac);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.side-tip__icon i { font-size: 16px; }
+.side-tip__text {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--tx-secondary);
+}
+.side-tip__text strong { color: var(--tx-primary); font-weight: 700; }
+
 @media (max-width: 640px) {
   .edit-panel { border-radius: var(--r-lg); }
+  .edit-side { position: static; }
 }
 </style>
 
@@ -440,12 +563,18 @@
 
   <!-- Page header -->
   <div class="edit-ph">
-    <div class="edit-ph__eyebrow">
-      <span class="edit-ph__eyebrow-dot"></span>
-      Manajemen Anggota
+    <div>
+      <div class="edit-ph__eyebrow">
+        <span class="edit-ph__eyebrow-dot"></span>
+        Manajemen Anggota
+      </div>
+      <h1 class="edit-ph__title">Edit Anggota</h1>
+      <p class="edit-ph__sub">Perbarui data <strong><?= htmlspecialchars($anggota['nama_lengkap']) ?></strong>.</p>
     </div>
-    <h1 class="edit-ph__title">Edit Anggota</h1>
-    <p class="edit-ph__sub">Perbarui data <strong><?= htmlspecialchars($anggota['nama_lengkap']) ?></strong>.</p>
+    <span class="edit-ph__status">
+      <i class="ti ti-user-check" aria-hidden="true"></i>
+      Anggota Aktif
+    </span>
   </div>
 
   <!-- Flash -->
@@ -464,135 +593,220 @@
   </div>
   <?php endif; ?>
 
-  <!-- NIA Badge -->
-  <?php if (!empty($anggota['nia'])): ?>
-  <div class="nia-badge">
-    <div class="nia-badge__icon">
-      <i class="ti ti-id-badge-2" aria-hidden="true"></i>
-    </div>
-    <div>
-      <div class="nia-badge__val"><?= htmlspecialchars($anggota['nia']) ?></div>
-      <div class="nia-badge__lbl">Nomor Induk Anggota</div>
-    </div>
-  </div>
-  <?php endif; ?>
+  <form method="POST"
+        action="<?= BASE_URL ?>/admin/anggota/<?= (int)$anggota['id'] ?>/update"
+        enctype="multipart/form-data"
+        id="edit-form">
+    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
 
-  <!-- Form panel -->
-  <div class="edit-panel">
-    <div class="edit-panel__head">
-      <span class="edit-panel__head-title">Data Anggota</span>
-      <span class="edit-panel__head-sub">— perubahan disimpan langsung ke database</span>
-    </div>
+    <div class="edit-grid">
 
-    <form method="POST"
-          action="<?= BASE_URL ?>/admin/anggota/<?= (int)$anggota['id'] ?>/update"
-          enctype="multipart/form-data"
-          id="edit-form">
-      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
-
-      <div class="edit-panel__body">
-
-        <!-- ── Identitas ── -->
-        <div class="form-section">
-          <div class="form-section__label">Identitas</div>
-
-          <!-- Nama -->
-          <div class="field">
-            <label class="field__label field__label--req" for="f-nama">Nama Lengkap</label>
-            <div class="finput-wrap">
-              <input type="text" id="f-nama" name="nama_lengkap" required
-                     class="finput"
-                     placeholder="Masukkan nama lengkap…"
-                     value="<?= htmlspecialchars($anggota['nama_lengkap']) ?>">
-              <span class="finput-ico">
-                <i class="ti ti-user" aria-hidden="true"></i>
-              </span>
-            </div>
-          </div>
-
-          <!-- Kelas + No HP -->
-          <div class="form-row">
-            <div class="field">
-              <label class="field__label" for="f-kelas">Kelas</label>
-              <div class="finput-wrap">
-                <input type="text" id="f-kelas" name="kelas"
-                       class="finput"
-                       placeholder="mis. XII RPL 1"
-                       value="<?= htmlspecialchars($anggota['kelas'] ?? '') ?>">
-                <span class="finput-ico">
-                  <i class="ti ti-school" aria-hidden="true"></i>
-                </span>
-              </div>
-            </div>
-            <div class="field">
-              <label class="field__label" for="f-nohp">No HP / WhatsApp</label>
-              <div class="finput-wrap">
-                <input type="tel" id="f-nohp" name="no_hp"
-                       class="finput"
-                       placeholder="08xx xxxx xxxx"
-                       value="<?= htmlspecialchars($anggota['no_hp'] ?? '') ?>">
-                <span class="finput-ico">
-                  <i class="ti ti-phone" aria-hidden="true"></i>
-                </span>
-              </div>
-            </div>
-          </div>
+      <!-- ══════════ KOLOM KIRI — Form utama ══════════ -->
+      <div class="edit-panel">
+        <div class="edit-panel__head">
+          <span class="edit-panel__head-title">Data Anggota</span>
+          <span class="edit-panel__head-sub">— perubahan disimpan langsung ke database</span>
         </div>
 
-        <!-- ── Foto ── -->
-        <div class="form-section">
-          <div class="form-section__label">Foto Profil</div>
+        <div class="edit-panel__body">
 
-          <div class="foto-row">
+          <!-- ── Identitas ── -->
+          <div class="form-section">
+            <div class="form-section__label">Identitas</div>
 
-            <!-- Preview current -->
-            <div class="foto-preview">
-              <?php if (!empty($anggota['foto'])): ?>
-                <img id="foto-preview-img"
-                     src="<?= UPLOAD_URL . '/' . htmlspecialchars($anggota['foto']) ?>"
-                     class="foto-preview__img"
-                     alt="Foto <?= htmlspecialchars($anggota['nama_lengkap']) ?>">
-              <?php else: ?>
-                <div class="foto-preview__fallback" id="foto-preview-fallback">
-                  <?= mb_strtoupper(mb_substr($anggota['nama_lengkap'], 0, 2)) ?>
-                </div>
-              <?php endif; ?>
-              <div class="foto-preview__cap">Saat ini</div>
+            <!-- Nama -->
+            <div class="field">
+              <label class="field__label field__label--req" for="f-nama">Nama Lengkap</label>
+              <div class="finput-wrap">
+                <input type="text" id="f-nama" name="nama_lengkap" required
+                       class="finput"
+                       placeholder="Masukkan nama lengkap…"
+                       value="<?= htmlspecialchars($anggota['nama_lengkap']) ?>">
+                <span class="finput-ico">
+                  <i class="ti ti-user" aria-hidden="true"></i>
+                </span>
+              </div>
             </div>
 
-            <!-- Upload zone -->
-            <div class="foto-upload">
-              <label class="foto-upload__label">
-                Ganti Foto <span class="field__label-optional">— opsional</span>
+            <!-- Kelas + No HP -->
+            <div class="form-row">
+              <div class="field">
+                <label class="field__label" for="f-kelas">Kelas</label>
+                <div class="finput-wrap">
+                  <input type="text" id="f-kelas" name="kelas"
+                         class="finput"
+                         placeholder="mis. XII RPL 1"
+                         value="<?= htmlspecialchars($anggota['kelas'] ?? '') ?>">
+                  <span class="finput-ico">
+                    <i class="ti ti-school" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="field">
+                <label class="field__label" for="f-nohp">No HP / WhatsApp</label>
+                <div class="finput-wrap">
+                  <input type="tel" id="f-nohp" name="no_hp"
+                         class="finput"
+                         placeholder="08xx xxxx xxxx"
+                         value="<?= htmlspecialchars($anggota['no_hp'] ?? '') ?>">
+                  <span class="finput-ico">
+                    <i class="ti ti-phone" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Kontak & Alamat (opsional, mengisi hirarki form agar tidak timpang) ── -->
+          <div class="form-section">
+            <div class="form-section__label">Kontak &amp; Alamat</div>
+
+            <div class="field">
+              <label class="field__label" for="f-alamat">
+                Alamat <span class="field__label-optional">— opsional</span>
               </label>
-              <div class="foto-dropzone" id="foto-dropzone">
-                <input type="file" name="foto" accept="image/*"
-                       id="foto-input" aria-label="Upload foto">
-                <div class="foto-dropzone__ico">
-                  <i class="ti ti-cloud-upload" aria-hidden="true"></i>
-                </div>
-                <div class="foto-dropzone__text">Klik atau seret foto ke sini</div>
-                <div class="foto-dropzone__hint">PNG, JPG, WEBP — maks. 2 MB</div>
-                <div class="foto-dropzone__chosen" id="foto-chosen"></div>
+              <div class="finput-wrap">
+                <input type="text" id="f-alamat" name="alamat"
+                       class="finput"
+                       placeholder="Nama jalan, RT/RW, kelurahan…"
+                       value="<?= htmlspecialchars($anggota['alamat'] ?? '') ?>">
+                <span class="finput-ico">
+                  <i class="ti ti-map-pin" aria-hidden="true"></i>
+                </span>
               </div>
             </div>
 
+            <div class="form-row">
+              <div class="field">
+                <label class="field__label" for="f-email">
+                  Email <span class="field__label-optional">— opsional</span>
+                </label>
+                <div class="finput-wrap">
+                  <input type="email" id="f-email" name="email"
+                         class="finput"
+                         placeholder="nama@email.com"
+                         value="<?= htmlspecialchars($anggota['email'] ?? '') ?>">
+                  <span class="finput-ico">
+                    <i class="ti ti-mail" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="field">
+                <label class="field__label" for="f-jk">Jenis Kelamin</label>
+                <div class="finput-wrap">
+                  <input type="text" id="f-jk" name="jenis_kelamin"
+                         class="finput"
+                         placeholder="Laki-laki / Perempuan"
+                         value="<?= htmlspecialchars($anggota['jenis_kelamin'] ?? '') ?>">
+                  <span class="finput-ico">
+                    <i class="ti ti-gender-bigender" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /.edit-panel__body -->
+
+        <!-- Footer actions -->
+        <div class="edit-panel__foot">
+          <a href="<?= BASE_URL ?>/admin/anggota" class="btn-cancel">Batal</a>
+          <button type="submit" class="btn-save" id="btn-save">
+            <i class="ti ti-check" aria-hidden="true"></i>
+            Simpan Perubahan
+          </button>
+        </div>
+      </div><!-- /.edit-panel kiri -->
+
+      <!-- ══════════ KOLOM KANAN — Sidebar ══════════ -->
+      <div class="edit-side">
+
+        <!-- Kartu foto profil + upload -->
+        <div class="edit-panel side-photo">
+          <div class="side-photo__frame">
+            <?php if (!empty($anggota['foto'])): ?>
+              <img id="foto-preview-img"
+                   src="<?= UPLOAD_URL . '/' . htmlspecialchars($anggota['foto']) ?>"
+                   class="side-photo__img"
+                   alt="Foto <?= htmlspecialchars($anggota['nama_lengkap']) ?>">
+            <?php else: ?>
+              <div class="side-photo__fallback" id="foto-preview-fallback">
+                <?= mb_strtoupper(mb_substr($anggota['nama_lengkap'], 0, 2)) ?>
+              </div>
+            <?php endif; ?>
+            <span class="side-photo__badge">
+              <i class="ti ti-camera" aria-hidden="true"></i>
+            </span>
+          </div>
+
+          <div>
+            <div class="side-photo__name"><?= htmlspecialchars($anggota['nama_lengkap']) ?></div>
+            <div class="side-photo__meta"><?= htmlspecialchars($anggota['kelas'] ?? 'Kelas belum diisi') ?></div>
+          </div>
+
+          <div class="foto-upload">
+            <label class="foto-upload__label">
+              Ganti Foto <span class="field__label-optional">— opsional</span>
+            </label>
+            <div class="foto-dropzone" id="foto-dropzone">
+              <input type="file" name="foto" accept="image/*"
+                     id="foto-input" aria-label="Upload foto">
+              <div class="foto-dropzone__ico">
+                <i class="ti ti-cloud-upload" aria-hidden="true"></i>
+              </div>
+              <div class="foto-dropzone__text">Klik atau seret foto</div>
+              <div class="foto-dropzone__hint">PNG, JPG, WEBP — maks. 2 MB</div>
+              <div class="foto-dropzone__chosen" id="foto-chosen"></div>
+            </div>
           </div>
         </div>
 
-      </div><!-- /.edit-panel__body -->
+        <!-- Kartu NIA -->
+        <?php if (!empty($anggota['nia'])): ?>
+        <div class="edit-panel side-nia">
+          <div class="side-nia__icon">
+            <i class="ti ti-id-badge-2" aria-hidden="true"></i>
+          </div>
+          <div>
+            <div class="side-nia__val"><?= htmlspecialchars($anggota['nia']) ?></div>
+            <div class="side-nia__lbl">Nomor Induk Anggota</div>
+          </div>
+        </div>
+        <?php endif; ?>
 
-      <!-- Footer actions -->
-      <div class="edit-panel__foot">
-        <a href="<?= BASE_URL ?>/admin/anggota" class="btn-cancel">Batal</a>
-        <button type="submit" class="btn-save" id="btn-save">
-          <i class="ti ti-check" aria-hidden="true"></i>
-          Simpan Perubahan
-        </button>
-      </div>
+        <!-- Kartu info ringkas -->
+        <div class="edit-panel">
+          <div class="edit-panel__head">
+            <span class="edit-panel__head-title">Ringkasan</span>
+          </div>
+          <div class="side-info__list">
+            <div class="side-info__row">
+              <span class="side-info__k"><i class="ti ti-calendar-plus" aria-hidden="true"></i> Terdaftar</span>
+              <span class="side-info__v"><?= !empty($anggota['created_at']) ? htmlspecialchars(date('d M Y', strtotime($anggota['created_at']))) : '—' ?></span>
+            </div>
+            <div class="side-info__row">
+              <span class="side-info__k"><i class="ti ti-refresh" aria-hidden="true"></i> Terakhir diubah</span>
+              <span class="side-info__v"><?= !empty($anggota['updated_at']) ? htmlspecialchars(date('d M Y', strtotime($anggota['updated_at']))) : '—' ?></span>
+            </div>
+            <div class="side-info__row">
+              <span class="side-info__k"><i class="ti ti-hash" aria-hidden="true"></i> ID Sistem</span>
+              <span class="side-info__v">#<?= (int)$anggota['id'] ?></span>
+            </div>
+          </div>
+        </div>
 
-    </form>
-  </div><!-- /.edit-panel -->
+        <!-- Tip -->
+        <div class="edit-panel side-tip">
+          <span class="side-tip__icon"><i class="ti ti-bulb" aria-hidden="true"></i></span>
+          <span class="side-tip__text">
+            <strong>Tips:</strong> pastikan No HP aktif agar notifikasi WhatsApp dari organisasi dapat diterima.
+          </span>
+        </div>
+
+      </div><!-- /.edit-side -->
+
+    </div><!-- /.edit-grid -->
+  </form>
 
 </div>
 </div>
@@ -623,7 +837,7 @@
         } else if (fallback) {
           var img = document.createElement('img');
           img.id        = 'foto-preview-img';
-          img.className = 'foto-preview__img';
+          img.className = 'side-photo__img';
           img.src       = e.target.result;
           img.alt       = 'Preview';
           fallback.parentNode.replaceChild(img, fallback);

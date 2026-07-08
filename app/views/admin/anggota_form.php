@@ -57,7 +57,7 @@
 }
 
 /* ── Layout ── */
-.tambah-wrap { max-width: 680px; }
+.tambah-wrap { max-width: 1080px; margin: 0 auto; }
 
 /* ── Back link ── */
 .tambah-back {
@@ -123,6 +123,22 @@
 .t-flash--error   { background: var(--red-d);   border-color: rgba(185,28,28,.22); color: var(--red); }
 .t-flash--warning { background: var(--amber-d); border-color: rgba(217,145,12,.22); color: var(--amber); }
 .t-flash--info    { background: var(--blue-d);  border-color: rgba(14,116,144,.22); color: var(--blue); }
+
+/* ═══════════════════════════════════════
+   GRID — form (kiri) + sidebar (kanan)
+   Ini yang menyeimbangkan layout, bukan
+   satu kolom sempit mengambang di kiri.
+═══════════════════════════════════════ */
+.tambah-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 22px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .tambah-grid { grid-template-columns: 1fr; }
+  .tambah-side { order: -1; }
+}
 
 /* ── Panel (identik dgn .panel dashboard) ── */
 .t-panel {
@@ -293,48 +309,6 @@
 .t-dropzone__text { font-size: 12px; font-weight: 700; color: var(--tx-secondary); }
 .t-dropzone__hint { font-size: 10.5px; color: var(--tx-muted); }
 
-/* ── Foto preview strip ── */
-.t-foto-strip {
-  display: none;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--ac-dim);
-  border: 1px solid var(--bd-accent);
-  border-radius: var(--r-lg);
-  margin-top: 8px;
-}
-.t-foto-strip.visible { display: flex; }
-.t-foto-strip__img {
-  width: 44px; height: 44px;
-  border-radius: var(--r-sm);
-  object-fit: cover;
-  border: 1px solid var(--bd-accent);
-  flex-shrink: 0;
-  display: block;
-}
-.t-foto-strip__name {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--ac);
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.t-foto-strip__clear {
-  width: 24px; height: 24px;
-  background: none; border: none;
-  cursor: pointer;
-  color: var(--tx-muted);
-  display: flex; align-items: center; justify-content: center;
-  padding: 0; flex-shrink: 0;
-  transition: color var(--t-fast) var(--ease);
-}
-.t-foto-strip__clear:hover { color: var(--red); }
-.t-foto-strip__clear i { font-size: 15px; }
-
 /* ── Checkbox row (§5.6) ── */
 .t-check-row {
   display: flex;
@@ -424,6 +398,138 @@
 @media (max-width: 640px) {
   .t-panel { border-radius: var(--r-lg); }
 }
+
+/* ═══════════════════════════════════════
+   SIDEBAR — kartu preview & panduan
+   Mengisi ruang kanan sekaligus memberi
+   nilai fungsional (preview real-time,
+   konteks, panduan) — bukan filler kosong.
+═══════════════════════════════════════ */
+.tambah-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+}
+
+.t-side-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--bd-subtle);
+  border-radius: var(--r-xl);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.t-side-card__title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tx-muted);
+}
+.t-side-card__title i { font-size: 14px; color: var(--ac); }
+
+/* Preview kartu anggota */
+.t-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding-top: 4px;
+}
+.t-preview-avatar {
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: var(--ac-dim);
+  border: 3px solid #fff;
+  outline: 1.5px solid var(--bd-accent);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  color: var(--ac);
+  font-size: 30px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+.t-preview-avatar img {
+  width: 100%; height: 100%; object-fit: cover; display: none;
+}
+.t-preview-avatar.has-img i { display: none; }
+.t-preview-avatar.has-img img { display: block; }
+.t-preview-name {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--tx-primary);
+  letter-spacing: -0.01em;
+  word-break: break-word;
+}
+.t-preview-kelas {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ac);
+  background: var(--ac-dim);
+  border-radius: 100px;
+  padding: 3px 10px;
+  margin-top: 4px;
+}
+.t-preview-empty {
+  font-size: 11px;
+  color: var(--tx-muted);
+  font-weight: 500;
+}
+.t-preview-clear {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--tx-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--t-fast) var(--ease);
+}
+.t-preview-clear:hover { color: var(--red); }
+.t-preview-clear i { font-size: 12px; }
+.t-preview-clear[hidden] { display: none; }
+
+/* Info list */
+.t-side-list { display: flex; flex-direction: column; gap: 10px; }
+.t-side-list li {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  font-size: 12px;
+  color: var(--tx-secondary);
+  line-height: 1.55;
+}
+.t-side-list li i {
+  color: var(--ac);
+  font-size: 13px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.t-side-list li strong { color: var(--tx-primary); font-weight: 700; }
+
+/* NIA status mini */
+.t-nia-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 12px;
+  background: var(--ac-dim);
+  border: 1px solid var(--bd-accent);
+  border-radius: var(--r-lg);
+}
+.t-nia-status i { font-size: 16px; color: var(--ac); flex-shrink: 0; }
+.t-nia-status span { font-size: 11.5px; font-weight: 600; color: var(--c-primary-dk, #0b5a70); line-height: 1.4; }
 </style>
 
 <div class="tambah-root">
@@ -461,151 +567,205 @@
   </div>
   <?php endif; ?>
 
-  <!-- Panel -->
-  <div class="t-panel">
-    <div class="t-panel__head">
-      <span class="t-panel__head-title">Data Anggota Baru</span>
-      <span class="t-panel__head-sub">— NIA dapat digenerate otomatis setelah simpan</span>
-    </div>
+  <!-- Grid: form (kiri) + sidebar (kanan) -->
+  <div class="tambah-grid">
 
-    <form method="POST"
-          action="<?= BASE_URL ?>/admin/anggota/tambah"
-          enctype="multipart/form-data"
-          id="add-form">
-      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
-
-      <div class="t-panel__body">
-
-        <!-- ── Identitas ── -->
-        <div class="t-section">
-          <div class="t-section__lbl">Identitas</div>
-
-          <div class="t-row">
-            <!-- Nama -->
-            <div class="t-field">
-              <label class="t-field__lbl t-field__lbl--req" for="f-nama">Nama Lengkap</label>
-              <div class="t-input-wrap">
-                <input type="text" id="f-nama" name="nama_lengkap" required
-                       class="t-input" placeholder="Nama lengkap…">
-                <span class="t-input-ico">
-                  <i class="ti ti-user" aria-hidden="true"></i>
-                </span>
-              </div>
-            </div>
-            <!-- Kelas -->
-            <div class="t-field">
-              <label class="t-field__lbl t-field__lbl--req" for="f-kelas">Kelas</label>
-              <div class="t-input-wrap">
-                <input type="text" id="f-kelas" name="kelas" required
-                       class="t-input" placeholder="mis. XI RPL 1">
-                <span class="t-input-ico">
-                  <i class="ti ti-school" aria-hidden="true"></i>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="t-row">
-            <!-- No HP -->
-            <div class="t-field">
-              <label class="t-field__lbl" for="f-nohp">No HP / WhatsApp</label>
-              <div class="t-input-wrap">
-                <input type="tel" id="f-nohp" name="no_hp"
-                       class="t-input" placeholder="08xx xxxx xxxx">
-                <span class="t-input-ico">
-                  <i class="ti ti-phone" aria-hidden="true"></i>
-                </span>
-              </div>
-            </div>
-            <!-- Email -->
-            <div class="t-field">
-              <label class="t-field__lbl" for="f-email">Email <span class="t-field__lbl-optional">— opsional</span></label>
-              <div class="t-input-wrap">
-                <input type="email" id="f-email" name="email"
-                       class="t-input" placeholder="email@domain.com">
-                <span class="t-input-ico">
-                  <i class="ti ti-mail" aria-hidden="true"></i>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── Keamanan ── -->
-        <div class="t-section">
-          <div class="t-section__lbl">Keamanan</div>
-
-          <div class="t-field">
-            <label class="t-field__lbl t-field__lbl--req" for="f-pass">Password</label>
-            <div class="t-input-wrap t-input-wrap--pwd">
-              <input type="password" id="f-pass" name="password" required minlength="6"
-                     class="t-input" placeholder="Min. 6 karakter">
-              <button type="button" class="t-pwd-toggle" id="pwd-toggle"
-                      aria-label="Toggle tampilkan password">
-                <i class="ti ti-eye" id="ico-eye" aria-hidden="true"></i>
-                <i class="ti ti-eye-off" id="ico-eye-off" aria-hidden="true" style="display:none"></i>
-              </button>
-            </div>
-            <span class="t-field__hint">Minimum 6 karakter</span>
-          </div>
-        </div>
-
-        <!-- ── Foto Profil ── -->
-        <div class="t-section">
-          <div class="t-section__lbl">Foto Profil</div>
-
-          <div class="t-field">
-            <label class="t-field__lbl">
-              Pas Foto <span class="t-field__lbl-optional">— opsional, maks. 2 MB</span>
-            </label>
-
-            <div class="t-dropzone" id="foto-dropzone">
-              <input type="file" name="foto" accept="image/*"
-                     id="foto-input" aria-label="Upload foto profil">
-              <div class="t-dropzone__ico">
-                <i class="ti ti-cloud-upload" aria-hidden="true"></i>
-              </div>
-              <div class="t-dropzone__text">Klik atau seret foto ke sini</div>
-              <div class="t-dropzone__hint">PNG, JPG, WEBP — maks. 2 MB</div>
-            </div>
-
-            <div class="t-foto-strip" id="foto-strip">
-              <img class="t-foto-strip__img" id="foto-strip-img" src="" alt="Preview foto">
-              <span class="t-foto-strip__name" id="foto-strip-name"></span>
-              <button type="button" class="t-foto-strip__clear" id="foto-clear"
-                      aria-label="Hapus pilihan foto">
-                <i class="ti ti-x" aria-hidden="true"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── Pengaturan ── -->
-        <div class="t-section">
-          <div class="t-section__lbl">Pengaturan</div>
-
-          <label class="t-check-row">
-            <input type="checkbox" name="aktivasi_langsung" value="1" checked id="chk-aktif">
-            <span class="t-check-box">
-              <i class="ti ti-check" aria-hidden="true"></i>
-            </span>
-            <span class="t-check-text">Aktifkan langsung &amp; generate NIA sekarang</span>
-            <span class="t-check-badge">Auto NIA</span>
-          </label>
-        </div>
-
-      </div><!-- /.t-panel__body -->
-
-      <div class="t-panel__foot">
-        <a href="<?= BASE_URL ?>/admin/anggota" class="t-btn-cancel">Batal</a>
-        <button type="submit" class="t-btn-save" id="btn-save">
-          <i class="ti ti-check" aria-hidden="true"></i>
-          Simpan Anggota
-        </button>
+    <!-- ══════════ KOLOM KIRI — FORM ══════════ -->
+    <div class="t-panel">
+      <div class="t-panel__head">
+        <span class="t-panel__head-title">Data Anggota Baru</span>
+        <span class="t-panel__head-sub">— NIA dapat digenerate otomatis setelah simpan</span>
       </div>
 
-    </form>
-  </div><!-- /.t-panel -->
+      <form method="POST"
+            action="<?= BASE_URL ?>/admin/anggota/tambah"
+            enctype="multipart/form-data"
+            id="add-form">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
+
+        <div class="t-panel__body">
+
+          <!-- ── Identitas ── -->
+          <div class="t-section">
+            <div class="t-section__lbl">Identitas</div>
+
+            <div class="t-row">
+              <!-- Nama -->
+              <div class="t-field">
+                <label class="t-field__lbl t-field__lbl--req" for="f-nama">Nama Lengkap</label>
+                <div class="t-input-wrap">
+                  <input type="text" id="f-nama" name="nama_lengkap" required
+                         class="t-input" placeholder="Nama lengkap…">
+                  <span class="t-input-ico">
+                    <i class="ti ti-user" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+              <!-- Kelas -->
+              <div class="t-field">
+                <label class="t-field__lbl t-field__lbl--req" for="f-kelas">Kelas</label>
+                <div class="t-input-wrap">
+                  <input type="text" id="f-kelas" name="kelas" required
+                         class="t-input" placeholder="mis. XI RPL 1">
+                  <span class="t-input-ico">
+                    <i class="ti ti-school" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="t-row">
+              <!-- No HP -->
+              <div class="t-field">
+                <label class="t-field__lbl" for="f-nohp">No HP / WhatsApp</label>
+                <div class="t-input-wrap">
+                  <input type="tel" id="f-nohp" name="no_hp"
+                         class="t-input" placeholder="08xx xxxx xxxx">
+                  <span class="t-input-ico">
+                    <i class="ti ti-phone" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+              <!-- Email -->
+              <div class="t-field">
+                <label class="t-field__lbl" for="f-email">Email <span class="t-field__lbl-optional">— opsional</span></label>
+                <div class="t-input-wrap">
+                  <input type="email" id="f-email" name="email"
+                         class="t-input" placeholder="email@domain.com">
+                  <span class="t-input-ico">
+                    <i class="ti ti-mail" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Keamanan ── -->
+          <div class="t-section">
+            <div class="t-section__lbl">Keamanan</div>
+
+            <div class="t-field">
+              <label class="t-field__lbl t-field__lbl--req" for="f-pass">Password</label>
+              <div class="t-input-wrap t-input-wrap--pwd">
+                <input type="password" id="f-pass" name="password" required minlength="6"
+                       class="t-input" placeholder="Min. 6 karakter">
+                <button type="button" class="t-pwd-toggle" id="pwd-toggle"
+                        aria-label="Toggle tampilkan password">
+                  <i class="ti ti-eye" id="ico-eye" aria-hidden="true"></i>
+                  <i class="ti ti-eye-off" id="ico-eye-off" aria-hidden="true" style="display:none"></i>
+                </button>
+              </div>
+              <span class="t-field__hint">Minimum 6 karakter</span>
+            </div>
+          </div>
+
+          <!-- ── Foto Profil ── -->
+          <div class="t-section">
+            <div class="t-section__lbl">Foto Profil</div>
+
+            <div class="t-field">
+              <label class="t-field__lbl">
+                Pas Foto <span class="t-field__lbl-optional">— opsional, maks. 2 MB</span>
+              </label>
+
+              <div class="t-dropzone" id="foto-dropzone">
+                <input type="file" name="foto" accept="image/*"
+                       id="foto-input" aria-label="Upload foto profil">
+                <div class="t-dropzone__ico">
+                  <i class="ti ti-cloud-upload" aria-hidden="true"></i>
+                </div>
+                <div class="t-dropzone__text">Klik atau seret foto ke sini</div>
+                <div class="t-dropzone__hint">PNG, JPG, WEBP — maks. 2 MB · lihat pratinjau di panel kanan</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Pengaturan ── -->
+          <div class="t-section">
+            <div class="t-section__lbl">Pengaturan</div>
+
+            <label class="t-check-row">
+              <input type="checkbox" name="aktivasi_langsung" value="1" checked id="chk-aktif">
+              <span class="t-check-box">
+                <i class="ti ti-check" aria-hidden="true"></i>
+              </span>
+              <span class="t-check-text">Aktifkan langsung &amp; generate NIA sekarang</span>
+              <span class="t-check-badge">Auto NIA</span>
+            </label>
+          </div>
+
+        </div><!-- /.t-panel__body -->
+
+        <div class="t-panel__foot">
+          <a href="<?= BASE_URL ?>/admin/anggota" class="t-btn-cancel">Batal</a>
+          <button type="submit" class="t-btn-save" id="btn-save">
+            <i class="ti ti-check" aria-hidden="true"></i>
+            Simpan Anggota
+          </button>
+        </div>
+
+      </form>
+    </div><!-- /.t-panel (form) -->
+
+    <!-- ══════════ KOLOM KANAN — SIDEBAR ══════════ -->
+    <aside class="tambah-side">
+
+      <!-- Preview kartu anggota -->
+      <div class="t-side-card">
+        <div class="t-side-card__title">
+          <i class="ti ti-id-badge-2" aria-hidden="true"></i>
+          Pratinjau Kartu
+        </div>
+        <div class="t-preview-card">
+          <div class="t-preview-avatar" id="preview-avatar">
+            <i class="ti ti-user" aria-hidden="true"></i>
+            <img id="preview-avatar-img" src="" alt="Preview foto">
+          </div>
+          <div class="t-preview-name" id="preview-name">Nama Anggota</div>
+          <span class="t-preview-kelas" id="preview-kelas" style="display:none;"></span>
+          <div class="t-preview-empty" id="preview-empty">Belum ada data diisi</div>
+          <button type="button" class="t-preview-clear" id="foto-clear" hidden>
+            <i class="ti ti-x" aria-hidden="true"></i>
+            Hapus foto
+          </button>
+        </div>
+      </div>
+
+      <!-- Status NIA -->
+      <div class="t-nia-status">
+        <i class="ti ti-sparkles" aria-hidden="true"></i>
+        <span>NIA akan digenerate otomatis begitu anggota disimpan &amp; diaktifkan.</span>
+      </div>
+
+      <!-- Panduan pengisian -->
+      <div class="t-side-card">
+        <div class="t-side-card__title">
+          <i class="ti ti-list-check" aria-hidden="true"></i>
+          Panduan Pengisian
+        </div>
+        <ul class="t-side-list">
+          <li>
+            <i class="ti ti-point-filled" aria-hidden="true"></i>
+            <span><strong>Nama &amp; Kelas</strong> wajib diisi sesuai data resmi sekolah.</span>
+          </li>
+          <li>
+            <i class="ti ti-point-filled" aria-hidden="true"></i>
+            <span>Password minimal <strong>6 karakter</strong>, bisa diubah anggota nanti.</span>
+          </li>
+          <li>
+            <i class="ti ti-point-filled" aria-hidden="true"></i>
+            <span>Foto profil bersifat opsional, maksimal ukuran <strong>2 MB</strong>.</span>
+          </li>
+          <li>
+            <i class="ti ti-point-filled" aria-hidden="true"></i>
+            <span>Nonaktifkan <strong>Auto NIA</strong> jika ingin memverifikasi data dahulu.</span>
+          </li>
+        </ul>
+      </div>
+
+    </aside>
+
+  </div><!-- /.tambah-grid -->
 
 </div>
 </div>
@@ -629,35 +789,47 @@
     });
   }
 
-  /* ── Foto dropzone ── */
-  var fileInput = document.getElementById('foto-input');
-  var dropzone  = document.getElementById('foto-dropzone');
-  var strip     = document.getElementById('foto-strip');
-  var stripImg  = document.getElementById('foto-strip-img');
-  var stripName = document.getElementById('foto-strip-name');
-  var clearBtn  = document.getElementById('foto-clear');
+  /* ── Preview kartu (foto + nama + kelas real-time) ── */
+  var fileInput   = document.getElementById('foto-input');
+  var dropzone    = document.getElementById('foto-dropzone');
+  var avatarBox   = document.getElementById('preview-avatar');
+  var avatarImg   = document.getElementById('preview-avatar-img');
+  var previewName = document.getElementById('preview-name');
+  var previewKelas= document.getElementById('preview-kelas');
+  var previewEmpty= document.getElementById('preview-empty');
+  var clearBtn    = document.getElementById('foto-clear');
+  var namaInput   = document.getElementById('f-nama');
+  var kelasInput  = document.getElementById('f-kelas');
+
+  function updateEmptyState() {
+    var hasNama  = namaInput && namaInput.value.trim().length > 0;
+    var hasKelas = kelasInput && kelasInput.value.trim().length > 0;
+    previewEmpty.style.display = (hasNama || hasKelas) ? 'none' : '';
+  }
 
   function showPreview(file) {
-    stripName.textContent = file.name;
     var reader = new FileReader();
     reader.onload = function (e) {
-      stripImg.src = e.target.result;
-      strip.classList.add('visible');
+      avatarImg.src = e.target.result;
+      avatarBox.classList.add('has-img');
+      clearBtn.hidden = false;
     };
     reader.readAsDataURL(file);
   }
 
   function clearPreview() {
-    fileInput.value = '';
-    strip.classList.remove('visible');
-    stripImg.src = '';
-    stripName.textContent = '';
+    if (fileInput) fileInput.value = '';
+    avatarImg.src = '';
+    avatarBox.classList.remove('has-img');
+    clearBtn.hidden = true;
   }
 
   if (fileInput) {
     fileInput.addEventListener('change', function () {
       if (fileInput.files && fileInput.files[0]) showPreview(fileInput.files[0]);
     });
+  }
+  if (dropzone) {
     dropzone.addEventListener('dragover', function (e) {
       e.preventDefault();
       dropzone.classList.add('drag-over');
@@ -666,8 +838,22 @@
       dropzone.addEventListener(ev, function () { dropzone.classList.remove('drag-over'); });
     });
   }
-
   if (clearBtn) { clearBtn.addEventListener('click', clearPreview); }
+
+  if (namaInput) {
+    namaInput.addEventListener('input', function () {
+      previewName.textContent = namaInput.value.trim() || 'Nama Anggota';
+      updateEmptyState();
+    });
+  }
+  if (kelasInput) {
+    kelasInput.addEventListener('input', function () {
+      var v = kelasInput.value.trim();
+      previewKelas.textContent = v;
+      previewKelas.style.display = v ? '' : 'none';
+      updateEmptyState();
+    });
+  }
 
   /* ── Submit loading ── */
   var form    = document.getElementById('add-form');
