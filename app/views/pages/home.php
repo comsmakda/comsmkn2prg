@@ -21,10 +21,25 @@ $og_url      = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https'
              . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 $og_sitename = $og_title;
 
-/* Fallback CDN background untuk hero jika admin belum upload hero_image sendiri.
-   Ringan: dikompresi via query param Unsplash (w=1600, q=60, auto=format). */
-$heroFallbackImg = 'https://images.unsplash.com/photo-1743090660977-babf07732432?auto=format&fit=crop&w=1600&q=60';
-$heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $heroFallbackImg;
+/* ══════════════════════════════════════════════════════════════
+   FALLBACK GAMBAR CDN (tema pendidikan/organisasi siswa)
+   Dipakai HANYA jika admin belum upload gambar sendiri di DB —
+   semua gambar utama tetap mengambil dari kolom UPLOAD_URL/DB.
+   Dikompresi via query param (w, q, auto=format) supaya ringan.
+   ══════════════════════════════════════════════════════════════ */
+$heroFallbackImg     = 'https://images.unsplash.com/photo-1743090660977-babf07732432?auto=format&fit=crop&w=1600&q=60';
+$aboutFallbackImg    = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1000&q=60';
+$sambutanFallbackImg = 'https://images.unsplash.com/photo-1544717297-fa95b6ee9643?auto=format&fit=crop&w=600&q=60';
+$galleryFallbackImgs = [
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1529390079861-591de354faf5?auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=60',
+    'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=60',
+];
+
+$heroImgSrc = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $heroFallbackImg;
 ?>
 
 <!-- ══ SEO: PRIMARY META (PENTING untuk ranking Google) ══ -->
@@ -107,8 +122,6 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 [data-reveal][data-delay="5"] { transition-delay: .3s; }
 
 /* ─── HERO ───────────────────────────────────────────────────── */
-/* Pola panel-branding design-system.md §6: foto + overlay gradient gelap + teks putih.
-   Ini satu-satunya bagian gelap di halaman — sisanya tetap terang & bersih. */
 .hero {
   position: relative;
   min-height: calc(100svh - 64px);
@@ -171,9 +184,7 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
   margin-bottom: .9rem;
   text-shadow: 0 2px 20px rgba(0,0,0,.2);
 }
-.hero-title .t-grad {
-  color: #67e8f9;
-}
+.hero-title .t-grad { color: #67e8f9; }
 .hero-tagline {
   font-size: .76rem; font-weight: 600;
   color: #7dd3e8;
@@ -224,7 +235,7 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
   margin-bottom: 1.8rem;
 }
 
-/* ─── BUTTONS — persis §5.3 design-system.md ────────────────── */
+/* ─── BUTTONS ────────────────────────────────────────────────── */
 .btn-primary {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 13px 24px;
@@ -254,7 +265,6 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
   background: rgba(255,255,255,.1);
   transform: translateY(-2px);
 }
-/* Varian outline dipakai di atas kanvas terang (bukan hero) */
 .btn-outline--light {
   border-color: var(--c-border); color: var(--c-ink); background: var(--c-white);
 }
@@ -275,7 +285,7 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 .hero-trust-text { font-size: .76rem; color: rgba(255,255,255,.68); }
 .hero-trust-text strong { color: #fff; }
 
-/* ─── HERO VISUAL (stats mosaic) — kartu putih bersih di atas foto ─── */
+/* ─── HERO VISUAL (stats mosaic) ─────────────────────────────── */
 .hero-visual { position: relative; }
 .hero-mosaic {
   display: grid;
@@ -339,10 +349,7 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
   border-bottom: 1px solid var(--c-border);
   padding: 11px 0; overflow: hidden;
 }
-.ticker-track {
-  display: flex; gap: 0; width: max-content;
-  animation: ticker 32s linear infinite;
-}
+.ticker-track { display: flex; gap: 0; width: max-content; animation: ticker 32s linear infinite; }
 .ticker-track:hover { animation-play-state: paused; }
 .ticker-item {
   display: flex; align-items: center; gap: 8px;
@@ -359,26 +366,16 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 .stats-inner {
   max-width: 1200px; margin: 0 auto;
   display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--c-border);
+  gap: 1px; background: var(--c-border);
   border: 1px solid var(--c-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
-.stat-cell {
-  background: var(--c-white);
-  padding: 1.5rem 1rem;
-  text-align: center;
-  position: relative;
-  transition: background .2s;
-  cursor: default;
-}
+.stat-cell { background: var(--c-white); padding: 1.5rem 1rem; text-align: center; position: relative; transition: background .2s; cursor: default; }
 .stat-cell:hover { background: #fbfcfe; }
 .stat-cell-bar {
-  position: absolute; bottom: 0; left: 50%;
-  transform: translateX(-50%);
-  width: 0; height: 2px;
-  background: var(--c-primary);
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 0; height: 2px; background: var(--c-primary);
   transition: width .35s var(--ease-out); border-radius: 2px;
 }
 .stat-cell:hover .stat-cell-bar { width: 50%; }
@@ -400,10 +397,7 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
   line-height: 1.14; letter-spacing: -.03em;
   margin-bottom: .7rem;
 }
-.section-desc {
-  font-size: .88rem; color: var(--c-muted);
-  line-height: 1.8; max-width: 500px;
-}
+.section-desc { font-size: .88rem; color: var(--c-muted); line-height: 1.8; max-width: 500px; }
 
 /* ─── SECTION WRAPPER ────────────────────────────────────────── */
 .section-wrap { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
@@ -412,11 +406,7 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 /* ─── ABOUT ──────────────────────────────────────────────────── */
 .about-section { background: var(--c-white); }
 .about-header { max-width: 580px; margin-bottom: 2.5rem; }
-.about-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2.5rem; align-items: start;
-}
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start; }
 .about-img-wrap {
   border-radius: var(--radius-lg); overflow: hidden;
   border: 1px solid var(--c-border);
@@ -425,19 +415,18 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
   position: relative;
 }
 .about-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.about-img-placeholder {
-  width: 100%; height: 100%;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .8rem;
-  color: var(--c-muted2);
+.about-img-fallback-tag {
+  position: absolute; left: 12px; bottom: 12px;
+  background: rgba(6,30,44,.72); color: #fff;
+  font-size: .66rem; font-weight: 600; letter-spacing: .03em;
+  padding: 5px 11px; border-radius: 99px;
+  backdrop-filter: blur(3px);
 }
-.about-img-placeholder span { font-size: .76rem; }
 
 .vm-stack { display: flex; flex-direction: column; gap: .85rem; }
 .vm-item {
-  background: var(--c-page);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-md);
-  padding: 1.2rem;
+  background: var(--c-page); border: 1px solid var(--c-border);
+  border-radius: var(--radius-md); padding: 1.2rem;
   display: flex; gap: .9rem;
   transition: border-color .2s, transform .2s;
 }
@@ -452,91 +441,48 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 .vm-item h3 { font-family: var(--font-display); font-size: .85rem; font-weight: 700; color: var(--c-ink); margin-bottom: .3rem; }
 .vm-item p  { font-size: .8rem; color: var(--c-muted); line-height: 1.72; }
 
-/* ─── SAMBUTAN ── kartu putih bersih, foto persegi ── */
+/* ─── SAMBUTAN ───────────────────────────────────────────────── */
 .sambutan-section { background: var(--c-page); }
-
 .sambutan-box {
-  background: var(--c-white);
-  border: 1px solid var(--c-border);
+  background: var(--c-white); border: 1px solid var(--c-border);
   border-radius: var(--radius-lg);
   box-shadow: 0 30px 70px -20px rgba(15,23,42,.14), 0 4px 18px rgba(15,23,42,.04);
   padding: 2.4rem;
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 2.4rem;
-  align-items: start;
-  margin-top: 2.2rem;
+  display: grid; grid-template-columns: 260px 1fr; gap: 2.4rem;
+  align-items: start; margin-top: 2.2rem;
 }
-
 .sambutan-photo-col { display: flex; flex-direction: column; align-items: center; gap: 0; }
-
 .sambutan-photo-frame {
-  width: 100%;
-  aspect-ratio: 3/4;
+  width: 100%; aspect-ratio: 3/4;
   border-radius: var(--radius-md) var(--radius-md) 0 0;
-  overflow: hidden;
-  border: 1px solid var(--c-border);
-  border-bottom: none;
-  background: var(--c-page);
-  position: relative;
-  flex-shrink: 0;
+  overflow: hidden; border: 1px solid var(--c-border); border-bottom: none;
+  background: var(--c-page); position: relative; flex-shrink: 0;
 }
-.sambutan-photo-frame img {
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: center top;
-  display: block;
-}
-.sambutan-photo-placeholder {
-  width: 100%; height: 100%;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .75rem;
-  color: var(--c-muted2);
-}
-
+.sambutan-photo-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
 .sambutan-identity {
-  width: 100%;
-  background: #f4f7fa;
-  border: 1px solid var(--c-border);
-  border-top: none;
+  width: 100%; background: #f4f7fa; border: 1px solid var(--c-border); border-top: none;
   border-radius: 0 0 var(--radius-md) var(--radius-md);
-  padding: .9rem 1rem;
-  text-align: center;
+  padding: .9rem 1rem; text-align: center;
 }
-
-.sambutan-name {
-  font-family: var(--font-display);
-  font-size: 1rem; font-weight: 800;
-  color: var(--c-ink); letter-spacing: -.02em;
-  margin-bottom: .25rem;
-}
-.sambutan-role {
-  font-size: .74rem; color: var(--c-primary);
-  font-weight: 700; line-height: 1.45;
-  margin-bottom: .4rem;
-}
+.sambutan-name { font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: var(--c-ink); letter-spacing: -.02em; margin-bottom: .25rem; }
+.sambutan-role { font-size: .74rem; color: var(--c-primary); font-weight: 700; line-height: 1.45; margin-bottom: .4rem; }
 .sambutan-masa {
   display: inline-flex; align-items: center; gap: 4px;
   font-size: .64rem; font-weight: 600; color: var(--c-muted);
   background: var(--c-white); border: 1px solid var(--c-border);
   border-radius: 99px; padding: 2px 9px;
 }
-
 .sambutan-content-col { display: flex; flex-direction: column; }
 .sambutan-content-title {
   font-family: var(--font-display);
-  font-size: clamp(1.2rem, 2vw, 1.55rem);
-  font-weight: 800; color: var(--c-primary-dk);
-  letter-spacing: -.03em;
-  margin-bottom: 1.2rem;
-  line-height: 1.18;
+  font-size: clamp(1.2rem, 2vw, 1.55rem); font-weight: 800; color: var(--c-primary-dk);
+  letter-spacing: -.03em; margin-bottom: 1.2rem; line-height: 1.18;
 }
 .sambutan-content-title span { color: var(--c-primary); }
 .sambutan-quote-icon { margin-bottom: .6rem; display: block; color: rgba(14,116,144,.14); }
 .sambutan-content {
-  font-size: .91rem; color: var(--c-muted);
-  line-height: 1.95;
-  font-style: italic;
-  padding-left: 1.1rem;
-  border-left: 2px solid rgba(14,116,144,.25);
+  font-size: .91rem; color: var(--c-muted); line-height: 1.95; font-style: italic;
+  padding-left: 1.1rem; border-left: 2px solid rgba(14,116,144,.25);
 }
 .sambutan-sig { display: flex; align-items: center; gap: 10px; margin-top: 1.4rem; }
 .sambutan-sig-line { width: 30px; height: 1.5px; background: var(--c-primary); border-radius: 2px; }
@@ -549,47 +495,36 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 .riwayat-group-head { display: flex; align-items: center; gap: 12px; margin-bottom: 1.2rem; }
 .riwayat-badge {
   display: inline-flex; align-items: center; gap: 5px;
-  font-size: .66rem; font-weight: 700;
-  letter-spacing: .05em; text-transform: uppercase;
+  font-size: .66rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
   padding: 4px 12px; border-radius: 99px; white-space: nowrap;
 }
-/* Ketua = aksen utama. Pembina = netral abu-abu — TIDAK memakai warna aksen kedua,
-   supaya tetap satu keluarga warna sesuai design-system.md §9. */
 .riwayat-badge--ketua   { background: rgba(14,116,144,.09); border: 1px solid rgba(14,116,144,.24); color: var(--c-primary); }
 .riwayat-badge--pembina { background: var(--c-page); border: 1px solid var(--c-border); color: var(--c-muted); }
 .riwayat-group-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--c-border), transparent); }
-
 .riwayat-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: .85rem; }
 .riwayat-card {
-  background: var(--c-white);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-md);
-  padding: 1.3rem 1rem 1rem;
+  background: var(--c-white); border: 1px solid var(--c-border);
+  border-radius: var(--radius-md); padding: 1.3rem 1rem 1rem;
   display: flex; flex-direction: column; align-items: center;
-  text-align: center; gap: .8rem;
-  position: relative;
+  text-align: center; gap: .8rem; position: relative;
   transition: all .25s var(--ease-out);
 }
 .riwayat-card:hover { border-color: rgba(14,116,144,.28); transform: translateY(-3px); box-shadow: 0 14px 30px -14px rgba(15,23,42,.2); }
 .riwayat-current-badge {
   position: absolute; top: 8px; right: 8px;
-  font-size: .58rem; font-weight: 700;
-  padding: 2px 8px; border-radius: 99px;
+  font-size: .58rem; font-weight: 700; padding: 2px 8px; border-radius: 99px;
   background: rgba(14,116,144,.1); color: var(--c-primary);
   border: 1px solid rgba(14,116,144,.22); letter-spacing: .03em;
 }
 .riwayat-current-badge--pembina { background: var(--c-page); color: var(--c-muted); border-color: var(--c-border); }
 .riwayat-card-foto {
-  width: 70px; height: 70px; border-radius: 50%;
-  overflow: hidden; border: 2px solid var(--c-border);
-  background: var(--c-page);
-  transition: border-color .2s;
+  width: 70px; height: 70px; border-radius: 50%; overflow: hidden;
+  border: 2px solid var(--c-border); background: var(--c-page); transition: border-color .2s;
 }
 .riwayat-card:hover .riwayat-card-foto { border-color: rgba(14,116,144,.4); }
 .riwayat-card-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .riwayat-foto-ph {
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
   font-family: var(--font-display); font-size: 1.1rem; font-weight: 800; color: #fff;
   background: var(--c-primary);
 }
@@ -611,24 +546,19 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 .features-section { background: var(--c-page); }
 .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .85rem; margin-top: 2.2rem; }
 .feat-card {
-  background: var(--c-white);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-md);
-  padding: 1.4rem;
-  position: relative; overflow: hidden;
-  transition: all .22s var(--ease-out);
+  background: var(--c-white); border: 1px solid var(--c-border);
+  border-radius: var(--radius-md); padding: 1.4rem;
+  position: relative; overflow: hidden; transition: all .22s var(--ease-out);
 }
 .feat-card:hover { border-color: rgba(14,116,144,.28); transform: translateY(-3px); box-shadow: 0 14px 30px -14px rgba(15,23,42,.18); }
 .feat-bg-num {
   position: absolute; bottom: -8px; right: 10px;
   font-family: var(--font-display); font-size: 3.6rem; font-weight: 800;
-  color: rgba(14,116,144,.045); pointer-events: none; line-height: 1;
-  user-select: none;
+  color: rgba(14,116,144,.045); pointer-events: none; line-height: 1; user-select: none;
 }
 .feat-icon {
   width: 40px; height: 40px; border-radius: var(--radius-sm);
-  background: rgba(14,116,144,.09);
-  display: flex; align-items: center; justify-content: center;
+  background: rgba(14,116,144,.09); display: flex; align-items: center; justify-content: center;
   color: var(--c-primary); margin-bottom: 1rem;
 }
 .feat-card:hover .feat-icon { background: rgba(14,116,144,.16); }
@@ -639,10 +569,8 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 .programs-section { background: var(--c-white); }
 .programs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .85rem; margin-top: 2.2rem; }
 .prog-card {
-  background: var(--c-page);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-md);
-  padding: 1.6rem;
+  background: var(--c-page); border: 1px solid var(--c-border);
+  border-radius: var(--radius-md); padding: 1.6rem;
   display: flex; gap: 1.1rem; align-items: flex-start;
   transition: all .22s var(--ease-out);
 }
@@ -652,74 +580,85 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 .prog-card h3 { font-family: var(--font-display); font-size: .93rem; font-weight: 700; color: var(--c-ink); margin-bottom: .35rem; }
 .prog-card p  { font-size: .8rem; color: var(--c-muted); line-height: 1.7; }
 .prog-tag {
-  display: inline-flex; align-items: center; gap: 4px;
-  margin-top: .7rem;
-  font-size: .64rem; font-weight: 600;
-  padding: 2px 10px; border-radius: 99px;
+  display: inline-flex; align-items: center; gap: 4px; margin-top: .7rem;
+  font-size: .64rem; font-weight: 600; padding: 2px 10px; border-radius: 99px;
   background: rgba(14,116,144,.08); border: 1px solid rgba(14,116,144,.2);
   color: var(--c-primary); letter-spacing: .01em;
 }
 
-/* ─── GALLERY ────────────────────────────────────────────────── */
+/* ─── GALLERY (kini carousel auto-slide 3 kolom) ─────────────── */
 .gallery-section { background: var(--c-page); }
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: 185px;
-  gap: .75rem;
-  margin-top: 2.2rem;
+.gallery-carousel-viewport { overflow: hidden; margin-top: 2.2rem; }
+.gallery-carousel-track {
+  display: flex; gap: .85rem;
+  transition: transform .55s var(--ease-in-out);
+  will-change: transform;
 }
-.gallery-item {
-  border-radius: var(--radius-md); overflow: hidden;
-  background: var(--c-white);
-  border: 1px solid var(--c-border);
-  position: relative;
-  transition: transform .25s var(--ease-out), box-shadow .25s;
+.gallery-slide { flex: 0 0 calc(33.333% - .567rem); min-width: 0; }
+.gallery-card {
+  position: relative; border-radius: var(--radius-md); overflow: hidden;
+  border: 1px solid var(--c-border); background: var(--c-white);
+  aspect-ratio: 4/3; cursor: zoom-in;
+  transition: transform .3s var(--ease-out), box-shadow .3s;
 }
-.gallery-item:hover { transform: scale(1.02); box-shadow: 0 16px 36px -14px rgba(15,23,42,.24); z-index: 2; }
-.gallery-item:nth-child(1) { grid-column: 1 / 3; }
-.gallery-item:nth-child(4) { grid-column: 3 / 5; }
-.gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.gallery-ph {
-  width: 100%; height: 100%; min-height: 140px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  color: var(--c-muted2);
-}
-.gallery-ph span { font-size: .7rem; }
+.gallery-card:hover { transform: translateY(-3px) scale(1.015); box-shadow: 0 16px 36px -14px rgba(15,23,42,.26); z-index: 2; }
+.gallery-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .gallery-overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(9,25,38,.78) 0%, transparent 55%);
+  background: linear-gradient(to top, rgba(9,25,38,.8) 0%, transparent 55%);
   opacity: 0; transition: opacity .25s;
-  display: flex; align-items: flex-end; padding: .8rem;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; padding: .8rem;
 }
-.gallery-item:hover .gallery-overlay { opacity: 1; }
+.gallery-card:hover .gallery-overlay { opacity: 1; }
 .gallery-overlay-text { font-size: .73rem; font-weight: 700; color: #fff; }
+.gallery-zoom-hint {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
+  display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0;
+}
+.gallery-carousel-controls { display: flex; align-items: center; gap: 9px; margin-top: 1.5rem; }
+.gallery-btn {
+  width: 36px; height: 36px; background: var(--c-white); border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;
+  color: var(--c-muted); cursor: pointer; transition: all .2s;
+}
+.gallery-btn:hover { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+.gallery-dots { display: flex; gap: 5px; }
+.gallery-dot { width: 6px; height: 6px; border-radius: 99px; background: var(--c-border); transition: all .3s; cursor: pointer; border: none; }
+.gallery-dot.active { width: 18px; background: var(--c-primary); }
+
+/* ─── LIGHTBOX ───────────────────────────────────────────────── */
+.lightbox-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(6,14,22,.9);
+  display: none; align-items: center; justify-content: center;
+  padding: 2rem; backdrop-filter: blur(2px);
+}
+.lightbox-overlay.is-open { display: flex; }
+.lightbox-img-wrap { max-width: 90vw; max-height: 85vh; position: relative; }
+.lightbox-img-wrap img { max-width: 90vw; max-height: 85vh; border-radius: var(--radius-md); display: block; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+.lightbox-caption { text-align: center; color: rgba(255,255,255,.8); font-size: .8rem; margin-top: .8rem; }
+.lightbox-close {
+  position: absolute; top: -18px; right: -18px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #fff; color: var(--c-ink); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 22px rgba(0,0,0,.35);
+}
 
 /* ─── TESTIMONIALS CAROUSEL ──────────────────────────────────── */
 .carousel-section { background: var(--c-white); overflow: hidden; }
 .carousel-viewport { overflow: hidden; }
-.carousel-track {
-  display: flex; gap: 1rem;
-  transition: transform .5s var(--ease-in-out);
-  will-change: transform;
-}
+.carousel-track { display: flex; gap: 1rem; transition: transform .5s var(--ease-in-out); will-change: transform; }
 .carousel-slide { flex: 0 0 calc(33.333% - .67rem); min-width: 0; }
-.test-card {
-  background: var(--c-page);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-md);
-  padding: 1.4rem;
-  height: 100%;
-  transition: border-color .2s;
-}
+.test-card { background: var(--c-page); border: 1px solid var(--c-border); border-radius: var(--radius-md); padding: 1.4rem; height: 100%; transition: border-color .2s; }
 .test-card:hover { border-color: rgba(14,116,144,.25); }
 .test-stars { display: flex; gap: 3px; margin-bottom: .8rem; }
 .test-stars svg { color: #d9910c; }
 .test-quote { font-size: .83rem; color: var(--c-muted); line-height: 1.8; margin-bottom: 1.2rem; font-style: italic; }
 .test-author { display: flex; align-items: center; gap: 9px; }
 .test-avatar {
-  width: 34px; height: 34px; border-radius: 50%;
-  background: var(--c-primary);
+  width: 34px; height: 34px; border-radius: 50%; background: var(--c-primary);
   display: flex; align-items: center; justify-content: center;
   font-weight: 800; font-size: .7rem; color: #fff; flex-shrink: 0;
 }
@@ -727,38 +666,29 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 .test-role { font-size: .68rem; color: var(--c-muted); margin-top: 1px; }
 .carousel-controls { display: flex; align-items: center; gap: 9px; margin-top: 1.5rem; }
 .carousel-btn {
-  width: 36px; height: 36px;
-  background: var(--c-white); border: 1px solid var(--c-border);
+  width: 36px; height: 36px; background: var(--c-white); border: 1px solid var(--c-border);
   border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;
   color: var(--c-muted); cursor: pointer; transition: all .2s;
 }
 .carousel-btn:hover { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
 .carousel-dots { display: flex; gap: 5px; }
-.carousel-dot {
-  width: 6px; height: 6px; border-radius: 99px;
-  background: var(--c-border); transition: all .3s; cursor: pointer; border: none;
-}
+.carousel-dot { width: 6px; height: 6px; border-radius: 99px; background: var(--c-border); transition: all .3s; cursor: pointer; border: none; }
 .carousel-dot.active { width: 18px; background: var(--c-primary); }
 
 /* ─── CTA ────────────────────────────────────────────────────── */
 .cta-section { background: var(--c-page); }
 .cta-box {
-  background: var(--c-white);
-  border: 1px solid var(--c-border);
+  background: var(--c-white); border: 1px solid var(--c-border);
   border-radius: var(--radius-lg);
   box-shadow: 0 30px 70px -20px rgba(15,23,42,.14), 0 4px 18px rgba(15,23,42,.04);
   padding: 2.6rem 2.4rem;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 2rem; align-items: center;
-  position: relative;
-  border-top: 3px solid var(--c-primary);
+  display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center;
+  position: relative; border-top: 3px solid var(--c-primary);
 }
 .cta-box h2 {
   font-family: var(--font-display);
   font-size: clamp(1.35rem, 2.5vw, 1.8rem);
-  font-weight: 800; color: var(--c-primary-dk); letter-spacing: -.03em;
-  margin-bottom: .65rem;
+  font-weight: 800; color: var(--c-primary-dk); letter-spacing: -.03em; margin-bottom: .65rem;
 }
 .cta-box p { font-size: .88rem; color: var(--c-muted); line-height: 1.75; max-width: 500px; }
 .cta-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
@@ -767,52 +697,28 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 .contact-section { background: var(--c-white); }
 .contact-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .85rem; margin-top: 2rem; }
 .contact-card {
-  background: var(--c-page);
-  border: 1px solid var(--c-border);
+  background: var(--c-page); border: 1px solid var(--c-border);
   border-radius: var(--radius-md); padding: 1.3rem;
-  display: flex; align-items: center; gap: .9rem;
-  text-decoration: none;
-  transition: all .2s;
+  display: flex; align-items: center; gap: .9rem; text-decoration: none; transition: all .2s;
 }
 .contact-card:hover { border-color: rgba(14,116,144,.28); transform: translateY(-2px); box-shadow: 0 10px 26px -14px rgba(15,23,42,.18); }
 .contact-icon {
-  width: 42px; height: 42px; flex-shrink: 0;
-  background: rgba(14,116,144,.09); border-radius: var(--radius-sm);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--c-primary);
+  width: 42px; height: 42px; flex-shrink: 0; background: rgba(14,116,144,.09);
+  border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: var(--c-primary);
 }
 .contact-label { font-size: .62rem; color: var(--c-muted2); font-weight: 700; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 3px; }
 .contact-val   { font-size: .85rem; color: var(--c-ink); font-weight: 700; }
 .contact-card-span { grid-column: 1 / -1; cursor: default; }
 
-/* Kartu peta lokasi */
-.contact-map-card {
-  grid-column: 1 / -1;
-  background: var(--c-page);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-.contact-map-head {
-  display: flex; align-items: center; gap: .9rem;
-  padding: 1.1rem 1.3rem;
-}
-.contact-map-frame {
-  width: 100%; height: 320px; display: block; border: 0;
-  filter: grayscale(.15) contrast(1.02);
-}
+.contact-map-card { grid-column: 1 / -1; background: var(--c-page); border: 1px solid var(--c-border); border-radius: var(--radius-md); overflow: hidden; }
+.contact-map-head { display: flex; align-items: center; gap: .9rem; padding: 1.1rem 1.3rem; }
+.contact-map-frame { width: 100%; height: 320px; display: block; border: 0; filter: grayscale(.15) contrast(1.02); }
 .contact-map-foot {
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-  padding: .8rem 1.3rem; flex-wrap: wrap;
-  border-top: 1px solid var(--c-border);
-  background: var(--c-white);
+  padding: .8rem 1.3rem; flex-wrap: wrap; border-top: 1px solid var(--c-border); background: var(--c-white);
 }
 .contact-map-foot span { font-size: .78rem; color: var(--c-muted); }
-.contact-map-link {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: .76rem; font-weight: 700; color: var(--c-primary);
-  text-decoration: none; white-space: nowrap;
-}
+.contact-map-link { display: inline-flex; align-items: center; gap: 5px; font-size: .76rem; font-weight: 700; color: var(--c-primary); text-decoration: none; white-space: nowrap; }
 .contact-map-link:hover { color: var(--c-primary-dk); }
 
 /* ─── DIVIDER ────────────────────────────────────────────────── */
@@ -822,10 +728,7 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 @media (max-width: 1024px) {
   .hero-inner      { grid-template-columns: 1fr 340px; gap: 2rem; }
   .features-grid   { grid-template-columns: repeat(2, 1fr); }
-  .carousel-slide  { flex: 0 0 calc(50% - .5rem); }
-  .gallery-grid    { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 170px; }
-  .gallery-item:nth-child(1),
-  .gallery-item:nth-child(4) { grid-column: 1 / -1; }
+  .carousel-slide, .gallery-slide  { flex: 0 0 calc(50% - .5rem); }
   .sambutan-box    { grid-template-columns: 210px 1fr; gap: 2rem; }
 }
 
@@ -841,11 +744,7 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
   .about-grid      { grid-template-columns: 1fr; gap: 1.8rem; }
   .features-grid   { grid-template-columns: 1fr; }
   .programs-grid   { grid-template-columns: 1fr; }
-  .gallery-grid    { grid-template-columns: 1fr; grid-auto-rows: auto; }
-  .gallery-item    { min-height: 170px; }
-  .gallery-item:nth-child(1),
-  .gallery-item:nth-child(4) { grid-column: 1 / -1; }
-  .carousel-slide  { flex: 0 0 100%; }
+  .carousel-slide, .gallery-slide  { flex: 0 0 100%; }
   .cta-box         { grid-template-columns: 1fr; text-align: center; padding: 2rem 1.5rem; gap: 1.5rem; }
   .cta-actions     { align-items: center; }
   .cta-box p       { margin-left: auto; margin-right: auto; }
@@ -871,8 +770,6 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
   .section-title   { font-size: 1.4rem; }
   .prog-card       { flex-direction: column; gap: .6rem; }
   .prog-num        { font-size: 1.6rem; }
-  .gallery-item    { min-height: 155px; }
-  .gallery-grid    { gap: .55rem; }
   .cta-box         { padding: 1.75rem 1.1rem; }
   .btn-primary, .btn-outline { padding: 11px 19px; font-size: .82rem; }
   .contact-icon    { width: 38px; height: 38px; border-radius: var(--radius-sm); }
@@ -922,7 +819,6 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
       <p class="hero-desc" id="hero-desc" style="opacity:0;transform:translateY(16px)"><?= $s('org_description') ?></p>
       <?php endif; ?>
 
-      <!-- SAMBUTAN / SELAMAT DATANG -->
       <div class="hero-sambutan" id="hero-sambutan">
         <div class="hero-sambutan-label">
           <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -964,7 +860,6 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
 
     <div class="hero-visual" aria-hidden="true">
       <div class="hero-mosaic">
-        <!-- Row 1 -->
         <div class="hm-card">
           <div class="hm-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
           <span class="hm-num"><?= $s('stat_members', '100+') ?></span>
@@ -975,23 +870,19 @@ $heroImgSrc      = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $
           <span class="hm-num"><?= $s('stat_years', '5+') ?></span>
           <span class="hm-label">Tahun Berdiri</span>
         </div>
-        <!-- Row 2 wide – dengan logo -->
         <div class="hm-card hm-card--wide">
           <?php if ($sr('org_logo') || $sr('org_photo')): ?>
           <div class="hm-logo-wrap">
             <img src="<?= UPLOAD_URL . '/' . $s($sr('org_logo') ? 'org_logo' : 'org_photo') ?>" alt="Logo COM">
           </div>
           <?php else: ?>
-          <div class="hm-logo-wrap">
-            <span class="hm-logo-fallback">COM</span>
-          </div>
+          <div class="hm-logo-wrap"><span class="hm-logo-fallback">COM</span></div>
           <?php endif; ?>
           <div>
             <div class="hm-title">Community Programmer</div>
             <div class="hm-sub">COM · SMKN 2 Pinrang — Platform Digital Organisasi Siswa</div>
           </div>
         </div>
-        <!-- Row 3 -->
         <div class="hm-card">
           <div class="hm-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <span class="hm-num"><?= $s('stat_events', '50+') ?></span>
@@ -1021,10 +912,7 @@ $tickerAll   = array_merge($tickerItems, $tickerItems);
 <div class="ticker-section" aria-hidden="true">
   <div class="ticker-track">
     <?php foreach ($tickerAll as $item): ?>
-    <span class="ticker-item">
-      <span class="ticker-dot"></span>
-      <?= htmlspecialchars($item) ?>
-    </span>
+    <span class="ticker-item"><span class="ticker-dot"></span><?= htmlspecialchars($item) ?></span>
     <?php endforeach; ?>
   </div>
 </div>
@@ -1071,10 +959,8 @@ $tickerAll   = array_merge($tickerItems, $tickerItems);
         <?php if ($sr('org_photo')): ?>
           <img src="<?= UPLOAD_URL . '/' . $s('org_photo') ?>" alt="Foto Organisasi COM SMKN 2 Pinrang" loading="lazy">
         <?php else: ?>
-          <div class="about-img-placeholder">
-            <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span>Foto Organisasi</span>
-          </div>
+          <img src="<?= htmlspecialchars($aboutFallbackImg) ?>" alt="Foto Organisasi COM SMKN 2 Pinrang" loading="lazy">
+          <span class="about-img-fallback-tag">Foto Organisasi</span>
         <?php endif; ?>
       </div>
 
@@ -1118,25 +1004,15 @@ $tickerAll   = array_merge($tickerItems, $tickerItems);
     <h2 class="section-title" data-reveal data-delay="1">Kata-Kata dari Pembina</h2>
 
     <div class="sambutan-box" data-reveal data-delay="2">
-
-      <!-- Kolom kiri: foto persegi + identitas di bawah foto -->
       <div class="sambutan-photo-col">
         <?php $pembinaFoto = $settings['pembina_foto']['value'] ?? ''; ?>
         <div class="sambutan-photo-frame">
           <?php if ($pembinaFoto): ?>
-            <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($pembinaFoto) ?>"
-                 alt="Foto Pembina COM SMKN 2 Pinrang"
-                 loading="lazy">
+            <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($pembinaFoto) ?>" alt="Foto Pembina COM SMKN 2 Pinrang" loading="lazy">
           <?php else: ?>
-            <div class="sambutan-photo-placeholder">
-              <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
-            </div>
+            <img src="<?= htmlspecialchars($sambutanFallbackImg) ?>" alt="Foto Pembina COM SMKN 2 Pinrang" loading="lazy">
           <?php endif; ?>
         </div>
-        <!-- Identitas menempel di bawah foto -->
         <div class="sambutan-identity">
           <div class="sambutan-name"><?= htmlspecialchars($settings['pembina_nama']['value'] ?? 'Nama Pembina') ?></div>
           <div class="sambutan-role"><?= htmlspecialchars($settings['pembina_jabatan']['value'] ?? 'Guru Pembina') ?></div>
@@ -1149,11 +1025,8 @@ $tickerAll   = array_merge($tickerItems, $tickerItems);
         </div>
       </div>
 
-      <!-- Kolom kanan: isi sambutan -->
       <div class="sambutan-content-col">
-        <div class="sambutan-content-title">
-          Sambutan<br><span>Pembina</span>
-        </div>
+        <div class="sambutan-content-title">Sambutan<br><span>Pembina</span></div>
         <svg class="sambutan-quote-icon" width="36" height="36" viewBox="0 0 44 44" fill="none">
           <path d="M8 28c0-5.52 4.48-10 10-10V12C9.4 12 2 19.4 2 28v8h14V28H8zm22 0c0-5.52 4.48-10 10-10V12c-8.6 0-16 7.4-16 16v8h14V28h-8z" fill="currentColor"/>
         </svg>
@@ -1168,7 +1041,6 @@ $tickerAll   = array_merge($tickerItems, $tickerItems);
           <span><?= htmlspecialchars($settings['pembina_nama']['value'] ?? 'Pembina') ?></span>
         </div>
       </div>
-
     </div>
   </div>
 </section>
@@ -1195,8 +1067,7 @@ $showRiwayat = count($ketuaList) || count($riwPembinaList);
         <div class="riwayat-group-line"></div>
       </div>
       <div class="riwayat-cards">
-        <?php foreach ($ketuaList as $idx => $k):
-          $isFirst = ($idx === 0); ?>
+        <?php foreach ($ketuaList as $idx => $k): $isFirst = ($idx === 0); ?>
         <div class="riwayat-card <?= $isFirst ? 'riwayat-card--current' : '' ?>">
           <?php if ($isFirst): ?><div class="riwayat-current-badge">Terkini</div><?php endif; ?>
           <div class="riwayat-card-foto">
@@ -1213,9 +1084,7 @@ $showRiwayat = count($ketuaList) || count($riwPembinaList);
               <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               <?= htmlspecialchars($k['periode']) ?>
             </div>
-            <?php if (!empty($k['catatan'])): ?>
-            <div class="riwayat-card-catatan"><?= htmlspecialchars($k['catatan']) ?></div>
-            <?php endif; ?>
+            <?php if (!empty($k['catatan'])): ?><div class="riwayat-card-catatan"><?= htmlspecialchars($k['catatan']) ?></div><?php endif; ?>
           </div>
         </div>
         <?php endforeach; ?>
@@ -1230,8 +1099,7 @@ $showRiwayat = count($ketuaList) || count($riwPembinaList);
         <div class="riwayat-group-line"></div>
       </div>
       <div class="riwayat-cards">
-        <?php foreach ($riwPembinaList as $idx => $p):
-          $isFirst = ($idx === 0); ?>
+        <?php foreach ($riwPembinaList as $idx => $p): $isFirst = ($idx === 0); ?>
         <div class="riwayat-card <?= $isFirst ? 'riwayat-card--current' : '' ?> riwayat-card--pembina">
           <?php if ($isFirst): ?><div class="riwayat-current-badge riwayat-current-badge--pembina">Terkini</div><?php endif; ?>
           <div class="riwayat-card-foto">
@@ -1248,9 +1116,7 @@ $showRiwayat = count($ketuaList) || count($riwPembinaList);
               <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               <?= htmlspecialchars($p['periode']) ?>
             </div>
-            <?php if (!empty($p['catatan'])): ?>
-            <div class="riwayat-card-catatan"><?= htmlspecialchars($p['catatan']) ?></div>
-            <?php endif; ?>
+            <?php if (!empty($p['catatan'])): ?><div class="riwayat-card-catatan"><?= htmlspecialchars($p['catatan']) ?></div><?php endif; ?>
           </div>
         </div>
         <?php endforeach; ?>
@@ -1288,9 +1154,7 @@ $featIcons = [
         if (!$title && !$desc) continue;
       ?>
       <div class="feat-card" data-reveal data-delay="<?= $delay ?>">
-        <div class="feat-icon">
-          <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><?= $featIcons[$idx] ?? '' ?></svg>
-        </div>
+        <div class="feat-icon"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><?= $featIcons[$idx] ?? '' ?></svg></div>
         <h4><?= htmlspecialchars($title) ?></h4>
         <p><?= htmlspecialchars($desc) ?></p>
         <span class="feat-bg-num" aria-hidden="true"><?= str_pad($i, 2, '0', STR_PAD_LEFT) ?></span>
@@ -1337,35 +1201,59 @@ $featIcons = [
 
 <div class="section-divider"></div>
 
-<!-- ══ GALLERY ══ -->
+<!-- ══ GALLERY (CAROUSEL 3 KOLOM, AUTO-SLIDE 3 DETIK) ══ -->
 <section class="gallery-section section-pad" id="gallery">
   <div class="section-wrap">
     <div class="eyebrow" data-reveal><span class="eyebrow-bar"></span>Galeri</div>
     <h2 class="section-title" data-reveal data-delay="1">Momen Kegiatan</h2>
-    <p class="section-desc" data-reveal data-delay="2">Dokumentasi kegiatan dan prestasi organisasi kami.</p>
+    <p class="section-desc" data-reveal data-delay="2">Dokumentasi kegiatan dan prestasi organisasi kami. Klik foto untuk memperbesar.</p>
 
-    <div class="gallery-grid" data-reveal data-delay="2">
-      <?php for ($i = 1; $i <= 6; $i++):
-        $img   = $sr("gallery_img_{$i}");
-        $label = $s("gallery_label_{$i}", "Foto {$i}");
-      ?>
-      <div class="gallery-item">
-        <?php if ($img): ?>
-          <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($img) ?>" alt="<?= $label ?> - COM SMKN 2 Pinrang" loading="lazy">
-        <?php else: ?>
-          <div class="gallery-ph">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span><?= $label ?></span>
+    <div data-reveal data-delay="2">
+      <div class="gallery-carousel-viewport">
+        <div class="gallery-carousel-track" id="gallery-track">
+          <?php for ($i = 1; $i <= 6; $i++):
+            $img      = $sr("gallery_img_{$i}");
+            $label    = $s("gallery_label_{$i}", "Kegiatan " . $i);
+            $imgSrc   = $img ? (UPLOAD_URL . '/' . htmlspecialchars($img)) : htmlspecialchars($galleryFallbackImgs[($i - 1) % count($galleryFallbackImgs)]);
+          ?>
+          <div class="gallery-slide">
+            <div class="gallery-card" data-lightbox="<?= $imgSrc ?>" data-caption="<?= $label ?>">
+              <img src="<?= $imgSrc ?>" alt="<?= $label ?> - COM SMKN 2 Pinrang" loading="lazy">
+              <div class="gallery-overlay">
+                <span class="gallery-overlay-text"><?= $label ?></span>
+                <span class="gallery-zoom-hint">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                </span>
+              </div>
+            </div>
           </div>
-        <?php endif; ?>
-        <div class="gallery-overlay">
-          <span class="gallery-overlay-text"><?= $label ?></span>
+          <?php endfor; ?>
         </div>
       </div>
-      <?php endfor; ?>
+
+      <div class="gallery-carousel-controls" aria-label="Kontrol galeri">
+        <button class="gallery-btn" id="gal-prev" aria-label="Sebelumnya">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="gallery-btn" id="gal-next" aria-label="Berikutnya">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="gallery-dots" id="gal-dots" role="tablist"></div>
+      </div>
     </div>
   </div>
 </section>
+
+<!-- Lightbox galeri -->
+<div class="lightbox-overlay" id="lightbox">
+  <div class="lightbox-img-wrap">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Tutup">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+</div>
 
 <div class="section-divider"></div>
 
@@ -1481,7 +1369,6 @@ $featIcons = [
       </div>
       <?php endif; ?>
 
-      <!-- Peta Lokasi SMKN 2 Pinrang -->
       <?php
         $mapsQuery = $sr('maps_query') ?: 'SMK Negeri 2 Pinrang';
         $mapsEmbed = 'https://www.google.com/maps?q=' . urlencode($mapsQuery) . '&output=embed';
@@ -1495,12 +1382,7 @@ $featIcons = [
             <div class="contact-val">SMK Negeri 2 Pinrang</div>
           </div>
         </div>
-        <iframe
-          class="contact-map-frame"
-          src="<?= htmlspecialchars($mapsEmbed) ?>"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          title="Peta Lokasi SMK Negeri 2 Pinrang"></iframe>
+        <iframe class="contact-map-frame" src="<?= htmlspecialchars($mapsEmbed) ?>" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Peta Lokasi SMK Negeri 2 Pinrang"></iframe>
         <div class="contact-map-foot">
           <span><?= $s('contact_address', 'SMK Negeri 2 Pinrang, Sulawesi Selatan') ?></span>
           <a href="<?= htmlspecialchars($mapsLink) ?>" target="_blank" rel="noopener noreferrer" class="contact-map-link">
@@ -1544,10 +1426,7 @@ $featIcons = [
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          e.target.classList.add('_vis');
-          io.unobserve(e.target);
-        }
+        if (e.isIntersecting) { e.target.classList.add('_vis'); io.unobserve(e.target); }
       });
     }, { threshold: 0.07 });
     revealEls.forEach(function (el) { io.observe(el); });
@@ -1555,79 +1434,119 @@ $featIcons = [
     revealEls.forEach(function (el) { el.classList.add('_vis'); });
   }
 
-  /* ── Carousel ── */
-  var track  = document.getElementById('carousel-track');
-  var dotsEl = document.getElementById('car-dots');
-  if (!track || !dotsEl) return;
+  /* ── Generic carousel factory (dipakai testimoni & galeri) ── */
+  function initCarousel(opts) {
+    var track  = document.getElementById(opts.trackId);
+    var dotsEl = document.getElementById(opts.dotsId);
+    var prevBtn = document.getElementById(opts.prevId);
+    var nextBtn = document.getElementById(opts.nextId);
+    if (!track || !dotsEl) return null;
 
-  var slides = Array.prototype.slice.call(track.querySelectorAll('.carousel-slide'));
-  if (!slides.length) return;
+    var slides = Array.prototype.slice.call(track.querySelectorAll(opts.slideSelector));
+    if (!slides.length) return null;
 
-  var cur = 0, timer = null;
+    var cur = 0, timer = null;
 
-  function getPerView() {
-    var w = window.innerWidth;
-    if (w < 560) return 1;
-    if (w < 1024) return 2;
-    return 3;
-  }
+    function getPerView() {
+      var w = window.innerWidth;
+      if (w < 560) return 1;
+      if (w < 1024) return 2;
+      return 3;
+    }
 
-  var perView = getPerView();
-  var total   = Math.max(1, Math.ceil(slides.length / perView));
+    var perView = getPerView();
+    var total   = Math.max(1, Math.ceil(slides.length / perView));
 
-  /* Build dots */
-  for (var i = 0; i < total; i++) {
-    (function (idx) {
-      var d = document.createElement('button');
-      d.className = 'carousel-dot' + (idx === 0 ? ' active' : '');
-      d.setAttribute('aria-label', 'Halaman ' + (idx + 1));
-      d.setAttribute('role', 'tab');
-      d.addEventListener('click', function () { goTo(idx); stopTimer(); startTimer(); });
-      dotsEl.appendChild(d);
-    })(i);
-  }
+    dotsEl.innerHTML = '';
+    for (var i = 0; i < total; i++) {
+      (function (idx) {
+        var d = document.createElement('button');
+        d.className = opts.dotClass + (idx === 0 ? ' active' : '');
+        d.setAttribute('aria-label', 'Halaman ' + (idx + 1));
+        d.setAttribute('role', 'tab');
+        d.addEventListener('click', function () { goTo(idx); stopTimer(); startTimer(); });
+        dotsEl.appendChild(d);
+      })(i);
+    }
 
-  function goTo(p) {
-    cur = ((p % total) + total) % total;
-    var gap     = 16;
-    var slideW  = slides[0].offsetWidth + gap;
-    track.style.transform = 'translateX(-' + (cur * perView * slideW) + 'px)';
-    dotsEl.querySelectorAll('.carousel-dot').forEach(function (d, i) {
-      d.classList.toggle('active', i === cur);
-      d.setAttribute('aria-selected', i === cur ? 'true' : 'false');
+    function goTo(p) {
+      cur = ((p % total) + total) % total;
+      var gap    = opts.gap;
+      var slideW = slides[0].offsetWidth + gap;
+      track.style.transform = 'translateX(-' + (cur * perView * slideW) + 'px)';
+      dotsEl.querySelectorAll('.' + opts.dotClass).forEach(function (d, i) {
+        d.classList.toggle('active', i === cur);
+        d.setAttribute('aria-selected', i === cur ? 'true' : 'false');
+      });
+    }
+
+    function startTimer() { timer = setInterval(function () { goTo(cur + 1); }, opts.interval); }
+    function stopTimer()  { clearInterval(timer); }
+
+    if (prevBtn) prevBtn.addEventListener('click', function () { goTo(cur - 1); stopTimer(); startTimer(); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { goTo(cur + 1); stopTimer(); startTimer(); });
+
+    track.addEventListener('mouseenter', stopTimer);
+    track.addEventListener('mouseleave', startTimer);
+
+    var touchStartX = 0;
+    track.addEventListener('touchstart', function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', function (e) {
+      var diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 45) { goTo(diff > 0 ? cur + 1 : cur - 1); stopTimer(); startTimer(); }
+    }, { passive: true });
+
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        var np = getPerView();
+        if (np !== perView) {
+          perView = np;
+          total   = Math.max(1, Math.ceil(slides.length / perView));
+          cur     = 0;
+          goTo(0);
+        }
+      }, 180);
     });
+
+    startTimer();
+    return { goTo: goTo, stopTimer: stopTimer, startTimer: startTimer };
   }
 
-  function startTimer() { timer = setInterval(function () { goTo(cur + 1); }, 5000); }
-  function stopTimer()  { clearInterval(timer); }
-
-  document.getElementById('car-prev').addEventListener('click', function () { goTo(cur - 1); stopTimer(); startTimer(); });
-  document.getElementById('car-next').addEventListener('click', function () { goTo(cur + 1); stopTimer(); startTimer(); });
-
-  track.addEventListener('mouseenter', stopTimer);
-  track.addEventListener('mouseleave', startTimer);
-
-  var touchStartX = 0;
-  track.addEventListener('touchstart', function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
-  track.addEventListener('touchend',   function (e) {
-    var diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 45) { goTo(diff > 0 ? cur + 1 : cur - 1); stopTimer(); startTimer(); }
-  }, { passive: true });
-
-  var resizeTimer;
-  window.addEventListener('resize', function () {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(function () {
-      var np = getPerView();
-      if (np !== perView) {
-        perView = np;
-        total   = Math.max(1, Math.ceil(slides.length / perView));
-        cur     = 0;
-        goTo(0);
-      }
-    }, 180);
+  /* Testimoni: 3 kolom desktop, auto-slide tiap 3 detik */
+  initCarousel({
+    trackId: 'carousel-track', dotsId: 'car-dots',
+    prevId: 'car-prev', nextId: 'car-next',
+    slideSelector: '.carousel-slide', dotClass: 'carousel-dot',
+    gap: 16, interval: 3000
   });
 
-  startTimer();
+  /* Galeri: carousel 3 kolom, auto-slide tiap 3 detik */
+  initCarousel({
+    trackId: 'gallery-track', dotsId: 'gal-dots',
+    prevId: 'gal-prev', nextId: 'gal-next',
+    slideSelector: '.gallery-slide', dotClass: 'gallery-dot',
+    gap: 13.6, interval: 3000
+  });
+
+  /* ── Lightbox galeri ── */
+  var lightbox     = document.getElementById('lightbox');
+  var lightboxImg   = document.getElementById('lightbox-img');
+  var lightboxCap    = document.getElementById('lightbox-caption');
+  var lightboxClose  = document.getElementById('lightbox-close');
+
+  document.querySelectorAll('.gallery-card').forEach(function (card) {
+    card.addEventListener('click', function () {
+      lightboxImg.src = card.getAttribute('data-lightbox');
+      lightboxCap.textContent = card.getAttribute('data-caption') || '';
+      lightbox.classList.add('is-open');
+    });
+  });
+  function closeLightbox() { lightbox.classList.remove('is-open'); lightboxImg.src = ''; }
+  if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+  if (lightbox) lightbox.addEventListener('click', function (e) { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLightbox(); });
+
 })();
 </script>
