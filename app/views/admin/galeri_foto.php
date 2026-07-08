@@ -4,14 +4,57 @@
 ?>
 
 <style>
-/* ── Base & Variables Fallback ── */
-.bn * { box-sizing: border-box; }
-.bn {
+/* ═══════════════════════════════════════
+   SCOPE ROOT — alias ke Design System
+   (token asli didefinisikan global di layout;
+    fallback disertakan bila file ini dirender berdiri sendiri)
+═══════════════════════════════════════ */
+.bn-root {
+  --tx-primary:   var(--c-ink,    #0f172a);
+  --tx-secondary: var(--c-muted,  #64748b);
+  --tx-muted:     var(--c-muted2, #94a3b8);
+
+  --bg-surface: var(--c-white, #ffffff);
+  --bg-2:       #fbfcfe;
+  --bg-overlay: #eef2f6;
+  --bg-hover:   #f4f7fa;
+
+  --bd-subtle: var(--c-border, #e6ebf1);
+  --bd-strong: #d5dde6;
+
+  --ac:     var(--c-primary,    #0e7490);
+  --ac-dk:  var(--c-primary-dk, #0b5a70);
+  --ac-lt:  var(--c-primary-lt, #06b6d4);
+  --ac-dim: var(--c-primary-08, rgba(14,116,144,.08));
+
+  --ok:     var(--c-green-text,   #15803d);
+  --ok-dim: var(--c-green-bg,     #f0fdf4);
+  --ok-bd:  var(--c-green-border, #bbf7d0);
+
+  --er:     var(--c-red-text,   #b91c1c);
+  --er-dim: var(--c-red-bg,     #fef2f2);
+  --er-bd:  var(--c-red-border, #fecaca);
+
+  --r-sm: var(--radius-sm, 9px);
+  --r-md: var(--radius-sm, 9px);
+  --r-lg: var(--radius-lg, 22px);
+
+  --font:      var(--font-ui, 'Plus Jakarta Sans', sans-serif);
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bn-root * { box-sizing: border-box; }
+.bn-root {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
-  font-family: var(--font, system-ui, -apple-system, sans-serif);
+  gap: 1.5rem;
+  font-family: var(--font);
+  color: var(--tx-primary);
+  -webkit-font-smoothing: antialiased;
 }
+.bn-root .bn-wrap { max-width: 1100px; }
 
 /* ── Header ── */
 .bn-header {
@@ -21,118 +64,105 @@
   gap: 1.25rem;
   flex-wrap: wrap;
 }
-.bn-header-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+.bn-header-text { display: flex; flex-direction: column; gap: 0.25rem; }
+.bn-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ac); margin-bottom: 4px;
 }
+.bn-eyebrow__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ac); box-shadow: 0 0 6px var(--ac); }
 .bn-page-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: var(--tx-primary, #ffffff);
-  letter-spacing: -.03em;
-  margin: 0;
-  line-height: 1.2;
+  font-size: 1.45rem; font-weight: 800; color: var(--ac-dk);
+  letter-spacing: -.03em; margin: 0; line-height: 1.2;
 }
-.bn-page-sub {
-  font-size: .875rem;
-  color: var(--tx-muted, #9ca3af);
-  margin: 0;
-}
-.bn-header-actions {
-  display: flex;
-  gap: .5rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
+.bn-page-sub { font-size: .82rem; color: var(--tx-secondary); margin: 4px 0 0; }
+.bn-header-actions { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
 
 /* ── Buttons ── */
 .bn-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  height: 38px; padding: 0 16px; border-radius: var(--r-md, 8px);
-  font-size: .875rem; font-weight: 600; text-decoration: none; font-family: inherit;
-  border: 1px solid transparent; cursor: pointer; transition: all .2s ease;
+  height: 38px; padding: 0 16px; border-radius: var(--r-md);
+  font-size: .82rem; font-weight: 700; text-decoration: none; font-family: inherit;
+  border: 1.5px solid transparent; cursor: pointer; transition: all .18s var(--ease);
 }
-.bn-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+.bn-btn i { font-size: 15px; }
 .bn-btn:active { transform: translateY(0); }
 
-.bn-btn--back {
-  background: transparent; color: var(--tx-secondary, #d1d5db); border-color: rgba(255,255,255,0.15);
-}
-.bn-btn--back:hover { background: rgba(255,255,255,0.05); }
+.bn-btn--back { background: #fff; color: var(--tx-primary); border-color: var(--bd-subtle); }
+.bn-btn--back:hover { background: var(--bg-hover); border-color: var(--bd-strong); }
 
-.bn-btn--view {
-  background: var(--ac-dim, rgba(59,130,246,0.15)); color: var(--ac-bright, #93c5fd); border-color: rgba(59,130,246,0.3);
-}
+.bn-btn--view { background: var(--ac-dim); color: var(--ac-dk); border-color: rgba(14,116,144,.25); }
+.bn-btn--view:hover { background: rgba(14,116,144,.14); }
 
 .bn-btn--primary {
-  background: var(--ac, #3b82f6); color: #fff;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  background: var(--ac); color: #fff; border: none;
+  box-shadow: 0 8px 22px rgba(14,116,144,.25);
 }
+.bn-btn--primary:hover { background: var(--ac-lt); transform: translateY(-2px); box-shadow: 0 12px 28px rgba(6,182,212,.3); }
 
 /* ── Flash ── */
 .bn-flash {
-  display: flex; align-items: center; gap: .75rem; padding: 1rem 1.25rem;
-  border-radius: var(--r-md, 8px); font-size: .875rem; font-weight: 600;
-  border: 1px solid rgba(255,255,255,0.05); animation: bn-fadein .3s ease-out;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: flex; align-items: center; gap: .7rem; padding: .8rem 1.1rem;
+  border-radius: var(--r-lg); font-size: .82rem; font-weight: 500;
+  border: 1px solid; animation: bn-fadein .3s var(--ease);
 }
+.bn-flash i { font-size: 17px; flex-shrink: 0; }
 @keyframes bn-fadein { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
-.bn-flash--success { background: rgba(16,185,129,0.1); color: var(--ok, #34d399); border-color: rgba(16,185,129,0.2); }
-.bn-flash--error   { background: rgba(239,68,68,0.1); color: var(--er, #f87171); border-color: rgba(239,68,68,0.2); }
+.bn-flash--success { background: var(--ok-dim); color: var(--ok); border-color: var(--ok-bd); }
+.bn-flash--error   { background: var(--er-dim); color: var(--er); border-color: var(--er-bd); }
 
 /* ── Panels ── */
 .bn-panel {
-  background: var(--bg-surface, #0f172a);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: var(--r-lg, 12px);
-  padding: 1.5rem;
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+  background: var(--bg-surface);
+  border: 1px solid var(--bd-subtle);
+  border-radius: var(--r-lg);
+  padding: 1.35rem 1.4rem;
 }
 .bn-panel-header {
-  font-family: var(--font-mono, monospace);
-  font-size: .65rem; font-weight: 700; color: var(--ac, #60a5fa);
-  text-transform: uppercase; letter-spacing: .12em;
-  margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px;
+  font-size: .68rem; font-weight: 700; color: var(--ac);
+  text-transform: uppercase; letter-spacing: .1em;
+  margin-bottom: 1.15rem; display: flex; align-items: center; gap: 8px;
 }
-.bn-panel-header__line {
-  flex: 1; height: 1px; background: linear-gradient(to right, rgba(255,255,255,0.1), transparent);
-}
+.bn-panel-header i { font-size: 15px; }
+.bn-panel-header--muted { color: var(--tx-muted); }
+.bn-panel-header__line { flex: 1; height: 1px; background: linear-gradient(to right, var(--ac-lt), transparent); }
+.bn-panel-header--muted .bn-panel-header__line { background: linear-gradient(to right, var(--bd-strong), transparent); }
 
 /* ── Dropzone ── */
 .bn-drop {
-  border: 2px dashed rgba(255,255,255,0.15);
-  border-radius: var(--r-lg, 12px);
-  padding: 2.5rem 1rem;
+  border: 1.5px dashed var(--bd-strong);
+  border-radius: var(--r-lg);
+  padding: 2.25rem 1rem;
   text-align: center;
-  cursor: pointer; transition: all .2s ease;
-  background: rgba(0,0,0,0.2);
+  cursor: pointer; transition: all .18s var(--ease);
+  background: var(--bg-hover);
 }
-.bn-drop:hover, .bn-drop.dragover {
-  border-color: var(--ac, #3b82f6); background: rgba(59,130,246,0.05);
-}
+.bn-drop:hover, .bn-drop.dragover { border-color: var(--ac-lt); background: var(--ac-dim); }
 .bn-drop__icon {
-  width: 40px; height: 40px; color: rgba(255,255,255,0.3); margin: 0 auto 1rem; display: block;
+  width: 44px; height: 44px; border-radius: var(--r-md);
+  background: var(--bg-overlay); color: var(--tx-muted);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1rem;
 }
-.bn-drop__h { font-size: 1rem; font-weight: 600; color: var(--tx-primary, #ffffff); margin: 0 0 .5rem 0; }
-.bn-drop__p { font-size: .8rem; color: var(--tx-muted, #9ca3af); margin: 0; }
+.bn-drop__icon i { font-size: 20px; }
+.bn-drop__h { font-size: .95rem; font-weight: 700; color: var(--tx-primary); margin: 0 0 .4rem 0; }
+.bn-drop__p { font-size: .78rem; color: var(--tx-muted); margin: 0; }
 
 /* ── Preview Grid ── */
 .bn-preview {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 1rem; margin-top: 1.5rem;
 }
 .bn-preview-item {
-  position: relative; aspect-ratio: 1; border-radius: var(--r-md, 8px); overflow: hidden;
-  background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  position: relative; aspect-ratio: 1; border-radius: var(--r-md); overflow: hidden;
+  background: var(--bg-2); border: 1px solid var(--bd-subtle);
 }
 .bn-preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .bn-preview-item__lbl {
   position: absolute; bottom: 0; left: 0; right: 0;
-  background: linear-gradient(transparent, rgba(0,0,0,0.8));
-  padding: 10px 6px 6px; font-size: .65rem; color: #fff;
+  background: linear-gradient(transparent, rgba(15,23,42,.8));
+  padding: 10px 6px 6px; font-size: .64rem; color: #fff;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  font-family: var(--font-mono, monospace); text-align: center;
+  font-family: var(--font-mono); text-align: center;
 }
 
 /* ── Photo Grid (Saved Photos) ── */
@@ -140,60 +170,74 @@
   display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem;
 }
 .bn-foto {
-  position: relative; aspect-ratio: 1; border-radius: var(--r-md, 8px); overflow: hidden;
-  background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform .3s ease;
+  position: relative; aspect-ratio: 1; border-radius: var(--r-md); overflow: hidden;
+  background: var(--bg-2); border: 1px solid var(--bd-subtle);
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease);
 }
-.bn-foto:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.15); box-shadow: 0 8px 16px rgba(0,0,0,0.4); }
-.bn-foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
+.bn-foto:hover { transform: translateY(-3px); border-color: var(--bd-strong); box-shadow: 0 12px 26px rgba(15,23,42,.1); }
+.bn-foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s var(--ease); }
 .bn-foto:hover img { transform: scale(1.05); }
 
 /* Overlay Actions */
 .bn-foto__overlay {
-  position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+  position: absolute; inset: 0; background: rgba(15,23,42,.55);
   display: flex; align-items: center; justify-content: center;
-  opacity: 0; transition: opacity .2s ease; backdrop-filter: blur(2px);
+  opacity: 0; transition: opacity .18s var(--ease); backdrop-filter: blur(2px);
 }
 .bn-foto:hover .bn-foto__overlay { opacity: 1; }
 
 .bn-foto__del {
-  padding: 8px 14px; background: var(--er, #ef4444); color: #fff;
-  border: none; border-radius: var(--r-sm, 6px); font-size: .75rem; font-weight: 700;
+  padding: 8px 14px; background: var(--er); color: #fff;
+  border: none; border-radius: var(--r-sm); font-size: .74rem; font-weight: 700;
   cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
-  transition: all .2s ease; box-shadow: 0 4px 10px rgba(239,68,68,0.4);
+  transition: all .18s var(--ease); box-shadow: 0 4px 12px rgba(185,28,28,.4);
+  font-family: var(--font);
 }
-.bn-foto__del:hover { background: #dc2626; transform: scale(1.05); }
+.bn-foto__del i { font-size: 14px; }
+.bn-foto__del:hover { background: #a51818; transform: scale(1.05); }
 
 /* Foto Label */
 .bn-foto__title {
   position: absolute; bottom: 0; left: 0; right: 0;
-  background: linear-gradient(transparent, rgba(0,0,0,0.9));
-  padding: 12px 10px 8px; font-size: .75rem; font-weight: 500; color: #fff;
+  background: linear-gradient(transparent, rgba(15,23,42,.9));
+  padding: 12px 10px 8px; font-size: .74rem; font-weight: 600; color: #fff;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   pointer-events: none;
 }
 
 /* ── Empty State ── */
 .bn-empty {
-  padding: 4rem 2rem; text-align: center; color: var(--tx-muted, #9ca3af);
+  padding: 3.5rem 2rem; text-align: center; color: var(--tx-muted);
 }
-.bn-empty svg { width: 48px; height: 48px; opacity: 0.2; margin-bottom: 1rem; }
+.bn-empty__icon {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--bg-overlay); color: var(--tx-muted);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1rem;
+}
+.bn-empty__icon i { font-size: 26px; }
+.bn-empty p { font-size: .84rem; margin: 0; font-weight: 500; }
 </style>
 
-<div class="bn">
+<div class="bn-root">
+<div class="bn-wrap">
 
   <div class="bn-header">
     <div class="bn-header-text">
+      <div class="bn-eyebrow">
+        <span class="bn-eyebrow__dot"></span>
+        Manajemen Galeri
+      </div>
       <h1 class="bn-page-title">Foto: <?= htmlspecialchars($album['judul']) ?></h1>
       <p class="bn-page-sub"><?= count($fotos) ?> foto tersimpan dalam album ini</p>
     </div>
     <div class="bn-header-actions">
       <a href="<?= BASE_URL ?>/admin/galeri" class="bn-btn bn-btn--back">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <i class="ti ti-arrow-left" aria-hidden="true"></i>
         Kembali
       </a>
       <a href="<?= BASE_URL ?>/galeri/<?= htmlspecialchars($album['slug']) ?>" target="_blank" class="bn-btn bn-btn--view">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <i class="ti ti-eye" aria-hidden="true"></i>
         Lihat Publik
       </a>
     </div>
@@ -201,17 +245,14 @@
 
   <?php if (!empty($flash)): ?>
   <div class="bn-flash bn-flash--<?= htmlspecialchars($flash['type']) ?>">
-    <?php if($flash['type'] === 'success'): ?>
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-    <?php else: ?>
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-    <?php endif; ?>
+    <i class="ti <?= $flash['type'] === 'success' ? 'ti-circle-check' : 'ti-alert-circle' ?>" aria-hidden="true"></i>
     <span><?= htmlspecialchars($flash['msg']) ?></span>
   </div>
   <?php endif; ?>
 
   <div class="bn-panel">
     <div class="bn-panel-header">
+      <i class="ti ti-cloud-upload" aria-hidden="true"></i>
       Upload Foto Baru <span class="bn-panel-header__line"></span>
     </div>
 
@@ -223,7 +264,7 @@
            ondragover="event.preventDefault(); this.classList.add('dragover');"
            ondragleave="this.classList.remove('dragover');"
            ondrop="handleDrop(event)">
-        <svg class="bn-drop__icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        <div class="bn-drop__icon"><i class="ti ti-cloud-upload" aria-hidden="true"></i></div>
         <p class="bn-drop__h">Klik atau seret foto ke area ini</p>
         <p class="bn-drop__p">Mendukung format JPG, PNG, WEBP. Dapat memilih banyak file sekaligus.</p>
         <input type="file" id="foto-input" name="fotos[]" accept="image/jpeg,image/png,image/webp" multiple style="display:none" onchange="previewFiles(this.files)">
@@ -233,7 +274,7 @@
 
       <div style="display:flex; justify-content:flex-end; margin-top: 1.5rem;">
         <button type="submit" id="upload-btn" class="bn-btn bn-btn--primary" style="display:none;">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+          <i class="ti ti-upload" aria-hidden="true"></i>
           Mulai Upload
         </button>
       </div>
@@ -241,13 +282,14 @@
   </div>
 
   <div class="bn-panel">
-    <div class="bn-panel-header" style="color:var(--tx-muted)">
+    <div class="bn-panel-header bn-panel-header--muted">
+      <i class="ti ti-photo" aria-hidden="true"></i>
       <?= count($fotos) ?> Foto Dalam Album <span class="bn-panel-header__line"></span>
     </div>
 
     <?php if (empty($fotos)): ?>
       <div class="bn-empty">
-        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <div class="bn-empty__icon"><i class="ti ti-photo-off" aria-hidden="true"></i></div>
         <p>Album masih kosong. Silakan upload foto di atas.</p>
       </div>
     <?php else: ?>
@@ -255,12 +297,12 @@
         <?php foreach ($fotos as $f): ?>
         <div class="bn-foto">
           <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($f['file']) ?>" alt="<?= htmlspecialchars($f['judul'] ?? '') ?>" loading="lazy">
-          
+
           <div class="bn-foto__overlay">
             <form method="POST" action="<?= BASE_URL ?>/admin/galeri/foto/<?= $f['id'] ?>/delete" onsubmit="return confirm('Apakah Anda yakin ingin menghapus foto ini?')" style="margin:0">
               <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
               <button type="submit" class="bn-foto__del" title="Hapus Foto">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <i class="ti ti-trash" aria-hidden="true"></i>
                 Hapus
               </button>
             </form>
@@ -276,38 +318,39 @@
   </div>
 
 </div>
+</div>
 
 <script>
 function previewFiles(files) {
   var grid = document.getElementById('preview-grid');
   var btn  = document.getElementById('upload-btn');
   var drop = document.getElementById('drop-zone');
-  
+
   grid.innerHTML = '';
   drop.classList.remove('dragover');
 
-  if (!files.length) { 
-    btn.style.display = 'none'; 
-    return; 
+  if (!files.length) {
+    btn.style.display = 'none';
+    return;
   }
-  
+
   btn.style.display = 'inline-flex';
-  
+
   Array.from(files).forEach(function(file) {
     if(!file.type.startsWith('image/')) return; // Hanya preview gambar
-    
+
     var reader = new FileReader();
     reader.onload = function(e) {
       var div = document.createElement('div');
       div.className = 'bn-preview-item';
-      
+
       var img = document.createElement('img');
       img.src = e.target.result;
-      
+
       var lbl = document.createElement('div');
       lbl.className = 'bn-preview-item__lbl';
       lbl.textContent = file.name;
-      
+
       div.appendChild(img);
       div.appendChild(lbl);
       grid.appendChild(div);
