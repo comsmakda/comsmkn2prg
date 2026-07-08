@@ -4,78 +4,101 @@
 // Layout main.php sudah menyediakan header/footer
 ?>
 <style>
-/* ============================================================
-   BERITA PAGE
-   ============================================================ */
-.brt-hero{background:var(--c-surface);border-bottom:1px solid var(--c-border);padding:3rem 0 2.2rem}
+/* ═══════════════════════════════════════════
+   BERITA PAGE — mengikuti Design System
+   (token asli didefinisikan global di layout;
+    fallback disertakan bila halaman ini dirender berdiri sendiri)
+═══════════════════════════════════════════ */
+.brt-root {
+  --tx-primary:   var(--c-ink,    #0f172a);
+  --tx-secondary: var(--c-muted,  #64748b);
+  --tx-muted:     var(--c-muted2, #94a3b8);
+  --bg-page:      var(--c-page,   #eef2f6);
+  --bg-surface:   var(--c-white,  #ffffff);
+  --bg-elevated:  #f8fafc;
+  --bd-subtle:    var(--c-border, #e6ebf1);
+  --ac:           var(--c-primary,    #0e7490);
+  --ac-dk:        var(--c-primary-dk, #0b5a70);
+  --ac-lt:        var(--c-primary-lt, #06b6d4);
+  --green:      var(--c-green-text,   #15803d);
+  --r-sm: var(--radius-sm, 9px);
+  --r-md: var(--radius-md, 13px);
+  --r-lg: var(--radius-lg, 22px);
+  --font-ui: var(--ff, 'Plus Jakarta Sans', sans-serif);
+  font-family: var(--font-ui);
+}
+
+.brt-hero{background:var(--bg-surface);border-bottom:1px solid var(--bd-subtle);padding:3rem 0 2.2rem}
 .brt-hero-inner{max-width:1200px;margin:0 auto;padding:0 2rem}
-.brt-hero h1{font-family:var(--font-display);font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;color:#fff;letter-spacing:-.035em;margin-bottom:.4rem}
-.brt-hero p{font-size:.88rem;color:var(--c-muted2)}
+.brt-hero .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ac)}
+.brt-hero .eyebrow-bar{width:16px;height:2px;border-radius:2px;background:var(--ac)}
+.brt-hero h1{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;color:var(--ac-dk);letter-spacing:-.035em;margin-bottom:.4rem}
+.brt-hero p{font-size:.88rem;color:var(--tx-secondary)}
 
 .brt-wrap{max-width:1200px;margin:0 auto;padding:2.5rem 2rem}
 
 /* ---- Filter ---- */
 .brt-filter{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem;align-items:center}
-.brt-filter-label{font-family:var(--font-mono);font-size:.6rem;color:var(--c-muted);text-transform:uppercase;letter-spacing:.1em;margin-right:.3rem}
-.brt-btn{padding:5px 15px;border-radius:99px;font-size:.74rem;font-weight:600;border:1px solid var(--c-border);color:var(--c-muted2);background:var(--c-surface2);text-decoration:none;transition:all .18s;white-space:nowrap}
-.brt-btn:hover{color:#fff;border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.06)}
-.brt-btn.active{background:var(--c-sky);border-color:var(--c-sky);color:#fff}
+.brt-filter-label{font-size:.65rem;font-weight:700;color:var(--tx-muted);text-transform:uppercase;letter-spacing:.1em;margin-right:.3rem}
+.brt-btn{padding:6px 15px;border-radius:99px;font-size:.76rem;font-weight:700;border:1px solid var(--bd-subtle);color:var(--tx-secondary);background:var(--bg-surface);text-decoration:none;transition:all .18s;white-space:nowrap}
+.brt-btn:hover{color:var(--tx-primary);border-color:#d7dee7;background:var(--bg-elevated)}
+.brt-btn.active{background:var(--ac);border-color:var(--ac);color:#fff}
 
 /* ---- Grid & Card ---- */
 .brt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
 
-.brt-card{background:var(--c-surface2);border:1px solid var(--c-border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:all .28s cubic-bezier(.22,1,.36,1)}
-.brt-card:hover{border-color:rgba(14,165,233,.25);transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,.28)}
+.brt-card{background:var(--bg-surface);border:1px solid var(--bd-subtle);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;transition:all .28s cubic-bezier(.22,1,.36,1)}
+.brt-card:hover{border-color:rgba(14,116,144,.28);transform:translateY(-3px);box-shadow:0 16px 36px -14px rgba(15,23,42,.18), 0 4px 14px rgba(15,23,42,.05)}
 
-.brt-card-img{aspect-ratio:16/9;overflow:hidden;background:var(--c-surface3);position:relative}
+.brt-card-img{aspect-ratio:16/9;overflow:hidden;background:var(--bg-elevated);position:relative}
 .brt-card-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
 .brt-card:hover .brt-card-img img{transform:scale(1.04)}
-.brt-card-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--c-muted);opacity:.3}
+.brt-card-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--tx-muted)}
 
 .brt-card-body{padding:1.1rem;flex:1;display:flex;flex-direction:column}
-.brt-card-kat{display:inline-block;font-family:var(--font-mono);font-size:.59rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 9px;border-radius:99px;margin-bottom:.65rem;width:fit-content}
-.brt-card-title{font-family:var(--font-display);font-size:.92rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:.5rem;letter-spacing:-.022em;text-decoration:none;display:block;transition:color .18s}
-.brt-card-title:hover{color:var(--c-sky)}
-.brt-card-ring{font-size:.78rem;color:var(--c-muted2);line-height:1.72;flex:1;margin-bottom:.9rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.brt-card-kat{display:inline-block;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:.65rem;width:fit-content}
+.brt-card-title{font-size:.94rem;font-weight:800;color:var(--tx-primary);line-height:1.3;margin-bottom:.5rem;letter-spacing:-.022em;text-decoration:none;display:block;transition:color .18s}
+.brt-card-title:hover{color:var(--ac)}
+.brt-card-ring{font-size:.8rem;color:var(--tx-secondary);line-height:1.72;flex:1;margin-bottom:.9rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 
-.brt-card-meta{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:.62rem;color:var(--c-muted)}
+.brt-card-meta{display:flex;align-items:center;justify-content:space-between;font-size:.68rem;color:var(--tx-muted);font-weight:500}
 .brt-card-stats{display:flex;gap:8px}
 .brt-stat{display:flex;align-items:center;gap:3px}
 
 /* ---- Share footer ---- */
-.brt-card-footer{padding:.75rem 1.1rem .9rem;border-top:1px solid var(--c-border);position:relative}
+.brt-card-footer{padding:.75rem 1.1rem .9rem;border-top:1px solid var(--bd-subtle);position:relative}
 .brt-share-wrap{position:relative}
-.brt-share-btn{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:.6rem;color:var(--c-muted);background:none;border:1px solid var(--c-border);border-radius:6px;padding:4px 10px;cursor:pointer;transition:all .18s;white-space:nowrap}
-.brt-share-btn:hover{color:#fff;border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.05)}
-.brt-share-btn:focus-visible{outline:2px solid var(--c-sky);outline-offset:2px}
+.brt-share-btn{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:700;color:var(--tx-secondary);background:var(--bg-elevated);border:1px solid var(--bd-subtle);border-radius:var(--r-sm);padding:5px 11px;cursor:pointer;transition:all .18s;white-space:nowrap}
+.brt-share-btn:hover{color:var(--tx-primary);border-color:#d7dee7;background:#eef2f6}
+.brt-share-btn:focus-visible{outline:2px solid var(--ac-lt);outline-offset:2px}
 
-.brt-share-popup{display:none;position:absolute;bottom:calc(100% + 6px);left:0;background:var(--c-surface);border:1px solid var(--c-border);border-radius:10px;padding:.5rem;box-shadow:0 8px 28px rgba(0,0,0,.45);z-index:99;min-width:220px}
+.brt-share-popup{display:none;position:absolute;bottom:calc(100% + 6px);left:0;background:var(--bg-surface);border:1px solid var(--bd-subtle);border-radius:var(--r-md);padding:.5rem;box-shadow:0 20px 48px -14px rgba(15,23,42,.22), 0 4px 16px rgba(15,23,42,.06);z-index:99;min-width:220px}
 .brt-share-popup.open{display:block;animation:brtPopIn .16s ease}
 @keyframes brtPopIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .brt-share-popup-row{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
 
-.sh-icon{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:7px;border:none;cursor:pointer;text-decoration:none;transition:opacity .18s,transform .15s,box-shadow .18s;flex-shrink:0}
-.sh-icon:hover{opacity:.85;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.35)}
+.sh-icon{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:var(--r-sm);border:none;cursor:pointer;text-decoration:none;transition:opacity .18s,transform .15s,box-shadow .18s;flex-shrink:0}
+.sh-icon:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 6px 16px rgba(15,23,42,.18)}
 .sh-icon:active{transform:translateY(0)}
-.sh-icon:focus-visible{outline:2px solid var(--c-sky);outline-offset:2px}
+.sh-icon:focus-visible{outline:2px solid var(--ac-lt);outline-offset:2px}
 .sh-icon svg{display:block}
 .sh-wa{background:#22c55e;color:#fff}
 .sh-fb{background:#1877F2;color:#fff}
-.sh-tw{background:#0f1419;color:#fff;border:1px solid #2a2a2a}
-.sh-tt{background:#111;color:#fff;border:1px solid #2a2a2a}
+.sh-tw{background:#0f1419;color:#fff}
+.sh-tt{background:#111;color:#fff}
 .sh-ig{background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af);color:#fff}
-.sh-copy{background:var(--c-surface2);color:var(--c-muted2);border:1px solid var(--c-border)}
-.sh-copy:hover{color:#fff;border-color:rgba(14,165,233,.45);background:rgba(14,165,233,.08)}
+.sh-copy{background:var(--bg-elevated);color:var(--tx-secondary);border:1px solid var(--bd-subtle)}
+.sh-copy:hover{color:var(--ac);border-color:rgba(14,116,144,.35);background:rgba(14,116,144,.06)}
 
 /* ---- Empty state ---- */
-.brt-empty{text-align:center;padding:4rem 2rem;color:var(--c-muted)}
-.brt-empty svg{margin:0 auto 1rem;display:block;opacity:.2}
-.brt-empty p{font-size:.88rem}
+.brt-empty{text-align:center;padding:4rem 2rem;color:var(--tx-muted);background:var(--bg-surface);border:1.5px dashed var(--bd-subtle);border-radius:var(--r-md)}
+.brt-empty svg{margin:0 auto 1rem;display:block;opacity:.4}
+.brt-empty p{font-size:.88rem;font-weight:500}
 
 /* ---- Pagination ---- */
 .brt-pag{display:flex;gap:.4rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
-.brt-pag a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1px solid var(--c-border);background:var(--c-surface2);color:var(--c-muted2);font-size:.78rem;font-weight:600;text-decoration:none;transition:all .18s}
-.brt-pag a.active,.brt-pag a:hover{background:var(--c-sky);border-color:var(--c-sky);color:#fff}
+.brt-pag a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--r-sm);border:1px solid var(--bd-subtle);background:var(--bg-surface);color:var(--tx-secondary);font-size:.8rem;font-weight:700;text-decoration:none;transition:all .18s}
+.brt-pag a.active,.brt-pag a:hover{background:var(--ac);border-color:var(--ac);color:#fff}
 .brt-pag a.disabled{opacity:.35;pointer-events:none}
 
 @media(max-width:1024px){.brt-grid{grid-template-columns:repeat(2,1fr)}}
@@ -85,6 +108,8 @@
   .brt-filter{gap:.4rem}
 }
 </style>
+
+<div class="brt-root">
 
 <div class="brt-hero">
   <div class="brt-hero-inner">
@@ -115,7 +140,7 @@
 
   <!-- Empty state -->
   <div class="brt-empty">
-    <svg width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+    <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
       <polyline points="14 2 14 8 20 8"/>
     </svg>
@@ -130,7 +155,7 @@
       $bUrlEnc  = urlencode($bUrl);
       $bTitle   = urlencode($b['judul']);
       $bShareId = 'sp-' . $b['id'];
-      $bKatColor = htmlspecialchars($b['kategori_warna'] ?? '#0ea5e9');
+      $bKatColor = htmlspecialchars($b['kategori_warna'] ?? '#0e7490');
     ?>
     <article class="brt-card">
 
@@ -140,7 +165,7 @@
                alt="<?= htmlspecialchars($b['judul']) ?>" loading="lazy">
         <?php else: ?>
           <div class="brt-card-img-ph">
-            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24">
+            <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
             </svg>
@@ -150,7 +175,7 @@
 
       <div class="brt-card-body">
         <?php if (!empty($b['kategori_nama'])): ?>
-        <span class="brt-card-kat" style="background:<?= $bKatColor ?>22;color:<?= $bKatColor ?>;border:1px solid <?= $bKatColor ?>44">
+        <span class="brt-card-kat" style="background:<?= $bKatColor ?>1a;color:<?= $bKatColor ?>;border:1px solid <?= $bKatColor ?>44">
           <?= htmlspecialchars($b['kategori_nama']) ?>
         </span>
         <?php endif; ?>
@@ -250,6 +275,8 @@
   <?php endif; ?>
 </div>
 
+</div><!-- /.brt-root -->
+
 <script>
 (function(){
   'use strict';
@@ -298,8 +325,8 @@
       navigator.clipboard.writeText(url).then(function(){
         var svg = btn.querySelector('svg');
         var orig = svg.outerHTML;
-        svg.outerHTML = '<svg width="14" height="14" fill="none" stroke="#22c55e" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
-        btn.style.borderColor = 'rgba(34,197,94,.4)';
+        svg.outerHTML = '<svg width="14" height="14" fill="none" stroke="#15803d" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+        btn.style.borderColor = 'rgba(21,128,61,.4)';
         btn.title = 'Tersalin!';
         setTimeout(function(){
           var b = document.querySelector('.brt-copy-btn[data-url="'+url+'"]');
