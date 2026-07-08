@@ -1,64 +1,92 @@
 <?php // app/views/admin/profil.php ?>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700;800&display=swap');
+/* ═══════════════════════════════════════
+   SCOPE ROOT — alias ke Design System
+   (token asli didefinisikan global di layout;
+    fallback disertakan bila file ini dirender berdiri sendiri)
+═══════════════════════════════════════ */
+.prf {
+  /* Text */
+  --tx-primary:   var(--c-ink,    #0f172a);
+  --tx-secondary: var(--c-muted,  #64748b);
+  --tx-muted:     var(--c-muted2, #94a3b8);
 
-:root {
-  --font-ui:   'Sora', sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
-  --bg-base:     #0a0c10;
-  --bg-surface:  #0f1117;
-  --bg-elevated: #141820;
-  --bg-overlay:  #1a1f2e;
-  --bd-subtle:   rgba(255,255,255,0.055);
-  --bd-default:  rgba(255,255,255,0.10);
-  --bd-accent:   rgba(99,179,237,0.35);
-  --tx-primary:  #e8ecf4;
-  --tx-secondary:#9aa3b8;
-  --tx-muted:    #4f5773;
-  --ac:          #63b3ed;
-  --ac-dim:      rgba(99,179,237,0.10);
-  --green:       #48bb78;
-  --green-d:     rgba(72,187,120,0.12);
-  --red:         #fc8181;
-  --red-d:       rgba(252,129,129,0.12);
-  --amber:       #f6c244;
-  --amber-d:     rgba(246,194,68,0.12);
-  --r-xs: 4px; --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px;
-  --ease: cubic-bezier(0.16,1,0.3,1);
-  --t-fast: 120ms; --t-base: 200ms;
+  /* Surface */
+  --bg-surface:  var(--c-white, #ffffff);
+  --bg-elevated: #f8fafc;
+  --bg-overlay:  #eef2f6;
+  --bg-active:   var(--c-primary-08, rgba(14,116,144,.08));
+
+  /* Border */
+  --bd-subtle:  var(--c-border, #e6ebf1);
+  --bd-default: var(--c-border, #e6ebf1);
+  --bd-accent:  var(--c-primary-25, rgba(14,116,144,.25));
+
+  /* Accent (satu-satunya warna aksen dekoratif) */
+  --ac:      var(--c-primary,    #0e7490);
+  --ac-dk:   var(--c-primary-dk, #0b5a70);
+  --ac-lt:   var(--c-primary-lt, #06b6d4);
+  --ac-dim:  var(--c-primary-08, rgba(14,116,144,.08));
+  --ac-glow: var(--c-primary-12, rgba(14,116,144,.12));
+
+  /* Status */
+  --green:   var(--c-green-text, #15803d);
+  --green-d: var(--c-green-bg,   #f0fdf4);
+  --red:     var(--c-red-text,   #b91c1c);
+  --red-d:   var(--c-red-bg,     #fef2f2);
+  --amber:   var(--c-amber-icon, #d9910c);
+  --amber-d: var(--c-amber-bg,   #fef6e2);
+
+  /* Radius */
+  --r-xs: 6px;
+  --r-sm: var(--radius-sm, 9px);
+  --r-md: var(--radius-md, 13px);
+  --r-lg: var(--radius-lg, 22px);
+
+  /* Font — satu keluarga font di seluruh sistem */
+  --font-ui: var(--ff, 'Plus Jakarta Sans', sans-serif);
+
+  /* Motion */
+  --ease:  cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast: 120ms;
+  --t-base: 160ms;
+  --t-slow: 300ms;
 }
 
 .prf * { box-sizing: border-box; margin: 0; padding: 0; }
 .prf {
   font-family: var(--font-ui);
   color: var(--tx-primary);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  max-width: 860px;
+  max-width: 900px;
 }
+.prf a { text-decoration: none; color: inherit; }
 
-/* ── Page header ── */
+/* ═══════════════════════════════════════
+   PAGE HEADER
+═══════════════════════════════════════ */
 .ph {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
   flex-wrap: wrap;
 }
 .ph__eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ac);
-  margin-bottom: 7px;
+  margin-bottom: 8px;
 }
 .ph__eyebrow::before {
   content: '';
@@ -66,31 +94,112 @@
   border-radius: 50%;
   background: var(--ac);
   box-shadow: 0 0 6px var(--ac);
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity:1; box-shadow: 0 0 6px var(--ac); }
+  50%      { opacity:.5; box-shadow: 0 0 12px var(--ac); }
 }
 .ph__title {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 800;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
+  color: var(--ac-dk);
   line-height: 1.1;
 }
 .ph__sub {
-  font-size: 12.5px;
-  color: var(--tx-muted);
-  margin-top: 5px;
+  font-size: 13px;
+  color: var(--tx-secondary);
+  margin-top: 6px;
 }
 
-/* ── Layout grid ── */
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
+.btn-sec {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  background: var(--bg-surface);
+  color: var(--tx-secondary);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 700;
+  border: 1.5px solid var(--bd-subtle);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--t-fast) var(--ease);
+}
+.btn-sec:hover {
+  border-color: var(--bd-accent);
+  color: var(--ac);
+  background: var(--ac-dim);
+}
+.btn-sec i { font-size: 14px; }
+
+.btn-pri {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 22px;
+  background: var(--ac);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 800;
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(14,116,144,.22);
+  transition: background var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease), transform var(--t-fast) var(--ease);
+}
+.btn-pri:hover {
+  background: var(--ac-lt);
+  box-shadow: 0 12px 28px rgba(6,182,212,.3);
+  transform: translateY(-2px);
+}
+.btn-pri i { font-size: 15px; }
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 15px;
+  background: var(--red-d);
+  color: var(--red);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 700;
+  border: 1px solid rgba(185,28,28,.2);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--t-fast) var(--ease);
+}
+.btn-danger:hover {
+  background: rgba(185,28,28,.14);
+  border-color: var(--red);
+}
+.btn-danger i { font-size: 14px; }
+
+/* ═══════════════════════════════════════
+   LAYOUT GRID
+═══════════════════════════════════════ */
 .prf-grid {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 20px;
+  grid-template-columns: 240px 1fr;
+  gap: 16px;
   align-items: start;
 }
 @media (max-width: 640px) {
   .prf-grid { grid-template-columns: 1fr; }
 }
 
-/* ── Card base ── */
+/* ═══════════════════════════════════════
+   CARD BASE
+═══════════════════════════════════════ */
 .card {
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
@@ -98,41 +207,41 @@
   overflow: hidden;
 }
 
-/* ── Avatar card ── */
+/* ═══════════════════════════════════════
+   AVATAR CARD
+═══════════════════════════════════════ */
 .ava-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 28px 20px 20px;
+  padding: 30px 20px 22px;
   gap: 14px;
 }
 
-.ava-wrap {
+.foto-preview-wrap {
   position: relative;
-  width: 96px;
-  height: 96px;
-  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
 }
 .ava-img {
-  width: 96px;
-  height: 96px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--bd-accent);
+  border: 3px solid var(--ac-dim);
   display: block;
 }
 .ava-initials {
-  width: 96px;
-  height: 96px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background: var(--ac-dim);
-  border: 2px solid var(--bd-accent);
+  border: 3px solid var(--ac-dim);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 30px;
+  font-weight: 800;
   color: var(--ac);
   text-transform: uppercase;
   letter-spacing: -0.02em;
@@ -143,12 +252,12 @@
   position: absolute;
   bottom: 2px;
   right: 2px;
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: var(--bg-elevated);
-  border: 1px solid var(--bd-default);
-  color: var(--tx-secondary);
+  background: var(--ac);
+  border: 2px solid var(--bg-surface);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,54 +265,69 @@
   transition: all var(--t-fast) var(--ease);
 }
 .ava-upload-btn:hover {
-  background: var(--ac-dim);
-  border-color: var(--bd-accent);
-  color: var(--ac);
+  background: var(--ac-lt);
+  transform: scale(1.06);
 }
-.ava-upload-btn svg { width: 13px; height: 13px; }
+.ava-upload-btn i { font-size: 14px; }
+
+.foto-remove-btn {
+  display: none;
+  position: absolute;
+  top: -3px; left: -3px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 2px solid var(--bg-surface);
+  color: #fff;
+  align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 12px; line-height: 1;
+  font-weight: 700;
+  z-index: 2;
+}
+.foto-remove-btn.is-visible { display: flex; }
 
 .ava-name {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   color: var(--tx-primary);
   letter-spacing: -0.02em;
   text-align: center;
 }
 .ava-role {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 10.5px;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ac);
   background: var(--ac-dim);
   border: 1px solid var(--bd-accent);
   border-radius: var(--r-xs);
-  padding: 3px 10px;
+  padding: 3px 11px;
 }
 
 .ava-meta {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 9px;
   border-top: 1px solid var(--bd-subtle);
-  padding-top: 14px;
+  padding-top: 15px;
   margin-top: 2px;
 }
 .ava-meta-row {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-size: 11.5px;
   color: var(--tx-muted);
 }
-.ava-meta-row svg { width: 12px; height: 12px; flex-shrink: 0; }
+.ava-meta-row i { font-size: 14px; flex-shrink: 0; color: var(--tx-muted); }
 .ava-meta-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* ── Main form card ── */
-.form-card {}
-
+/* ═══════════════════════════════════════
+   FORM CARD
+═══════════════════════════════════════ */
 .form-section {
   padding: 20px 22px;
   border-bottom: 1px solid var(--bd-subtle);
@@ -214,17 +338,16 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
-  font-family: var(--font-mono);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--tx-muted);
   margin-bottom: 18px;
 }
-.section-title svg { width: 13px; height: 13px; }
+.section-title i { font-size: 15px; color: var(--ac); }
 
-/* ── Form fields ── */
+/* ── Fields ── */
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -236,21 +359,15 @@
   .form-row { grid-template-columns: 1fr; }
 }
 
-.field {}
 .field label {
   display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--tx-muted);
-  letter-spacing: 0.04em;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--tx-secondary);
+  letter-spacing: 0.01em;
   margin-bottom: 6px;
-  text-transform: uppercase;
-  font-family: var(--font-mono);
 }
-.field label .req {
-  color: var(--red);
-  margin-left: 2px;
-}
+.field label .req { color: var(--red); margin-left: 2px; }
 
 .field input,
 .field textarea {
@@ -258,42 +375,36 @@
   font-family: var(--font-ui);
   font-size: 13px;
   color: var(--tx-primary);
-  background: var(--bg-elevated);
-  border: 1px solid var(--bd-subtle);
-  border-radius: var(--r-md);
-  padding: 9px 12px;
+  background: #fbfcfe;
+  border: 1.5px solid var(--bd-subtle);
+  border-radius: var(--r-sm);
+  padding: 11px 14px;
   outline: none;
-  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  transition: border var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
   -webkit-appearance: none;
 }
 .field input:focus,
 .field textarea:focus {
-  border-color: var(--bd-accent);
-  background: var(--bg-overlay);
+  border-color: var(--ac-lt);
+  box-shadow: 0 0 0 3px rgba(6,182,212,.12);
+  background: #fff;
 }
 .field input::placeholder,
-.field textarea::placeholder {
-  color: var(--tx-muted);
-}
-.field input[readonly] {
-  color: var(--tx-muted);
-  cursor: not-allowed;
-}
+.field textarea::placeholder { color: var(--tx-muted); }
+.field input[readonly] { color: var(--tx-muted); cursor: not-allowed; }
+
 .field__hint {
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--tx-muted);
   margin-top: 5px;
   line-height: 1.5;
 }
 
-/* ── Password strength indicator ── */
-.pw-strength {
-  margin-top: 7px;
-  display: none;
-}
+/* ── Password strength ── */
+.pw-strength { margin-top: 8px; display: none; }
 .pw-strength.is-visible { display: block; }
 .pw-strength__bar {
-  height: 3px;
+  height: 4px;
   background: var(--bg-overlay);
   border-radius: 99px;
   overflow: hidden;
@@ -305,11 +416,7 @@
   transition: width var(--t-base) var(--ease), background var(--t-base) var(--ease);
   width: 0%;
 }
-.pw-strength__label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-}
+.pw-strength__label { font-size: 10.5px; font-weight: 700; }
 .pw-strength--weak   .pw-strength__fill { width: 25%; background: var(--red); }
 .pw-strength--weak   .pw-strength__label { color: var(--red); }
 .pw-strength--fair   .pw-strength__fill { width: 50%; background: var(--amber); }
@@ -319,14 +426,12 @@
 .pw-strength--strong .pw-strength__fill { width: 100%; background: var(--green); }
 .pw-strength--strong .pw-strength__label { color: var(--green); }
 
-/* ── Input with icon/toggle ── */
-.input-wrap {
-  position: relative;
-}
-.input-wrap input { padding-right: 40px; }
+/* ── Input with toggle ── */
+.input-wrap { position: relative; }
+.input-wrap input { padding-right: 42px; }
 .input-wrap__toggle {
   position: absolute;
-  right: 10px;
+  right: 11px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -337,11 +442,33 @@
   padding: 0;
   transition: color var(--t-fast) var(--ease);
 }
-.input-wrap__toggle:hover { color: var(--tx-primary); }
-.input-wrap__toggle svg { width: 14px; height: 14px; }
+.input-wrap__toggle:hover { color: var(--ac); }
+.input-wrap__toggle i { font-size: 16px; }
 
-/* ── File input hidden ── */
 #foto-input { display: none; }
+
+/* ── Foto profil chooser ── */
+.foto-choose-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  background: var(--bg-elevated);
+  color: var(--tx-secondary);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 700;
+  border: 1.5px solid var(--bd-subtle);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.foto-choose-btn:hover {
+  border-color: var(--bd-accent);
+  color: var(--ac);
+  background: var(--ac-dim);
+}
+.foto-choose-btn i { font-size: 15px; }
 
 /* ── Form actions ── */
 .form-actions {
@@ -349,60 +476,16 @@
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
-  padding: 16px 22px;
+  padding: 18px 22px;
   border-top: 1px solid var(--bd-subtle);
   background: var(--bg-elevated);
 }
-
-.btn-sec {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 16px;
-  background: transparent;
-  color: var(--tx-secondary);
-  font-family: var(--font-ui);
-  font-size: 12px;
-  font-weight: 600;
-  border: 1px solid var(--bd-subtle);
-  border-radius: var(--r-md);
-  cursor: pointer;
-  text-decoration: none;
-  transition: all var(--t-fast) var(--ease);
-}
-.btn-sec:hover {
-  border-color: var(--bd-default);
-  color: var(--tx-primary);
-  background: var(--bg-overlay);
-}
-
-.btn-pri {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 20px;
-  background: var(--ac);
-  color: #0a0c10;
-  font-family: var(--font-ui);
-  font-size: 12px;
-  font-weight: 700;
-  border: none;
-  border-radius: var(--r-md);
-  cursor: pointer;
-  transition: background var(--t-fast) var(--ease), box-shadow var(--t-base) var(--ease), transform var(--t-fast) var(--ease);
-}
-.btn-pri:hover {
-  background: #7ec8f5;
-  box-shadow: 0 4px 20px rgba(99,179,237,0.30);
-  transform: translateY(-1px);
-}
-.btn-pri svg { width: 14px; height: 14px; }
 
 /* ── Danger zone ── */
 .danger-zone {
   margin-top: 20px;
   background: var(--bg-surface);
-  border: 1px solid rgba(252,129,129,0.15);
+  border: 1px solid rgba(185,28,28,.18);
   border-radius: var(--r-lg);
   overflow: hidden;
 }
@@ -411,15 +494,14 @@
   align-items: center;
   gap: 8px;
   padding: 14px 22px;
-  border-bottom: 1px solid rgba(252,129,129,0.10);
-  font-size: 11px;
+  border-bottom: 1px solid rgba(185,28,28,.12);
+  font-size: 10.5px;
   font-weight: 700;
-  font-family: var(--font-mono);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--red);
 }
-.danger-zone__head svg { width: 13px; height: 13px; }
+.danger-zone__head i { font-size: 15px; }
 .danger-zone__body {
   padding: 18px 22px;
   display: flex;
@@ -436,29 +518,9 @@
 }
 .danger-zone__desc strong { color: var(--tx-secondary); }
 
-.btn-danger {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: var(--red-d);
-  color: var(--red);
-  font-family: var(--font-ui);
-  font-size: 12px;
-  font-weight: 700;
-  border: 1px solid rgba(252,129,129,0.25);
-  border-radius: var(--r-md);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all var(--t-fast) var(--ease);
-}
-.btn-danger:hover {
-  background: rgba(252,129,129,0.20);
-  border-color: var(--red);
-}
-.btn-danger svg { width: 13px; height: 13px; }
-
-/* ── Toast ── */
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
 .toast {
   position: fixed;
   bottom: 24px;
@@ -467,14 +529,14 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 16px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--bd-default);
-  border-radius: var(--r-md);
+  padding: 13px 17px;
+  background: var(--bg-surface);
+  border: 1px solid var(--bd-subtle);
+  border-radius: var(--r-sm);
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--tx-primary);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  box-shadow: 0 20px 45px -14px rgba(15,23,42,.28), 0 4px 16px rgba(15,23,42,.08);
   opacity: 0;
   transform: translateY(8px);
   transition: opacity var(--t-base) var(--ease), transform var(--t-base) var(--ease);
@@ -486,12 +548,14 @@
 .toast--ok  .toast__dot { background: var(--green); }
 .toast--err .toast__dot { background: var(--red); }
 
-/* ── Confirm overlay (logout) ── */
+/* ═══════════════════════════════════════
+   CONFIRM OVERLAY
+═══════════════════════════════════════ */
 .confirm-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.65);
+  background: rgba(15,23,42,.55);
   backdrop-filter: blur(4px);
   z-index: 9999;
   align-items: center;
@@ -499,13 +563,13 @@
 }
 .confirm-overlay.is-open { display: flex; }
 .confirm-box {
-  background: var(--bg-elevated);
-  border: 1px solid var(--bd-default);
-  border-radius: var(--r-xl);
+  background: var(--bg-surface);
+  border: 1px solid var(--bd-subtle);
+  border-radius: var(--r-lg);
   padding: 28px;
   max-width: 360px;
   width: 90%;
-  box-shadow: 0 24px 60px rgba(0,0,0,.5);
+  box-shadow: 0 30px 70px -20px rgba(15,23,42,.35), 0 4px 18px rgba(15,23,42,.08);
   animation: pop-in 300ms var(--ease) both;
 }
 @keyframes pop-in {
@@ -513,16 +577,16 @@
   to   { transform: scale(1)   translateY(0);    opacity: 1; }
 }
 .confirm-box__ico {
-  width: 42px; height: 42px;
+  width: 44px; height: 44px;
   border-radius: var(--r-md);
   background: var(--red-d);
   display: flex; align-items: center; justify-content: center;
   color: var(--red);
   margin-bottom: 16px;
 }
-.confirm-box__ico svg { width: 20px; height: 20px; }
+.confirm-box__ico i { font-size: 20px; }
 .confirm-box__title {
-  font-size: 15px; font-weight: 700;
+  font-size: 15.5px; font-weight: 800;
   color: var(--tx-primary);
   margin-bottom: 6px;
   letter-spacing: -0.02em;
@@ -531,31 +595,7 @@
   font-size: 12.5px; color: var(--tx-muted);
   line-height: 1.6; margin-bottom: 20px;
 }
-.confirm-box__acts {
-  display: flex; gap: 8px; justify-content: flex-end;
-}
-
-/* ── Preview overlay foto ── */
-.foto-preview-wrap {
-  position: relative;
-  width: 96px; height: 96px;
-}
-.foto-remove-btn {
-  display: none;
-  position: absolute;
-  top: -4px; right: -4px;
-  width: 20px; height: 20px;
-  border-radius: 50%;
-  background: var(--red);
-  border: 1.5px solid var(--bg-base);
-  color: #fff;
-  align-items: center; justify-content: center;
-  cursor: pointer;
-  font-size: 11px; line-height: 1;
-  font-weight: 700;
-  z-index: 2;
-}
-.foto-remove-btn.is-visible { display: flex; }
+.confirm-box__acts { display: flex; gap: 8px; justify-content: flex-end; }
 
 @media (max-width: 480px) {
   .form-actions { flex-direction: column-reverse; }
@@ -572,11 +612,8 @@
       <h1 class="ph__title">Edit Profil Admin</h1>
       <p class="ph__sub">Kelola informasi akun dan keamanan login administrator.</p>
     </div>
-    <!-- Link kembali ke dashboard -->
     <a href="<?= BASE_URL ?>/admin/dashboard" class="btn-sec" style="align-self:flex-start;margin-top:4px;">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;" aria-hidden="true">
-        <path d="M9 11L5 7l4-4"/>
-      </svg>
+      <i class="ti ti-arrow-left" aria-hidden="true"></i>
       Dashboard
     </a>
   </div>
@@ -601,9 +638,7 @@
           <?php endif; ?>
         </div>
         <button type="button" class="ava-upload-btn" id="ava-upload-btn" title="Ganti foto" onclick="document.getElementById('foto-input').click()">
-          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z"/>
-          </svg>
+          <i class="ti ti-camera" aria-hidden="true"></i>
         </button>
         <button type="button" class="foto-remove-btn" id="foto-remove-btn" title="Hapus foto baru" aria-label="Hapus preview foto">×</button>
       </div>
@@ -613,32 +648,20 @@
 
       <div class="ava-meta">
         <div class="ava-meta-row">
-          <!-- Email icon -->
-          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="1" y="3" width="12" height="9" rx="1"/><path d="M1 3l6 5 6-5"/>
-          </svg>
+          <i class="ti ti-mail" aria-hidden="true"></i>
           <span id="display-email"><?= htmlspecialchars($admin['email'] ?? '—') ?></span>
         </div>
         <div class="ava-meta-row">
-          <!-- No HP icon -->
-          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3.5" y="1" width="7" height="12" rx="1.5"/><circle cx="7" cy="10.5" r=".6" fill="currentColor" stroke="none"/>
-          </svg>
+          <i class="ti ti-phone" aria-hidden="true"></i>
           <span id="display-nohp"><?= !empty($admin['no_hp']) ? htmlspecialchars($admin['no_hp']) : '—' ?></span>
         </div>
         <div class="ava-meta-row">
-          <!-- Clock icon -->
-          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v3l1.5 1.5"/>
-          </svg>
+          <i class="ti ti-clock" aria-hidden="true"></i>
           <span>Bergabung <?= !empty($admin['created_at']) ? date('M Y', strtotime($admin['created_at'])) : '—' ?></span>
         </div>
         <div class="ava-meta-row">
-          <!-- Shield icon -->
-          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M7 1l5 2v4c0 3-2.5 5-5 6C4.5 12 2 10 2 7V3l5-2z"/>
-          </svg>
-          <span style="color:var(--green);">Status Aktif</span>
+          <i class="ti ti-shield-check" aria-hidden="true" style="color:var(--green);"></i>
+          <span style="color:var(--green);font-weight:600;">Status Aktif</span>
         </div>
       </div>
 
@@ -656,14 +679,12 @@
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
         <input type="file" name="foto" id="foto-input" accept="image/jpeg,image/png,image/webp" aria-label="Upload foto profil">
 
-        <div class="card form-card">
+        <div class="card">
 
           <!-- ── Seksi: Informasi Dasar ── -->
           <div class="form-section">
             <div class="section-title">
-              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="7" cy="5" r="2.5"/><path d="M1.5 13c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/>
-              </svg>
+              <i class="ti ti-user" aria-hidden="true"></i>
               Informasi Dasar
             </div>
 
@@ -715,23 +736,13 @@
           <!-- ── Seksi: Foto Profil ── -->
           <div class="form-section">
             <div class="section-title">
-              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <rect x="1" y="2.5" width="12" height="9" rx="1.5"/>
-                <circle cx="7" cy="7" r="2"/>
-                <circle cx="10.5" cy="4.5" r=".5" fill="currentColor" stroke="none"/>
-              </svg>
+              <i class="ti ti-photo" aria-hidden="true"></i>
               Foto Profil
             </div>
 
             <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-              <button type="button"
-                      onclick="document.getElementById('foto-input').click()"
-                      style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;background:var(--bg-elevated);color:var(--tx-secondary);font-family:var(--font-ui);font-size:12px;font-weight:600;border:1px solid var(--bd-subtle);border-radius:var(--r-md);cursor:pointer;transition:all var(--t-fast) var(--ease);"
-                      onmouseover="this.style.borderColor='var(--bd-accent)';this.style.color='var(--ac)';this.style.background='var(--ac-dim)'"
-                      onmouseout="this.style.borderColor='var(--bd-subtle)';this.style.color='var(--tx-secondary)';this.style.background='var(--bg-elevated)'">
-                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:13px;height:13px;">
-                  <path d="M7 9V1M4 4l3-3 3 3M2 11h10"/>
-                </svg>
+              <button type="button" class="foto-choose-btn" onclick="document.getElementById('foto-input').click()">
+                <i class="ti ti-upload" aria-hidden="true"></i>
                 Pilih Foto Baru
               </button>
               <span class="field__hint" id="foto-filename">Belum ada file dipilih &mdash; JPG, PNG, WebP maks. 2 MB.</span>
@@ -740,7 +751,7 @@
             <?php if (!empty($admin['foto'])): ?>
             <div style="margin-top:14px;">
               <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tx-muted);cursor:pointer;">
-                <input type="checkbox" name="hapus_foto" value="1" id="hapus-foto-cb" style="accent-color:var(--red);width:14px;height:14px;">
+                <input type="checkbox" name="hapus_foto" value="1" id="hapus-foto-cb" style="accent-color:var(--red);width:15px;height:15px;">
                 <span>Hapus foto saat ini (gunakan inisial nama)</span>
               </label>
             </div>
@@ -751,9 +762,7 @@
           <!-- ── Seksi: Keamanan ── -->
           <div class="form-section">
             <div class="section-title">
-              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <rect x="2" y="6" width="10" height="7" rx="1"/><path d="M5 6V4a2 2 0 014 0v2"/>
-              </svg>
+              <i class="ti ti-lock" aria-hidden="true"></i>
               Ubah Password
             </div>
 
@@ -769,9 +778,7 @@
                     autocomplete="current-password"
                   >
                   <button type="button" class="input-wrap__toggle" data-target="password_lama" aria-label="Tampilkan/sembunyikan password">
-                    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ico-eye" aria-hidden="true">
-                      <path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z"/><circle cx="7" cy="7" r="1.5"/>
-                    </svg>
+                    <i class="ti ti-eye" aria-hidden="true"></i>
                   </button>
                 </div>
                 <div class="field__hint">Wajib diisi jika ingin mengganti password.</div>
@@ -790,9 +797,7 @@
                     autocomplete="new-password"
                   >
                   <button type="button" class="input-wrap__toggle" data-target="password_baru" aria-label="Tampilkan/sembunyikan password baru">
-                    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ico-eye" aria-hidden="true">
-                      <path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z"/><circle cx="7" cy="7" r="1.5"/>
-                    </svg>
+                    <i class="ti ti-eye" aria-hidden="true"></i>
                   </button>
                 </div>
                 <div class="pw-strength" id="pw-strength">
@@ -811,9 +816,7 @@
                     autocomplete="new-password"
                   >
                   <button type="button" class="input-wrap__toggle" data-target="password_konfirmasi" aria-label="Tampilkan/sembunyikan konfirmasi password">
-                    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ico-eye" aria-hidden="true">
-                      <path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z"/><circle cx="7" cy="7" r="1.5"/>
-                    </svg>
+                    <i class="ti ti-eye" aria-hidden="true"></i>
                   </button>
                 </div>
                 <div class="field__hint" id="pw-match-hint"></div>
@@ -830,22 +833,18 @@
           <div class="form-actions">
             <a href="<?= BASE_URL ?>/admin/dashboard" class="btn-sec">Batal</a>
             <button type="submit" class="btn-pri" id="submit-btn">
-              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M2 7l3.5 3.5L12 3"/>
-              </svg>
+              <i class="ti ti-check" aria-hidden="true"></i>
               Simpan Perubahan
             </button>
           </div>
 
-        </div><!-- /.form-card -->
+        </div><!-- /.card -->
       </form>
 
       <!-- ── Danger Zone: Logout Semua Sesi ── -->
       <div class="danger-zone">
         <div class="danger-zone__head">
-          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M7 2L12.5 12H1.5L7 2z"/><path d="M7 6v3M7 10.5v.5"/>
-          </svg>
+          <i class="ti ti-alert-triangle" aria-hidden="true"></i>
           Zona Berbahaya
         </div>
         <div class="danger-zone__body">
@@ -854,9 +853,7 @@
             Kamu akan logout dan semua sesi browser lain akan dihentikan. Gunakan hanya jika akun kamu mungkin diakses orang lain.
           </div>
           <button type="button" class="btn-danger" id="logout-all-btn">
-            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5.5 2H3a1 1 0 00-1 1v8a1 1 0 001 1h2.5M9.5 10l2.5-3-2.5-3M12 7H6"/>
-            </svg>
+            <i class="ti ti-logout" aria-hidden="true"></i>
             Logout Semua Sesi
           </button>
         </div>
@@ -878,9 +875,7 @@
 <div class="confirm-overlay" id="logout-overlay" role="dialog" aria-modal="true" aria-labelledby="logout-dialog-title">
   <div class="confirm-box">
     <div class="confirm-box__ico">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M8 3H5a2 2 0 00-2 2v10a2 2 0 002 2h3M13 15l4-5-4-5M17 10H7"/>
-      </svg>
+      <i class="ti ti-logout" aria-hidden="true"></i>
     </div>
     <div class="confirm-box__title" id="logout-dialog-title">Logout Semua Sesi?</div>
     <div class="confirm-box__sub">
@@ -890,7 +885,7 @@
       <button type="button" class="btn-sec" id="logout-cancel">Batal</button>
       <form method="POST" action="<?= BASE_URL ?>/admin/profil/logout-all" style="margin:0;padding:0;">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
-        <button type="submit" class="btn-pri" style="background:var(--red);color:#fff;">
+        <button type="submit" class="btn-pri" style="background:var(--red);box-shadow:0 8px 22px rgba(185,28,28,.22);">
           Ya, Logout Semua
         </button>
       </form>
@@ -1036,11 +1031,11 @@
     if (pwBaru.value === pwKonfirmasi.value) {
       pwMatchHint.textContent         = '✓ Password cocok';
       pwMatchHint.style.color         = 'var(--green)';
-      pwKonfirmasi.style.borderColor  = 'rgba(72,187,120,0.4)';
+      pwKonfirmasi.style.borderColor  = 'rgba(21,128,61,0.4)';
     } else {
       pwMatchHint.textContent         = '✗ Password tidak cocok';
       pwMatchHint.style.color         = 'var(--red)';
-      pwKonfirmasi.style.borderColor  = 'rgba(252,129,129,0.4)';
+      pwKonfirmasi.style.borderColor  = 'rgba(185,28,28,0.4)';
     }
   }
 
