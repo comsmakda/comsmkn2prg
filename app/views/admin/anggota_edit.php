@@ -1,34 +1,49 @@
 <?php // app/views/admin/anggota_edit.php ?>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700;800&display=swap');
+/* ═══════════════════════════════════════
+   SCOPE ROOT — alias ke Design System
+   (token asli didefinisikan global di layout;
+    fallback disertakan bila file ini dirender berdiri sendiri)
+═══════════════════════════════════════ */
+.edit-root {
+  --tx-primary:   var(--c-ink,    #0f172a);
+  --tx-secondary: var(--c-muted,  #64748b);
+  --tx-muted:     var(--c-muted2, #94a3b8);
 
-:root {
-  --font-ui:    'Sora', sans-serif;
-  --font-mono:  'IBM Plex Mono', monospace;
-  --bg-surface:  #0f1117;
-  --bg-elevated: #141820;
-  --bg-overlay:  #1a1f2e;
-  --bd-subtle:   rgba(255,255,255,0.055);
-  --bd-default:  rgba(255,255,255,0.10);
-  --bd-accent:   rgba(99,179,237,0.35);
-  --tx-primary:  #e8ecf4;
-  --tx-secondary:#9aa3b8;
-  --tx-muted:    #4f5773;
-  --ac:          #63b3ed;
-  --ac-dim:      rgba(99,179,237,0.10);
-  --ac-glow:     rgba(99,179,237,0.18);
-  --blue:        #4f9eff;
-  --blue-d:      rgba(79,158,255,0.12);
-  --green:       #48bb78;
-  --green-d:     rgba(72,187,120,0.12);
-  --red:         #fc8181;
-  --red-d:       rgba(252,129,129,0.12);
-  --amber:       #f6c244;
-  --amber-d:     rgba(246,194,68,0.12);
-  --r-xs: 4px; --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px;
-  --ease: cubic-bezier(0.16,1,0.3,1);
-  --t-fast: 120ms; --t-base: 200ms;
+  --bg-surface:  var(--c-white, #ffffff);
+  --bg-elevated: #f8fafc;
+  --bg-overlay:  #eef2f6;
+
+  --bd-subtle:  var(--c-border, #e6ebf1);
+  --bd-default: var(--c-border, #e6ebf1);
+  --bd-accent:  var(--c-primary-25, rgba(14,116,144,.25));
+
+  --ac:      var(--c-primary,    #0e7490);
+  --ac-dim:  var(--c-primary-08, rgba(14,116,144,.08));
+  --ac-glow: var(--c-primary-12, rgba(14,116,144,.12));
+  --ac-lt:   var(--c-primary-lt, #06b6d4);
+
+  --green:   var(--c-green-text, #15803d);
+  --green-d: var(--c-green-bg,   #f0fdf4);
+  --red:     var(--c-red-text,   #b91c1c);
+  --red-d:   var(--c-red-bg,     #fef2f2);
+  --amber:   var(--c-amber-icon, #d9910c);
+  --amber-d: var(--c-amber-bg,   #fef6e2);
+  --blue:    var(--c-primary,    #0e7490);
+  --blue-d:  var(--c-primary-08, rgba(14,116,144,.08));
+
+  --r-xs: 6px;
+  --r-sm: var(--radius-sm, 9px);
+  --r-md: var(--radius-sm, 9px);
+  --r-lg: var(--radius-md, 13px);
+  --r-xl: var(--radius-lg, 22px);
+
+  --font-ui: var(--ff, 'Plus Jakarta Sans', sans-serif);
+
+  --ease:   cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast: 120ms;
+  --t-base: 160ms;
 }
 
 .edit-root * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,91 +51,88 @@
 .edit-root {
   font-family: var(--font-ui);
   color: var(--tx-primary);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Layout ── */
-.edit-wrap {
-  max-width: 620px;
-}
+.edit-wrap { max-width: 680px; }
 
-/* ── Breadcrumb / back ── */
+/* ── Back link ── */
 .edit-back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--tx-muted);
-  margin-bottom: 20px;
-  padding: 5px 0;
-  border-radius: var(--r-xs);
+  margin-bottom: 18px;
   transition: color var(--t-fast) var(--ease);
 }
-.edit-back:hover { color: var(--tx-secondary); }
-.edit-back svg { width: 13px; height: 13px; }
+.edit-back:hover { color: var(--ac); }
+.edit-back i { font-size: 14px; }
 
-/* ── Page header ── */
-.edit-ph {
-  margin-bottom: 24px;
-}
+/* ── Page header (samakan dgn .dh dashboard) ── */
+.edit-ph { margin-bottom: 22px; }
 .edit-ph__eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ac);
-  margin-bottom: 7px;
+  margin-bottom: 8px;
 }
-.edit-ph__eyebrow::before {
-  content: '';
+.edit-ph__eyebrow-dot {
   width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--ac);
   box-shadow: 0 0 6px var(--ac);
 }
 .edit-ph__title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
-  letter-spacing: -0.04em;
-  color: var(--tx-primary);
+  letter-spacing: -0.03em;
+  color: var(--c-primary-dk, #0b5a70);
   line-height: 1.1;
 }
+.edit-ph__sub {
+  font-size: 12.5px;
+  color: var(--tx-secondary);
+  margin-top: 6px;
+}
+.edit-ph__sub strong { color: var(--tx-primary); font-weight: 700; }
 
-/* ── Flash alert ── */
+/* ── Flash alert (§5.5) ── */
 .flash {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   padding: 12px 14px;
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   font-size: 12.5px;
   font-weight: 500;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   border: 1px solid;
 }
-.flash svg { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; }
-.flash--success { background: var(--green-d); border-color: rgba(72,187,120,0.25); color: var(--green); }
-.flash--error   { background: var(--red-d);   border-color: rgba(252,129,129,0.25); color: var(--red); }
-.flash--warning { background: var(--amber-d); border-color: rgba(246,194,68,0.25);  color: var(--amber); }
-.flash--info    { background: var(--blue-d);  border-color: rgba(79,158,255,0.25);  color: var(--blue); }
+.flash i { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.flash--success { background: var(--green-d); border-color: rgba(21,128,61,.22); color: var(--green); }
+.flash--error   { background: var(--red-d);   border-color: rgba(185,28,28,.22); color: var(--red); }
+.flash--warning { background: var(--amber-d); border-color: rgba(217,145,12,.22); color: var(--amber); }
+.flash--info    { background: var(--blue-d);  border-color: rgba(14,116,144,.22); color: var(--blue); }
 
-/* ── NIA Badge ── */
+/* ── NIA badge (kecil, aksen, konsisten dgn kpi style) ── */
 .nia-badge {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 13px 16px;
   background: var(--ac-dim);
   border: 1px solid var(--bd-accent);
-  border-radius: var(--r-md);
-  margin-bottom: 22px;
+  border-radius: var(--r-lg);
+  margin-bottom: 18px;
 }
 .nia-badge__icon {
   width: 36px; height: 36px;
@@ -132,70 +144,64 @@
   color: var(--ac);
   flex-shrink: 0;
 }
-.nia-badge__icon svg { width: 16px; height: 16px; }
+.nia-badge__icon i { font-size: 16px; }
 .nia-badge__val {
-  font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--ac);
-  letter-spacing: 0.06em;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--c-primary-dk, #0b5a70);
+  letter-spacing: 0.01em;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 .nia-badge__lbl {
   font-size: 10.5px;
   color: var(--tx-muted);
   margin-top: 3px;
+  font-weight: 500;
 }
 
-/* ── Panel ── */
+/* ── Panel (identik dgn .panel dashboard) ── */
 .edit-panel {
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-xl);
   overflow: hidden;
 }
 .edit-panel__head {
-  padding: 14px 20px;
+  padding: 15px 20px;
   border-bottom: 1px solid var(--bd-subtle);
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 .edit-panel__head-title {
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 800;
   color: var(--tx-primary);
   letter-spacing: -0.01em;
 }
 .edit-panel__head-sub {
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--tx-muted);
+  font-weight: 400;
+  margin-left: 6px;
 }
 .edit-panel__body {
   padding: 22px 20px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
-/* ── Section divider inside form ── */
-.form-section {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+/* ── Section label (mengikuti .sec-label dashboard, versi ringkas) ── */
+.form-section { display: flex; flex-direction: column; gap: 14px; }
 .form-section + .form-section {
   padding-top: 18px;
   border-top: 1px solid var(--bd-subtle);
 }
 .form-section__label {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--tx-muted);
-  margin-bottom: 4px;
 }
 
 /* ── Form row 2-col ── */
@@ -210,61 +216,53 @@
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field__label {
   font-size: 11.5px;
-  font-weight: 600;
-  color: var(--tx-secondary);
-  letter-spacing: 0.01em;
+  font-weight: 700;
+  color: var(--tx-ink, var(--tx-primary));
 }
 .field__label--req::after {
   content: ' *';
   color: var(--red);
-  font-size: 11px;
 }
-.field__hint {
-  font-size: 10.5px;
+.field__label-optional {
+  font-weight: 400;
   color: var(--tx-muted);
-  margin-top: -2px;
 }
 
-/* Input & select base */
+/* Input base (§5.2 — icon SELALU di kanan) */
 .finput {
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--tx-primary);
-  background: var(--bg-elevated);
-  border: 1px solid var(--bd-subtle);
-  border-radius: var(--r-md);
-  padding: 9px 12px;
+  background: #fbfcfe;
+  border: 1.5px solid var(--bd-subtle);
+  border-radius: var(--r-sm);
+  padding: 11px 14px;
   outline: none;
   width: 100%;
   transition:
-    border-color var(--t-fast) var(--ease),
-    background   var(--t-fast) var(--ease),
+    border-color var(--t-base) var(--ease),
+    background   var(--t-base) var(--ease),
     box-shadow   var(--t-base) var(--ease);
 }
 .finput::placeholder { color: var(--tx-muted); font-size: 12.5px; }
 .finput:focus {
-  border-color: var(--bd-accent);
-  background: var(--bg-overlay);
-  box-shadow: 0 0 0 3px rgba(99,179,237,0.08);
-}
-.finput:disabled {
-  opacity: .5;
-  cursor: not-allowed;
+  border-color: var(--ac-lt);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(6,182,212,.12);
 }
 
-/* Input with leading icon */
 .finput-wrap { position: relative; }
-.finput-wrap .finput { padding-left: 34px; }
+.finput-wrap .finput { padding-right: 36px; }
 .finput-ico {
   position: absolute;
-  left: 11px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--tx-muted);
   display: flex;
   pointer-events: none;
 }
-.finput-ico svg { width: 13px; height: 13px; }
+.finput-ico i { font-size: 15px; }
 
 /* ── Foto section ── */
 .foto-row {
@@ -273,48 +271,53 @@
   gap: 16px;
   flex-wrap: wrap;
 }
-.foto-preview {
-  flex-shrink: 0;
-}
+.foto-preview { flex-shrink: 0; }
 .foto-preview__img {
   width: 72px; height: 72px;
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   object-fit: cover;
   border: 1px solid var(--bd-subtle);
   display: block;
 }
 .foto-preview__fallback {
   width: 72px; height: 72px;
-  border-radius: var(--r-md);
-  background: var(--bg-overlay);
-  border: 1px solid var(--bd-subtle);
+  border-radius: var(--r-lg);
+  background: var(--ac-dim);
+  border: 1px solid var(--bd-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
   font-size: 18px;
-  font-weight: 700;
-  color: var(--tx-muted);
+  font-weight: 800;
+  color: var(--ac);
   text-transform: uppercase;
 }
 .foto-preview__cap {
   font-size: 10px;
   color: var(--tx-muted);
-  margin-top: 5px;
+  margin-top: 6px;
   text-align: center;
+  font-weight: 500;
 }
 
-.foto-upload { flex: 1; min-width: 0; }
+.foto-upload { flex: 1; min-width: 220px; }
+.foto-upload__label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--tx-primary);
+  margin-bottom: 8px;
+  display: block;
+}
 .foto-dropzone {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 20px;
+  padding: 22px;
   background: var(--bg-elevated);
   border: 1.5px dashed var(--bd-default);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   cursor: pointer;
   transition:
     border-color var(--t-base) var(--ease),
@@ -323,7 +326,7 @@
 }
 .foto-dropzone:hover,
 .foto-dropzone.drag-over {
-  border-color: var(--bd-accent);
+  border-color: var(--ac-lt);
   background: var(--ac-dim);
 }
 .foto-dropzone input[type="file"] {
@@ -335,7 +338,7 @@
   height: 100%;
 }
 .foto-dropzone__ico {
-  width: 32px; height: 32px;
+  width: 34px; height: 34px;
   border-radius: var(--r-sm);
   background: var(--bg-overlay);
   display: flex;
@@ -343,10 +346,10 @@
   justify-content: center;
   color: var(--tx-muted);
 }
-.foto-dropzone__ico svg { width: 15px; height: 15px; }
+.foto-dropzone__ico i { font-size: 16px; }
 .foto-dropzone__text {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--tx-secondary);
   text-align: center;
 }
@@ -356,16 +359,16 @@
   text-align: center;
 }
 .foto-dropzone__chosen {
-  font-family: var(--font-mono);
   font-size: 11px;
+  font-weight: 600;
   color: var(--ac);
   display: none;
   text-align: center;
 }
 
-/* ── Form footer / actions ── */
+/* ── Footer / actions ── */
 .edit-panel__foot {
-  padding: 14px 20px;
+  padding: 15px 20px;
   border-top: 1px solid var(--bd-subtle);
   display: flex;
   align-items: center;
@@ -378,45 +381,52 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 9px 16px;
-  background: var(--bg-elevated);
-  color: var(--tx-secondary);
+  padding: 11px 18px;
+  background: #fff;
+  color: var(--tx-primary);
   font-family: var(--font-ui);
   font-size: 12.5px;
-  font-weight: 600;
-  border: 1px solid var(--bd-subtle);
-  border-radius: var(--r-md);
+  font-weight: 700;
+  border: 1.5px solid var(--bd-subtle);
+  border-radius: var(--r-sm);
   cursor: pointer;
   transition: all var(--t-fast) var(--ease);
 }
-.btn-cancel:hover { border-color: var(--bd-default); color: var(--tx-primary); background: var(--bg-overlay); }
+.btn-cancel:hover { background: #f4f7fa; border-color: var(--bd-default); }
 
 .btn-save {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 9px 20px;
+  padding: 11px 22px;
   background: var(--ac);
-  color: #0a0c10;
+  color: #fff;
   font-family: var(--font-ui);
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 800;
   border: none;
-  border-radius: var(--r-md);
+  border-radius: var(--r-sm);
   cursor: pointer;
+  box-shadow: 0 8px 22px rgba(14,116,144,.25);
   transition:
     background  var(--t-fast) var(--ease),
     box-shadow  var(--t-base) var(--ease),
     transform   var(--t-fast) var(--ease);
 }
 .btn-save:hover {
-  background: #7ec8f5;
-  box-shadow: 0 4px 18px rgba(99,179,237,0.28);
-  transform: translateY(-1px);
+  background: var(--ac-lt);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(6,182,212,.3);
 }
 .btn-save:active { transform: translateY(0); }
-.btn-save svg { width: 14px; height: 14px; }
-.btn-save.is-loading { opacity: .7; pointer-events: none; }
+.btn-save i { font-size: 15px; }
+.btn-save.is-loading { opacity: .75; pointer-events: none; }
+.btn-save .ti-loader-2 { animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .edit-panel { border-radius: var(--r-lg); }
+}
 </style>
 
 <div class="edit-root">
@@ -424,30 +434,32 @@
 
   <!-- Back -->
   <a href="<?= BASE_URL ?>/admin/anggota" class="edit-back">
-    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M9 2L4 7l5 5"/>
-    </svg>
+    <i class="ti ti-arrow-left" aria-hidden="true"></i>
     Kembali ke Daftar Anggota
   </a>
 
   <!-- Page header -->
   <div class="edit-ph">
-    <div class="edit-ph__eyebrow">Manajemen Anggota</div>
+    <div class="edit-ph__eyebrow">
+      <span class="edit-ph__eyebrow-dot"></span>
+      Manajemen Anggota
+    </div>
     <h1 class="edit-ph__title">Edit Anggota</h1>
+    <p class="edit-ph__sub">Perbarui data <strong><?= htmlspecialchars($anggota['nama_lengkap']) ?></strong>.</p>
   </div>
 
   <!-- Flash -->
   <?php if (!empty($flash)): ?>
   <?php
     $flashIcons = [
-      'success' => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M5 8l2 2 4-4"/></svg>',
-      'error'   => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5"/><circle cx="8" cy="11" r=".6" fill="currentColor"/></svg>',
-      'warning' => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2L1.5 13h13L8 2z"/><path d="M8 7v3"/><circle cx="8" cy="11.5" r=".6" fill="currentColor"/></svg>',
-      'info'    => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 7v4M8 5.5v.5"/></svg>',
+      'success' => 'ti-circle-check',
+      'error'   => 'ti-alert-circle',
+      'warning' => 'ti-alert-triangle',
+      'info'    => 'ti-info-circle',
     ];
   ?>
   <div class="flash flash--<?= htmlspecialchars($flash['type']) ?>">
-    <?= $flashIcons[$flash['type']] ?? $flashIcons['info'] ?>
+    <i class="ti <?= $flashIcons[$flash['type']] ?? $flashIcons['info'] ?>" aria-hidden="true"></i>
     <span><?= htmlspecialchars($flash['msg']) ?></span>
   </div>
   <?php endif; ?>
@@ -456,10 +468,7 @@
   <?php if (!empty($anggota['nia'])): ?>
   <div class="nia-badge">
     <div class="nia-badge__icon">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="2" y="2" width="12" height="12" rx="1.5"/>
-        <path d="M5 6h6M5 8.5h4M5 11h3"/>
-      </svg>
+      <i class="ti ti-id-badge-2" aria-hidden="true"></i>
     </div>
     <div>
       <div class="nia-badge__val"><?= htmlspecialchars($anggota['nia']) ?></div>
@@ -491,16 +500,13 @@
           <div class="field">
             <label class="field__label field__label--req" for="f-nama">Nama Lengkap</label>
             <div class="finput-wrap">
-              <span class="finput-ico">
-                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <circle cx="7" cy="4.5" r="2.5"/>
-                  <path d="M2 13c0-2.76 2.24-5 5-5s5 2.24 5 5"/>
-                </svg>
-              </span>
               <input type="text" id="f-nama" name="nama_lengkap" required
                      class="finput"
                      placeholder="Masukkan nama lengkap…"
                      value="<?= htmlspecialchars($anggota['nama_lengkap']) ?>">
+              <span class="finput-ico">
+                <i class="ti ti-user" aria-hidden="true"></i>
+              </span>
             </div>
           </div>
 
@@ -509,30 +515,25 @@
             <div class="field">
               <label class="field__label" for="f-kelas">Kelas</label>
               <div class="finput-wrap">
-                <span class="finput-ico">
-                  <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="1.5" y="1.5" width="11" height="11" rx="1.5"/>
-                  </svg>
-                </span>
                 <input type="text" id="f-kelas" name="kelas"
                        class="finput"
                        placeholder="mis. XII RPL 1"
                        value="<?= htmlspecialchars($anggota['kelas'] ?? '') ?>">
+                <span class="finput-ico">
+                  <i class="ti ti-school" aria-hidden="true"></i>
+                </span>
               </div>
             </div>
             <div class="field">
               <label class="field__label" for="f-nohp">No HP / WhatsApp</label>
               <div class="finput-wrap">
-                <span class="finput-ico">
-                  <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3.5" y="1" width="7" height="12" rx="1.5"/>
-                    <circle cx="7" cy="10.5" r=".5" fill="currentColor"/>
-                  </svg>
-                </span>
                 <input type="tel" id="f-nohp" name="no_hp"
                        class="finput"
                        placeholder="08xx xxxx xxxx"
                        value="<?= htmlspecialchars($anggota['no_hp'] ?? '') ?>">
+                <span class="finput-ico">
+                  <i class="ti ti-phone" aria-hidden="true"></i>
+                </span>
               </div>
             </div>
           </div>
@@ -561,18 +562,14 @@
 
             <!-- Upload zone -->
             <div class="foto-upload">
-              <label class="field__label" style="margin-bottom:6px;display:block;">
-                Ganti Foto
-                <span style="font-weight:400;color:var(--tx-muted);"> — opsional</span>
+              <label class="foto-upload__label">
+                Ganti Foto <span class="field__label-optional">— opsional</span>
               </label>
               <div class="foto-dropzone" id="foto-dropzone">
                 <input type="file" name="foto" accept="image/*"
                        id="foto-input" aria-label="Upload foto">
                 <div class="foto-dropzone__ico">
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M8 11V4M5 7l3-3 3 3"/>
-                    <path d="M2 13h12"/>
-                  </svg>
+                  <i class="ti ti-cloud-upload" aria-hidden="true"></i>
                 </div>
                 <div class="foto-dropzone__text">Klik atau seret foto ke sini</div>
                 <div class="foto-dropzone__hint">PNG, JPG, WEBP — maks. 2 MB</div>
@@ -589,9 +586,7 @@
       <div class="edit-panel__foot">
         <a href="<?= BASE_URL ?>/admin/anggota" class="btn-cancel">Batal</a>
         <button type="submit" class="btn-save" id="btn-save">
-          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M2 7l3.5 3.5L12 3"/>
-          </svg>
+          <i class="ti ti-check" aria-hidden="true"></i>
           Simpan Perubahan
         </button>
       </div>
@@ -626,7 +621,6 @@
         if (previewImg) {
           previewImg.src = e.target.result;
         } else if (fallback) {
-          /* swap fallback for real img */
           var img = document.createElement('img');
           img.id        = 'foto-preview-img';
           img.className = 'foto-preview__img';
@@ -640,12 +634,11 @@
       reader.readAsDataURL(file);
     });
 
-    /* drag & drop highlight */
     dropzone.addEventListener('dragover', function (e) {
       e.preventDefault();
       dropzone.classList.add('drag-over');
     });
-    ['dragleave','drop'].forEach(function (ev) {
+    ['dragleave', 'drop'].forEach(function (ev) {
       dropzone.addEventListener(ev, function () {
         dropzone.classList.remove('drag-over');
       });
@@ -658,7 +651,7 @@
   if (form && saveBtn) {
     form.addEventListener('submit', function () {
       saveBtn.classList.add('is-loading');
-      saveBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M7 2a5 5 0 110 10" stroke-dasharray="20" stroke-dashoffset="20"><animate attributeName="stroke-dashoffset" values="20;0" dur="0.8s" repeatCount="indefinite"/></path></svg> Menyimpan…';
+      saveBtn.innerHTML = '<i class="ti ti-loader-2" aria-hidden="true"></i> Menyimpan…';
     });
   }
 }());
