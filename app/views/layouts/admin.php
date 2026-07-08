@@ -548,11 +548,6 @@ button { font-family: inherit; cursor: pointer; }
               'label' => 'Verifikasi PAB',
               'icon'  => 'ti-clipboard-check',
             ],
-            [
-              'href'  => '/admin/absensi',
-              'label' => 'Absensi',
-              'icon'  => 'ti-calendar-event',
-            ],
           ],
 
           'Konten' => [
@@ -569,13 +564,16 @@ button { font-family: inherit; cursor: pointer; }
             ],
           ],
 
-          'Tools' => [
+          'Absensi' => [
             [
-              'href'     => BASE_URL . '/generate_sso.php',
-              'label'    => 'Surat Digital',
-              'icon'     => 'ti-file-certificate',
-              'badge'    => 'SSO',
-              'external' => true,
+              'href'  => '/admin/absensi',
+              'label' => 'Absensi Kegiatan',
+              'icon'  => 'ti-calendar-event',
+            ],
+            [
+              'href'  => '/admin/absensi-pertemuan',
+              'label' => 'Absensi Pertemuan',
+              'icon'  => 'ti-users-group',
             ],
           ],
 
