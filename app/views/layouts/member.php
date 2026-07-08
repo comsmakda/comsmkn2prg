@@ -14,9 +14,9 @@
        RESET & BASE
     ───────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { height: 100%; }
+    html { height: 100%; overflow: hidden; }
     a    { color: inherit; text-decoration: none; }
-    button { font-family: inherit; cursor: pointer; border: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
 
     :root {
       --sidebar-width : 240px;
@@ -76,7 +76,8 @@
       color      : var(--color-text-1);
       font-size  : 14px;
       line-height: 1.55;
-      min-height : 100%;
+      height     : 100%;
+      overflow   : hidden; /* cegah body ikut scroll — scroll hanya di .main-area */
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -175,6 +176,7 @@
       scrollbar-width: none;
       position  : relative;
       z-index   : 1;
+      min-height: 0;
     }
     .sidebar__nav::-webkit-scrollbar { display: none; }
 
@@ -250,7 +252,7 @@
       opacity: 1;
     }
 
-    /* ── Footer ── */
+    /* ── Footer (kartu profil ringkas — tanpa tombol logout, sudah pindah ke topbar) ── */
     .sidebar__footer {
       padding    : 12px 10px;
       border-top : 1px solid var(--color-border);
@@ -267,7 +269,6 @@
       border-radius: var(--radius-md);
       background   : var(--color-surface-2);
       border       : 1px solid var(--color-border-2);
-      margin-bottom: 6px;
       transition   : border-color 150ms;
     }
     .user-card:hover { border-color: var(--color-border-3); }
@@ -318,30 +319,6 @@
       flex-shrink  : 0;
     }
 
-    .btn-logout {
-      display        : flex;
-      align-items    : center;
-      justify-content: center;
-      gap            : 8px;
-      width          : 100%;
-      padding        : 8px 10px;
-      border-radius  : var(--radius-sm);
-      background     : transparent;
-      border         : 1px solid transparent;
-      color          : var(--color-text-3);
-      font-size      : 12.5px;
-      font-weight    : 500;
-      transition     : background 150ms var(--ease),
-                       border-color 150ms var(--ease),
-                       color 150ms var(--ease);
-    }
-    .btn-logout:hover {
-      background  : var(--color-danger-dim);
-      border-color: var(--color-danger-border);
-      color       : var(--color-danger);
-    }
-    .btn-logout svg { width: 14px; height: 14px; flex-shrink: 0; }
-
     /* ─────────────────────────────────────────
        MOBILE OVERLAY
     ───────────────────────────────────────── */
@@ -369,8 +346,9 @@
       margin-left   : var(--sidebar-width);
       display       : flex;
       flex-direction: column;
-      min-height    : 100dvh;
       min-width     : 0;
+      min-height    : 0;
+      height        : 100dvh;
       overflow-y    : auto;
       overflow-x    : hidden;
       scrollbar-width: thin;
@@ -514,6 +492,9 @@
       margin    : 0 4px;
     }
 
+    /* ── Avatar + dropdown profil (berisi Profil, Hemat Daya, Logout) ── */
+    .topbar-avatar-wrap { position: relative; }
+
     .topbar-avatar {
       width          : 30px;
       height         : 30px;
@@ -529,6 +510,154 @@
       text-transform : uppercase;
       flex-shrink    : 0;
       box-shadow     : 0 0 12px var(--color-accent-glow);
+      transition     : box-shadow 150ms var(--ease), transform 150ms var(--ease);
+    }
+    .topbar-avatar:hover { box-shadow: 0 0 0 4px var(--color-accent-dim-2); }
+    .topbar-avatar[aria-expanded="true"] { box-shadow: 0 0 0 4px var(--color-accent-dim-2); }
+
+    .avatar-menu {
+      position     : absolute;
+      top          : calc(100% + 10px);
+      right        : 0;
+      width         : 250px;
+      background    : var(--color-surface-2);
+      border        : 1px solid var(--color-border-2);
+      border-radius : var(--radius-lg);
+      box-shadow    : 0 24px 48px rgba(0,0,0,0.55);
+      padding       : 6px;
+      opacity       : 0;
+      visibility    : hidden;
+      transform     : translateY(-6px) scale(.98);
+      transform-origin: top right;
+      transition    : opacity 160ms var(--ease), transform 160ms var(--ease-spring), visibility 160ms;
+      z-index       : 60;
+    }
+    .avatar-menu--open {
+      opacity   : 1;
+      visibility: visible;
+      transform : translateY(0) scale(1);
+    }
+
+    .avatar-menu__header {
+      display      : flex;
+      align-items  : center;
+      gap          : 10px;
+      padding      : 9px 10px 12px;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 6px;
+    }
+    .avatar-menu__avatar {
+      width          : 36px;
+      height         : 36px;
+      border-radius  : 50%;
+      background     : var(--color-accent-dim);
+      border         : 1.5px solid var(--color-accent-border);
+      display        : flex;
+      align-items    : center;
+      justify-content: center;
+      font-size      : 12px;
+      font-weight    : 700;
+      color          : var(--color-accent-light);
+      flex-shrink    : 0;
+      text-transform : uppercase;
+    }
+    .avatar-menu__info { min-width: 0; flex: 1; }
+    .avatar-menu__name {
+      font-size    : 13px;
+      font-weight  : 700;
+      color        : var(--color-text-1);
+      white-space  : nowrap;
+      overflow     : hidden;
+      text-overflow: ellipsis;
+      line-height  : 1.3;
+    }
+    .avatar-menu__role {
+      font-size  : 11px;
+      color      : var(--color-text-3);
+      font-weight: 500;
+    }
+
+    .avatar-menu__item {
+      display      : flex;
+      align-items  : center;
+      gap          : 10px;
+      padding      : 9px 10px;
+      border-radius: var(--radius-sm);
+      font-size    : 13px;
+      font-weight  : 500;
+      color        : var(--color-text-2);
+      transition   : background 140ms var(--ease), color 140ms var(--ease);
+      width        : 100%;
+      text-align   : left;
+    }
+    .avatar-menu__item:hover {
+      background: var(--color-surface-3);
+      color     : var(--color-text-1);
+    }
+    .avatar-menu__item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .8; }
+
+    .avatar-menu__item--danger { color: var(--color-danger); }
+    .avatar-menu__item--danger:hover {
+      background: var(--color-danger-dim);
+      color     : var(--color-danger);
+    }
+
+    .avatar-menu__item--static { cursor: default; }
+    .avatar-menu__item--static:hover { background: transparent; }
+
+    .avatar-menu__item-text {
+      flex          : 1;
+      display       : flex;
+      flex-direction: column;
+      gap           : 1px;
+      min-width     : 0;
+    }
+    .avatar-menu__item-label {
+      font-size  : 12.5px;
+      font-weight: 600;
+      color      : var(--color-text-1);
+    }
+    .avatar-menu__item-hint {
+      font-size: 10.5px;
+      color    : var(--color-text-3);
+      line-height: 1.3;
+    }
+
+    .avatar-menu__divider {
+      height    : 1px;
+      background: var(--color-border);
+      margin    : 6px 4px;
+    }
+
+    /* Toggle switch — dipakai untuk Mode Hemat Daya */
+    .switch {
+      position     : relative;
+      width        : 38px;
+      height       : 21px;
+      border-radius: 99px;
+      background   : var(--color-surface-4);
+      border       : 1px solid var(--color-border-3);
+      flex-shrink  : 0;
+      transition   : background 160ms var(--ease), border-color 160ms var(--ease);
+    }
+    .switch__thumb {
+      position     : absolute;
+      top          : 2px;
+      left         : 2px;
+      width        : 15px;
+      height       : 15px;
+      border-radius: 50%;
+      background   : var(--color-text-2);
+      transition   : transform 160ms var(--ease-spring), background 160ms var(--ease);
+    }
+    .switch--on {
+      background  : var(--color-accent-dim-2);
+      border-color: var(--color-accent-border);
+    }
+    .switch--on .switch__thumb {
+      transform : translateX(17px);
+      background: var(--color-accent-light);
+      box-shadow: 0 0 8px var(--color-accent-glow);
     }
 
     /* ─────────────────────────────────────────
@@ -574,6 +703,40 @@
     }
 
     /* ─────────────────────────────────────────
+       MODE HEMAT DAYA
+       Mematikan blur, animasi, dan glow/box-shadow
+       yang berat secara render — cocok untuk device
+       lawas / baterai lemah / koneksi lambat.
+    ───────────────────────────────────────── */
+    body.power-save .sidebar::after { display: none; }
+    body.power-save .topbar {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: var(--color-surface);
+    }
+    body.power-save .overlay {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    body.power-save *,
+    body.power-save *::before,
+    body.power-save *::after {
+      animation-duration: 0ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0ms !important;
+    }
+    body.power-save .brand__mark,
+    body.power-save .user-card__avatar,
+    body.power-save .user-card__status,
+    body.power-save .topbar-avatar,
+    body.power-save .avatar-menu__avatar,
+    body.power-save .notif-dot,
+    body.power-save .nav-link--active::before,
+    body.power-save .switch--on .switch__thumb {
+      box-shadow: none !important;
+    }
+
+    /* ─────────────────────────────────────────
        RESPONSIVE — ≤ 768px
     ───────────────────────────────────────── */
     @media (max-width: 768px) {
@@ -599,6 +762,10 @@
       .topbar {
         padding: 0 14px;
       }
+      .avatar-menu {
+        right: -6px;
+        width: 230px;
+      }
     }
 
     @media (max-width: 480px) {
@@ -615,13 +782,42 @@
   $userName    = $_SESSION['user_name'] ?? '';
   $initials    = mb_strtoupper(mb_substr(strip_tags($userName), 0, 1));
 
-  /* ── Navigation structure ─────────────── */
+  /* ── Navigation structure ─────────────────
+     Dikelompokkan berdasarkan kebutuhan anggota
+     organisasi: aktivitas keseharian (absensi &
+     kegiatan), informasi publik (berita & galeri),
+     lalu akun pribadi.
+  ─────────────────────────────────────────── */
   $navGroups = [
     'Utama' => [
       [
         'href'  => '/member/dashboard',
         'label' => 'Dashboard',
         'icon'  => '<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/>',
+      ],
+    ],
+    'Aktivitas' => [
+      [
+        'href'  => '/member/absensi',
+        'label' => 'Absensi Saya',
+        'icon'  => '<path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5M8.25 14.25l2.25 2.25 4.5-4.5"/>',
+      ],
+      [
+        'href'  => '/member/kegiatan',
+        'label' => 'Program & Kegiatan',
+        'icon'  => '<path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c2.32.184 4.594.581 6.75 1.078A2.25 2.25 0 0 0 21 15.926V8.074a2.25 2.25 0 0 0-3.91-1.514c-2.157.497-4.43.894-6.75 1.078m0 9.18V6.64"/>',
+      ],
+    ],
+    'Informasi' => [
+      [
+        'href'  => '/member/berita',
+        'label' => 'Berita & Artikel',
+        'icon'  => '<path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"/>',
+      ],
+      [
+        'href'  => '/member/galeri',
+        'label' => 'Galeri Foto',
+        'icon'  => '<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 19.5h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>',
       ],
     ],
     'Akun' => [
@@ -716,6 +912,8 @@
       <?php endforeach; ?>
     </nav>
 
+    <!-- Kartu profil ringkas — hanya informasi, tanpa aksi logout
+         (logout ada di dropdown avatar pada topbar) -->
     <div class="sidebar__footer">
       <div class="user-card">
         <div class="user-card__avatar" aria-hidden="true"><?= htmlspecialchars($initials) ?></div>
@@ -725,15 +923,6 @@
         </div>
         <div class="user-card__status" title="Online" aria-label="Status: online"></div>
       </div>
-
-      <a href="<?= BASE_URL ?>/logout" class="btn-logout">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-             stroke-width="2" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"/>
-        </svg>
-        Keluar
-      </a>
     </div>
 
   </aside>
@@ -787,10 +976,59 @@
 
         <div class="topbar__sep" aria-hidden="true"></div>
 
-        <div class="topbar-avatar"
-             title="<?= htmlspecialchars($userName) ?>"
-             aria-label="Pengguna: <?= htmlspecialchars($userName) ?>">
-          <?= htmlspecialchars($initials) ?>
+        <!-- Avatar + dropdown (Profil, Mode Hemat Daya, Keluar) -->
+        <div class="topbar-avatar-wrap" id="js-avatar-wrap">
+          <button
+            class="topbar-avatar"
+            id="js-avatar-btn"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="js-avatar-menu"
+            title="<?= htmlspecialchars($userName) ?>">
+            <?= htmlspecialchars($initials) ?>
+          </button>
+
+          <div class="avatar-menu" id="js-avatar-menu" role="menu">
+            <div class="avatar-menu__header">
+              <div class="avatar-menu__avatar" aria-hidden="true"><?= htmlspecialchars($initials) ?></div>
+              <div class="avatar-menu__info">
+                <div class="avatar-menu__name"><?= htmlspecialchars($userName) ?></div>
+                <div class="avatar-menu__role">Anggota</div>
+              </div>
+            </div>
+
+            <a href="<?= BASE_URL ?>/member/profile" class="avatar-menu__item" role="menuitem">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+              </svg>
+              Profil Saya
+            </a>
+
+            <div class="avatar-menu__item avatar-menu__item--static" role="menuitem">
+              <div class="avatar-menu__item-text">
+                <span class="avatar-menu__item-label">Mode Hemat Daya</span>
+                <span class="avatar-menu__item-hint">Kurangi efek blur &amp; animasi</span>
+              </div>
+              <button
+                type="button"
+                class="switch"
+                id="js-power-save-toggle"
+                role="switch"
+                aria-checked="false"
+                aria-label="Aktifkan mode hemat daya">
+                <span class="switch__thumb"></span>
+              </button>
+            </div>
+
+            <div class="avatar-menu__divider"></div>
+
+            <a href="<?= BASE_URL ?>/logout" class="avatar-menu__item avatar-menu__item--danger" role="menuitem">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"/>
+              </svg>
+              Keluar
+            </a>
+          </div>
         </div>
 
       </div>
@@ -862,8 +1100,61 @@
     logo.addEventListener('error', function() {
       brandName.style.display = '';
     });
-    /* Also reveal name if logo is very wide (icon-only logos look fine without text) */
   }
+
+  /* ════════════════════════════════════════════
+     DROPDOWN PROFIL (avatar) — Profil, Hemat Daya, Logout
+  ════════════════════════════════════════════ */
+  var avatarBtn  = document.getElementById('js-avatar-btn');
+  var avatarMenu = document.getElementById('js-avatar-menu');
+
+  function closeAvatarMenu() {
+    avatarMenu.classList.remove('avatar-menu--open');
+    avatarBtn.setAttribute('aria-expanded', 'false');
+  }
+  function toggleAvatarMenu(e) {
+    e.stopPropagation();
+    var isOpen = avatarMenu.classList.toggle('avatar-menu--open');
+    avatarBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+
+  avatarBtn.addEventListener('click', toggleAvatarMenu);
+
+  document.addEventListener('click', function (e) {
+    if (!avatarMenu.contains(e.target) && e.target !== avatarBtn) {
+      closeAvatarMenu();
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeAvatarMenu();
+  });
+
+  /* ════════════════════════════════════════════
+     MODE HEMAT DAYA — toggle + simpan preferensi
+  ════════════════════════════════════════════ */
+  var POWER_SAVE_KEY = 'com_member_power_save';
+  var powerToggle     = document.getElementById('js-power-save-toggle');
+
+  function applyPowerSave(isOn) {
+    document.body.classList.toggle('power-save', isOn);
+    if (powerToggle) {
+      powerToggle.classList.toggle('switch--on', isOn);
+      powerToggle.setAttribute('aria-checked', isOn ? 'true' : 'false');
+    }
+  }
+
+  var savedPreference = localStorage.getItem(POWER_SAVE_KEY) === '1';
+  applyPowerSave(savedPreference);
+
+  if (powerToggle) {
+    powerToggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var willBeOn = !document.body.classList.contains('power-save');
+      applyPowerSave(willBeOn);
+      localStorage.setItem(POWER_SAVE_KEY, willBeOn ? '1' : '0');
+    });
+  }
+
 }());
 </script>
 
