@@ -37,11 +37,25 @@ $catColor   = htmlspecialchars($berita['kategori_warna'] ?? '#0e7490');
   --radius-md: 13px;
   --radius-lg: 22px;
 
+  position: relative;
   font-family: 'Plus Jakarta Sans', sans-serif;
   max-width: 1180px;
   margin: 0 auto;
   padding: 2.25rem 1.5rem 4rem;
   color: var(--c-ink);
+}
+
+/* Full-bleed canvas: memastikan area ini tetap terang meski layout induk gelap */
+.bd-page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: var(--c-page);
+  z-index: -1;
 }
 
 /* ── Breadcrumb ── */
@@ -73,6 +87,14 @@ $catColor   = htmlspecialchars($berita['kategori_warna'] ?? '#0e7490');
   grid-template-columns: minmax(0, 1fr) 320px;
   gap: 2.5rem;
   align-items: start;
+}
+
+/* ── Article container (panel besar, §5.1) ── */
+.bd-article-card {
+  background: var(--c-white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 30px 70px -20px rgba(15,23,42,.14), 0 4px 18px rgba(15,23,42,.05);
+  padding: 2rem 2.2rem;
 }
 
 /* ── Article header ── */
@@ -521,6 +543,7 @@ textarea.f-field { resize: vertical; min-height: 100px; }
 }
 @media (max-width: 600px) {
   .bd-page { padding: 1.5rem 1rem 3rem; }
+  .bd-article-card { padding: 1.4rem 1.1rem; border-radius: var(--radius-md); box-shadow: none; }
   .f-row2 { grid-template-columns: 1fr; }
   .bd-title { font-size: 1.5rem; }
   .bd-engage { flex-direction: column; align-items: stretch; }
@@ -563,7 +586,7 @@ textarea.f-field { resize: vertical; min-height: 100px; }
     <!-- ═══════════════════════════════════
          ARTICLE
          ═══════════════════════════════════ -->
-    <article>
+    <article class="bd-article-card">
 
       <header class="bd-header">
 
