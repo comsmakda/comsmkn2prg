@@ -13,9 +13,9 @@ $shareTitle = urlencode($berita['judul']);
 
 /* ── Page wrapper ── */
 .bd-page {
-  max-width: 1200px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem 4rem;
+  padding: 2.25rem 1.5rem 4rem;
 }
 
 /* ── Breadcrumb ── */
@@ -23,7 +23,7 @@ $shareTitle = urlencode($berita['judul']);
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
   font-family: var(--font-mono);
   font-size: .68rem;
   color: var(--c-muted);
@@ -38,17 +38,18 @@ $shareTitle = urlencode($berita['judul']);
 }
 .bd-breadcrumb a:hover, .bd-breadcrumb a:focus-visible { color: var(--c-sky); }
 .bd-breadcrumb-sep { opacity: .35; font-size: .6rem; }
+.bd-breadcrumb [aria-current="page"] { color: var(--c-muted2); }
 
 /* ── Main grid ── */
 .bd-grid {
   display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 2.5rem;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 2.75rem;
   align-items: start;
 }
 
 /* ── Article header ── */
-.bd-header { margin-bottom: 1.6rem; }
+.bd-header { margin-bottom: 1.5rem; }
 
 .bd-category {
   display: inline-flex;
@@ -61,32 +62,32 @@ $shareTitle = urlencode($berita['judul']);
   text-transform: uppercase;
   padding: 4px 12px;
   border-radius: 4px;
-  margin-bottom: 1rem;
+  margin-bottom: .9rem;
 }
 
 .bd-title {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
   font-weight: 900;
   color: #fff;
-  line-height: 1.18;
+  line-height: 1.2;
   letter-spacing: -.04em;
-  margin: 0 0 1.2rem;
+  margin: 0 0 1.1rem;
 }
 
 .bd-meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: .2rem .8rem;
-  padding: 1rem 0;
+  gap: .3rem 1rem;
+  padding: .9rem 0;
   border-top: 1px solid var(--c-border);
   border-bottom: 1px solid var(--c-border);
 }
 .bd-meta-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-family: var(--font-mono);
   font-size: .63rem;
   color: var(--c-muted);
@@ -95,11 +96,12 @@ $shareTitle = urlencode($berita['judul']);
 
 /* ── Cover image ── */
 .bd-cover {
-  margin: 1.6rem 0;
+  margin: 1.5rem 0;
   border-radius: 12px;
   overflow: hidden;
   aspect-ratio: 16 / 9;
   background: var(--c-surface2);
+  border: 1px solid var(--c-border);
   contain: layout paint;
 }
 .bd-cover img {
@@ -113,18 +115,18 @@ $shareTitle = urlencode($berita['judul']);
 
 /* ── Article body ── */
 .bd-body {
-  font-size: .92rem;
+  font-size: .93rem;
   color: var(--c-muted2);
-  line-height: 1.9;
-  margin-bottom: 2.5rem;
+  line-height: 1.85;
+  margin-bottom: 2rem;
   overflow-wrap: break-word;
 }
 .bd-body h2 {
   font-family: var(--font-display);
   color: #fff;
-  font-size: 1.25rem;
+  font-size: 1.22rem;
   font-weight: 800;
-  margin: 2rem 0 .7rem;
+  margin: 1.9rem 0 .7rem;
   letter-spacing: -.03em;
   padding-bottom: .5rem;
   border-bottom: 2px solid var(--c-border);
@@ -132,17 +134,17 @@ $shareTitle = urlencode($berita['judul']);
 .bd-body h3 {
   font-family: var(--font-display);
   color: #fff;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 700;
-  margin: 1.6rem 0 .5rem;
+  margin: 1.5rem 0 .5rem;
   letter-spacing: -.02em;
 }
-.bd-body p { margin-bottom: 1.1rem; }
-.bd-body ul, .bd-body ol { margin: 0 0 1.1rem 1.5rem; }
+.bd-body p { margin-bottom: 1.05rem; }
+.bd-body ul, .bd-body ol { margin: 0 0 1.05rem 1.4rem; }
 .bd-body li { margin-bottom: .4rem; }
-.bd-body img { max-width: 100%; height: auto; border-radius: 10px; margin: 1.2rem 0; display: block; }
+.bd-body img { max-width: 100%; height: auto; border-radius: 10px; margin: 1.1rem 0; display: block; border: 1px solid var(--c-border); }
 .bd-body blockquote {
-  margin: 1.6rem 0;
+  margin: 1.5rem 0;
   padding: 1rem 1.2rem;
   border-left: 3px solid var(--c-sky);
   background: rgba(14,165,233,.05);
@@ -150,14 +152,24 @@ $shareTitle = urlencode($berita['judul']);
   color: var(--c-muted2);
   font-style: italic;
 }
-.bd-body a { color: var(--c-sky); text-decoration: underline; }
+.bd-body a { color: var(--c-sky); text-decoration: underline; text-underline-offset: 2px; }
 .bd-body strong { color: var(--c-text); }
-.bd-body hr { border: none; border-top: 1px solid var(--c-border); margin: 2rem 0; }
+.bd-body hr { border: none; border-top: 1px solid var(--c-border); margin: 1.9rem 0; }
 
-/* ── Divider ── */
-.bd-divider { height: 1px; background: var(--c-border); margin: 2rem 0; }
+/* ── Engagement panel (share + like unified, one visual block) ── */
+.bd-engage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--c-surface2);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  margin: 0 0 2.25rem;
+}
 
-/* ── Shared icon-button base (share + like use this) ── */
 .icon-btn {
   display: inline-flex;
   align-items: center;
@@ -173,54 +185,14 @@ $shareTitle = urlencode($berita['judul']);
 .icon-btn:focus-visible { outline: 2px solid var(--c-sky); outline-offset: 2px; }
 .icon-btn svg { display: block; }
 
-/* ── Share bar ── */
-.bd-share { margin-bottom: 2rem; }
-.bd-share-label {
-  font-family: var(--font-mono);
-  font-size: .62rem;
-  color: var(--c-muted);
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  margin-bottom: .75rem;
-}
-.bd-share-icons {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-  flex-wrap: wrap;
-}
-
-.sh-icon { width: 38px; height: 38px; border-radius: 8px; }
-.sh-icon:hover { box-shadow: 0 4px 12px rgba(0,0,0,.35); }
-
-.sh-wa   { background: #22c55e; color: #fff; }
-.sh-fb   { background: #1877F2; color: #fff; }
-.sh-tw   { background: #0f1419; color: #fff; border: 1px solid #2a2a2a; }
-.sh-tt   { background: #111;    color: #fff; border: 1px solid #2a2a2a; }
-.sh-ig   { background: linear-gradient(135deg,#f58529,#dd2a7b,#8134af); color: #fff; }
-.sh-copy { background: var(--c-surface2); color: var(--c-muted2); border: 1px solid var(--c-border); }
-.sh-copy:hover { color: #fff; border-color: rgba(14,165,233,.45); background: rgba(14,165,233,.08); }
-
-/* ── Like row ── */
-.bd-like-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.3rem;
-  background: var(--c-surface2);
-  border: 1px solid var(--c-border);
-  border-radius: 10px;
-  margin-bottom: 2.5rem;
-  flex-wrap: wrap;
-}
 .bd-like-btn {
   gap: 8px;
-  padding: 8px 18px;
-  border-radius: 7px;
+  padding: 9px 18px;
+  border-radius: 8px;
   border: 1px solid var(--c-border);
   background: var(--c-surface3);
   color: var(--c-muted2);
-  font-size: .83rem;
+  font-size: .82rem;
   font-weight: 700;
   font-family: var(--font-body);
   white-space: nowrap;
@@ -236,18 +208,38 @@ $shareTitle = urlencode($berita['judul']);
 .bd-like-btn:hover svg { transform: scale(1.15); }
 .bd-like-count {
   font-family: var(--font-mono);
-  font-size: .72rem;
+  font-size: .7rem;
   color: var(--c-muted);
+  white-space: nowrap;
 }
-.bd-like-count strong { color: var(--c-muted2); font-size: .8rem; }
+.bd-like-count strong { color: var(--c-muted2); font-size: .78rem; }
+.bd-engage-left { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+.bd-share-icons { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.sh-icon { width: 36px; height: 36px; border-radius: 8px; }
+.sh-icon:hover { box-shadow: 0 4px 12px rgba(0,0,0,.35); }
+
+.sh-wa   { background: #22c55e; color: #fff; }
+.sh-fb   { background: #1877F2; color: #fff; }
+.sh-tw   { background: #0f1419; color: #fff; border: 1px solid #2a2a2a; }
+.sh-tt   { background: #111;    color: #fff; border: 1px solid #2a2a2a; }
+.sh-ig   { background: linear-gradient(135deg,#f58529,#dd2a7b,#8134af); color: #fff; }
+.sh-copy { background: var(--c-surface3); color: var(--c-muted2); border: 1px solid var(--c-border); }
+.sh-copy:hover { color: #fff; border-color: rgba(14,165,233,.45); background: rgba(14,165,233,.08); }
+
+.bd-engage-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--c-border);
+}
 
 /* ── Comments (below the fold: defer rendering cost) ── */
-.bd-comments { margin-top: .5rem; content-visibility: auto; contain-intrinsic-size: 800px; }
+.bd-comments { margin-top: .25rem; content-visibility: auto; contain-intrinsic-size: 800px; }
 .bd-comments-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.1rem;
 }
 .bd-comments-title {
   font-family: var(--font-display);
@@ -271,11 +263,11 @@ $shareTitle = urlencode($berita['judul']);
   background: var(--c-surface2);
   border: 1px dashed var(--c-border);
   border-radius: 10px;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1.5rem;
 }
 .bd-no-comments p { font-size: .82rem; color: var(--c-muted); margin: 0; }
 
-.bd-comment-list { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1.8rem; }
+.bd-comment-list { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1.75rem; }
 .bd-comment {
   background: var(--c-surface2);
   border: 1px solid var(--c-border);
@@ -357,7 +349,7 @@ $shareTitle = urlencode($berita['judul']);
 }
 .f-field:focus { border-color: rgba(14,165,233,.45); box-shadow: 0 0 0 3px rgba(14,165,233,.07); }
 .f-field::placeholder { color: var(--c-muted); opacity: .5; }
-textarea.f-field { resize: vertical; min-height: 105px; }
+textarea.f-field { resize: vertical; min-height: 100px; }
 .f-hint { font-size: .68rem; color: var(--c-muted); line-height: 1.5; margin-bottom: .9rem; }
 .f-submit {
   gap: 7px;
@@ -372,7 +364,7 @@ textarea.f-field { resize: vertical; min-height: 105px; }
 }
 .f-submit:hover { background: var(--c-sky-light); transform: translateY(-1px); }
 
-/* ── Sidebar (below/aside the fold on desktop, deferred paint) ── */
+/* ── Sidebar ── */
 .bd-sidebar {
   position: sticky;
   top: 1.5rem;
@@ -405,7 +397,7 @@ textarea.f-field { resize: vertical; min-height: 105px; }
   display: flex;
   align-items: flex-start;
   gap: .65rem;
-  padding: .6rem .3rem;
+  padding: .65rem .3rem;
   border-bottom: 1px solid var(--c-border);
   border-radius: 6px;
   margin: 0 -.3rem;
@@ -414,8 +406,8 @@ textarea.f-field { resize: vertical; min-height: 105px; }
 .rel-item:last-child { border-bottom: none; }
 .rel-item:hover { background: rgba(255,255,255,.025); }
 .rel-thumb {
-  width: 64px;
-  height: 46px;
+  width: 68px;
+  height: 48px;
   border-radius: 6px;
   overflow: hidden;
   background: var(--c-surface3);
@@ -446,7 +438,10 @@ textarea.f-field { resize: vertical; min-height: 105px; }
 @media (max-width: 600px) {
   .bd-page { padding: 1.5rem 1rem 3rem; }
   .f-row2 { grid-template-columns: 1fr; }
-  .bd-title { font-size: 1.55rem; }
+  .bd-title { font-size: 1.5rem; }
+  .bd-engage { flex-direction: column; align-items: stretch; }
+  .bd-engage-left { justify-content: space-between; }
+  .bd-engage-divider { display: none; }
   /* Touch target minimum 44px */
   .sh-icon { width: 44px; height: 44px; }
   .bd-like-btn { padding: 10px 18px; min-height: 44px; }
@@ -454,7 +449,7 @@ textarea.f-field { resize: vertical; min-height: 105px; }
 </style>
 
 <?php if (!empty($flash)): ?>
-<div style="max-width:1200px;margin:1rem auto 0;padding:0 1.5rem">
+<div style="max-width:1180px;margin:1rem auto 0;padding:0 1.5rem">
   <div class="alert alert-<?= $flash['type'] ?>" role="alert"><?= htmlspecialchars($flash['msg']) ?></div>
 </div>
 <?php endif; ?>
@@ -525,74 +520,59 @@ textarea.f-field { resize: vertical; min-height: 105px; }
 
       <div class="bd-body"><?= $berita['konten'] ?></div>
 
-      <div class="bd-divider"></div>
+      <!-- Engagement: like + share dalam satu panel yang seimbang -->
+      <div class="bd-engage">
+        <div class="bd-engage-left">
+          <button type="button" class="icon-btn bd-like-btn <?= $isLiked ? 'liked' : '' ?>"
+                  id="like-btn"
+                  data-id="<?= $berita['id'] ?>"
+                  data-url="<?= BASE_URL ?>/berita/<?= $berita['id'] ?>/like"
+                  aria-pressed="<?= $isLiked ? 'true' : 'false' ?>">
+            <svg width="16" height="16"
+                 fill="<?= $isLiked ? 'currentColor' : 'none' ?>"
+                 stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span id="like-lbl"><?= $isLiked ? 'Disukai' : 'Suka' ?></span>
+          </button>
+          <span class="bd-like-count">
+            <strong id="like-cnt"><?= number_format($totalLikes) ?></strong> menyukai artikel ini
+          </span>
+        </div>
 
-      <!-- Share (icon-only, satu tempat) -->
-      <div class="bd-share">
-        <div class="bd-share-label">Bagikan artikel ini</div>
+        <div class="bd-engage-divider" aria-hidden="true"></div>
+
         <div class="bd-share-icons">
-
-          <!-- WhatsApp -->
           <a href="https://wa.me/?text=<?= $shareTitle ?>%20<?= urlencode($shareUrl) ?>"
              target="_blank" rel="noopener noreferrer"
              class="icon-btn sh-icon sh-wa" title="Bagikan ke WhatsApp" aria-label="Bagikan ke WhatsApp">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           </a>
-
-          <!-- Facebook -->
           <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($shareUrl) ?>"
              target="_blank" rel="noopener noreferrer"
              class="icon-btn sh-icon sh-fb" title="Bagikan ke Facebook" aria-label="Bagikan ke Facebook">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
           </a>
-
-          <!-- Twitter / X -->
           <a href="https://twitter.com/intent/tweet?text=<?= $shareTitle ?>&url=<?= urlencode($shareUrl) ?>"
              target="_blank" rel="noopener noreferrer"
              class="icon-btn sh-icon sh-tw" title="Bagikan ke Twitter/X" aria-label="Bagikan ke Twitter / X">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           </a>
-
-          <!-- TikTok -->
           <a href="https://www.tiktok.com/share?url=<?= urlencode($shareUrl) ?>"
              target="_blank" rel="noopener noreferrer"
              class="icon-btn sh-icon sh-tt" title="Bagikan ke TikTok" aria-label="Bagikan ke TikTok">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.77 1.52V6.75a4.85 4.85 0 0 1-1-.06z"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.77 1.52V6.75a4.85 4.85 0 0 1-1-.06z"/></svg>
           </a>
-
-          <!-- Instagram -->
           <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer"
              class="icon-btn sh-icon sh-ig" title="Salin link, lalu bagikan di Instagram" aria-label="Bagikan ke Instagram">
-            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
           </a>
-
-          <!-- Salin link -->
           <button type="button" class="icon-btn sh-icon sh-copy" id="copy-btn"
                   data-url="<?= htmlspecialchars($shareUrl) ?>"
                   title="Salin link" aria-label="Salin link">
-            <svg id="copy-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg id="copy-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           </button>
-
         </div>
-      </div>
-
-      <!-- Like -->
-      <div class="bd-like-row">
-        <button type="button" class="icon-btn bd-like-btn <?= $isLiked ? 'liked' : '' ?>"
-                id="like-btn"
-                data-id="<?= $berita['id'] ?>"
-                data-url="<?= BASE_URL ?>/berita/<?= $berita['id'] ?>/like"
-                aria-pressed="<?= $isLiked ? 'true' : 'false' ?>">
-          <svg width="16" height="16"
-               fill="<?= $isLiked ? 'currentColor' : 'none' ?>"
-               stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-          <span id="like-lbl"><?= $isLiked ? 'Disukai' : 'Suka' ?></span>
-        </button>
-        <span class="bd-like-count">
-          <strong id="like-cnt"><?= number_format($totalLikes) ?></strong> orang menyukai artikel ini
-        </span>
       </div>
 
       <!-- Komentar -->
@@ -680,7 +660,7 @@ textarea.f-field { resize: vertical; min-height: 105px; }
             <div class="rel-thumb">
               <?php if ($r['thumbnail']): ?>
                 <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($r['thumbnail']) ?>" alt=""
-                     width="64" height="46" loading="lazy" decoding="async">
+                     width="68" height="48" loading="lazy" decoding="async">
               <?php else: ?>
                 <div class="rel-thumb-empty">
                   <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -749,7 +729,7 @@ textarea.f-field { resize: vertical; min-height: 105px; }
       navigator.clipboard.writeText(copyBtn.dataset.url).then(function () {
         var ic = document.getElementById('copy-icon');
         if (ic) {
-          ic.outerHTML = '<svg id="copy-icon" width="16" height="16" fill="none" stroke="#22c55e" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+          ic.outerHTML = '<svg id="copy-icon" width="15" height="15" fill="none" stroke="#22c55e" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
         }
         copyBtn.style.borderColor = 'rgba(34,197,94,.4)';
         copyBtn.title = 'Tersalin!';
