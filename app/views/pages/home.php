@@ -1048,6 +1048,14 @@ $featIcons = ['ti-users', 'ti-calendar-event', 'ti-file-text', 'ti-user-circle',
         </a>
         <?php endif; ?>
 
+        <div class="contact-card" data-reveal data-delay="3">
+          <div class="contact-icon"><i class="bi bi-instagram"></i></i></div>
+          <div>
+            <div class="contact-label">Instagram</div>
+            <div class="contact-val">com_smakdapinrang</div>
+          </div>
+        </div>
+
         <?php if ($sr('contact_address')): ?>
         <div class="contact-card" data-reveal data-delay="3">
           <div class="contact-icon"><i class="ti ti-map-pin"></i></div>
@@ -1058,13 +1066,6 @@ $featIcons = ['ti-users', 'ti-calendar-event', 'ti-file-text', 'ti-user-circle',
         </div>
         <?php endif; ?>
 
-        <div class="contact-card" data-reveal data-delay="3">
-          <div class="contact-icon"><i class="ti ti-building"></i></div>
-          <div>
-            <div class="contact-label">Lokasi</div>
-            <div class="contact-val">SMK Negeri 2 Pinrang</div>
-          </div>
-        </div>
       </div>
 
       <!-- Kolom kanan: peta -->
