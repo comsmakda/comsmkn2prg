@@ -62,7 +62,10 @@
 /* ==========================================================================
    BASE
    ========================================================================== */
-html, body { height: 100%; }
+html, body {
+  height: 100%;
+  overflow: hidden; /* FIX: cegah body/window ikut scroll — scroll hanya di .pg */
+}
 body {
   font-family: var(--ff);
   background: var(--c-page);
@@ -324,6 +327,7 @@ button { font-family: inherit; cursor: pointer; }
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
+  min-height: 0; /* FIX: kunci utama — cegah .main ikut membesar mengikuti konten .pg */
   margin-left: 0;
 }
 @media (min-width: 768px) { .main { margin-left: var(--sw); } }
@@ -481,8 +485,10 @@ button { font-family: inherit; cursor: pointer; }
    PAGE
    ========================================================================== */
 .pg {
-  flex: 1; overflow-y: auto;
+  flex: 1;
+  overflow-y: auto;
   padding: 32px 28px;
+  min-height: 0; /* FIX: paksa .pg untuk benar-benar shrink & scroll di dalam dirinya sendiri */
 }
 @media (max-width: 480px) {
   .tb        { padding: 0 16px; }
