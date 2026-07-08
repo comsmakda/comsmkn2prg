@@ -1,35 +1,46 @@
 <?php // app/views/admin/pab.php ?>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700;800&display=swap');
-
 .pab-root {
-  --font-ui:    'Sora', sans-serif;
-  --font-mono:  'IBM Plex Mono', monospace;
-  --bg-surface:  #0f1117;
-  --bg-elevated: #141820;
-  --bg-overlay:  #1a1f2e;
-  --bd-subtle:   rgba(255,255,255,0.055);
-  --bd-default:  rgba(255,255,255,0.10);
-  --bd-accent:   rgba(99,179,237,0.35);
-  --tx-primary:  #e8ecf4;
-  --tx-secondary:#9aa3b8;
-  --tx-muted:    #4f5773;
-  --ac:          #63b3ed;
-  --ac-dim:      rgba(99,179,237,0.10);
-  --ac-glow:     rgba(99,179,237,0.18);
-  --green:       #48bb78;
-  --green-d:     rgba(72,187,120,0.12);
-  --green-bd:    rgba(72,187,120,0.28);
-  --red:         #fc8181;
-  --red-d:       rgba(252,129,129,0.12);
-  --red-bd:      rgba(252,129,129,0.28);
-  --amber:       #f6c244;
-  --amber-d:     rgba(246,194,68,0.12);
-  --amber-bd:    rgba(246,194,68,0.28);
-  --r-xs: 4px; --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px;
-  --ease: cubic-bezier(0.16,1,0.3,1);
-  --t-fast: 120ms; --t-base: 200ms;
+  --font-ui:   var(--ff, 'Plus Jakarta Sans', sans-serif);
+  --font-mono: var(--ff, 'Plus Jakarta Sans', sans-serif);
+
+  --bg-surface:  var(--c-white, #ffffff);
+  --bg-elevated: #f8fafc;
+  --bg-overlay:  #eef2f6;
+
+  --bd-subtle:  var(--c-border, #e6ebf1);
+  --bd-default: var(--c-border, #e6ebf1);
+  --bd-accent:  var(--c-primary-25, rgba(14,116,144,.25));
+
+  --tx-primary:   var(--c-ink,    #0f172a);
+  --tx-secondary: var(--c-muted,  #64748b);
+  --tx-muted:     var(--c-muted2, #94a3b8);
+
+  --ac:      var(--c-primary,    #0e7490);
+  --ac-dim:  var(--c-primary-08, rgba(14,116,144,.08));
+  --ac-glow: var(--c-primary-12, rgba(14,116,144,.12));
+
+  --green:    var(--c-green-text,   #15803d);
+  --green-d:  var(--c-green-bg,     #f0fdf4);
+  --green-bd: var(--c-green-border, #bbf7d0);
+
+  --red:    var(--c-red-text,   #b91c1c);
+  --red-d:  var(--c-red-bg,     #fef2f2);
+  --red-bd: var(--c-red-border, #fecaca);
+
+  --amber:    var(--c-amber-icon,   #d9910c);
+  --amber-d:  var(--c-amber-bg,     #fef6e2);
+  --amber-bd: var(--c-amber-border, #fbe3a8);
+
+  --r-xs: 6px;
+  --r-sm: var(--radius-sm, 9px);
+  --r-md: var(--radius-sm, 9px);
+  --r-lg: var(--radius-md, 13px);
+  --r-xl: var(--radius-lg, 22px);
+
+  --ease: cubic-bezier(0.22,1,0.36,1);
+  --t-fast: 120ms; --t-base: 160ms;
 }
 
 .pab-root *, .pab-root *::before, .pab-root *::after {
@@ -39,7 +50,7 @@
 .pab-root {
   font-family: var(--font-ui);
   color: var(--tx-primary);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -57,11 +68,10 @@
 .pab-ph__eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ac);
   margin-bottom: 6px;
@@ -77,8 +87,8 @@
 .pab-ph__title {
   font-size: 22px;
   font-weight: 800;
-  letter-spacing: -0.04em;
-  color: var(--tx-primary);
+  letter-spacing: -0.03em;
+  color: var(--c-primary-dk, #0b5a70);
   line-height: 1.1;
 }
 
@@ -89,18 +99,18 @@
   gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 22px;
-  padding: 12px 16px;
+  padding: 13px 18px;
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-xl);
 }
 .pab-status-badge {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   font-size: 12px;
-  font-weight: 600;
-  padding: 5px 12px;
+  font-weight: 700;
+  padding: 5px 13px;
   border-radius: 100px;
   border: 1px solid;
 }
@@ -138,7 +148,7 @@
   background: var(--bd-subtle);
 }
 .pab-statusbar__txt {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--tx-muted);
 }
 
@@ -147,9 +157,9 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 16px;
+  padding: 9px 17px;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   border: none;
   border-radius: var(--r-md);
@@ -160,15 +170,16 @@
     transform   var(--t-fast) var(--ease);
   margin-left: auto;
 }
-.pab-toggle svg { width: 13px !important; height: 13px !important; display: block; flex-shrink: 0; }
+.pab-toggle i { font-size: 14px; }
 .pab-toggle--close {
   background: var(--red-d);
   color: var(--red);
   border: 1px solid var(--red-bd);
 }
 .pab-toggle--close:hover {
-  background: rgba(252,129,129,0.2);
-  box-shadow: 0 4px 16px rgba(252,129,129,0.15);
+  background: var(--red);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(185,28,28,0.22);
   transform: translateY(-1px);
 }
 .pab-toggle--open {
@@ -177,8 +188,9 @@
   border: 1px solid var(--green-bd);
 }
 .pab-toggle--open:hover {
-  background: rgba(72,187,120,0.2);
-  box-shadow: 0 4px 16px rgba(72,187,120,0.15);
+  background: var(--green);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(21,128,61,0.22);
   transform: translateY(-1px);
 }
 .pab-toggle:active { transform: translateY(0); }
@@ -187,11 +199,11 @@
 .pab-panel {
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-xl);
   overflow: hidden;
 }
 .pab-panel__head {
-  padding: 12px 18px;
+  padding: 15px 20px;
   border-bottom: 1px solid var(--bd-subtle);
   display: flex;
   align-items: center;
@@ -200,14 +212,14 @@
   flex-wrap: wrap;
 }
 .pab-panel__head-title {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 800;
   color: var(--tx-primary);
 }
 .pab-panel__head-count {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--tx-muted);
+  font-weight: 500;
 }
 
 /* ── Table ── */
@@ -221,12 +233,11 @@
   background: var(--bg-elevated);
 }
 .pab-table thead th {
-  padding: 10px 16px;
+  padding: 11px 16px;
   text-align: left;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--tx-muted);
   white-space: nowrap;
@@ -237,9 +248,9 @@
   transition: background var(--t-fast) var(--ease);
 }
 .pab-table tbody tr:last-child { border-bottom: none; }
-.pab-table tbody tr:hover { background: rgba(255,255,255,0.022); }
+.pab-table tbody tr:hover { background: rgba(14,116,144,.03); }
 .pab-table td {
-  padding: 11px 16px;
+  padding: 12px 16px;
   vertical-align: middle;
   color: var(--tx-secondary);
   white-space: nowrap;
@@ -249,10 +260,10 @@
 .pab-cell-name {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
 }
 .pab-avatar {
-  width: 32px; height: 32px;
+  width: 34px; height: 34px;
   border-radius: var(--r-sm);
   object-fit: cover;
   border: 1px solid var(--bd-subtle);
@@ -260,57 +271,56 @@
   flex-shrink: 0;
 }
 .pab-avatar-fallback {
-  width: 32px; height: 32px;
+  width: 34px; height: 34px;
   border-radius: var(--r-sm);
-  background: var(--bg-overlay);
+  background: var(--bg-elevated);
   border: 1px solid var(--bd-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   color: var(--tx-muted);
   text-transform: uppercase;
   flex-shrink: 0;
 }
 .pab-name {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--tx-primary);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .pab-kelas {
   font-size: 10.5px;
   color: var(--tx-muted);
   margin-top: 1px;
+  font-weight: 500;
 }
 
 /* Date */
 .pab-date {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: var(--tx-muted);
+  font-weight: 500;
 }
 
 /* NIA */
 .pab-nia {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 11.5px;
+  font-weight: 700;
   color: var(--ac);
 }
-.pab-nia--empty { color: var(--tx-muted); }
+.pab-nia--empty { color: var(--tx-muted); font-weight: 500; }
 
 /* Status badge */
 .pab-badge {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  padding: 3px 9px;
+  padding: 3px 10px;
   border-radius: 100px;
   border: 1px solid;
   white-space: nowrap;
@@ -329,7 +339,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 12px;
+  padding: 7px 13px;
   font-family: var(--font-ui);
   font-size: 11.5px;
   font-weight: 700;
@@ -340,30 +350,30 @@
   transition: all var(--t-fast) var(--ease);
   line-height: 1;
 }
-.pab-btn svg { width: 11px !important; height: 11px !important; display: block; flex-shrink: 0; }
+.pab-btn i { font-size: 12px; }
 .pab-btn--approve {
   background: var(--green-d);
   color: var(--green);
   border: 1px solid var(--green-bd);
 }
-.pab-btn--approve:hover { background: rgba(72,187,120,0.2); transform: translateY(-1px); }
+.pab-btn--approve:hover { background: var(--green); color: #fff; transform: translateY(-1px); }
 .pab-btn--reject {
   background: var(--red-d);
   color: var(--red);
   border: 1px solid var(--red-bd);
 }
-.pab-btn--reject:hover { background: rgba(252,129,129,0.2); transform: translateY(-1px); }
+.pab-btn--reject:hover { background: var(--red); color: #fff; transform: translateY(-1px); }
 .pab-btn:active { transform: translateY(0); }
 
 /* Empty state */
 .pab-empty {
-  padding: 48px 20px;
+  padding: 52px 20px;
   text-align: center;
   color: var(--tx-muted);
 }
 .pab-empty__ico {
-  width: 40px; height: 40px;
-  border-radius: var(--r-md);
+  width: 44px; height: 44px;
+  border-radius: var(--r-lg);
   background: var(--bg-elevated);
   border: 1px solid var(--bd-subtle);
   display: flex;
@@ -371,17 +381,17 @@
   justify-content: center;
   margin: 0 auto 12px;
   color: var(--tx-muted);
+  font-size: 19px;
 }
-.pab-empty__ico svg { width: 18px !important; height: 18px !important; display: block; }
-.pab-empty__title { font-size: 13px; font-weight: 600; color: var(--tx-secondary); margin-bottom: 4px; }
-.pab-empty__sub   { font-size: 11.5px; color: var(--tx-muted); }
+.pab-empty__title { font-size: 13.5px; font-weight: 700; color: var(--tx-secondary); margin-bottom: 4px; }
+.pab-empty__sub   { font-size: 12px; color: var(--tx-muted); }
 
 /* ── Modal ── */
 .pab-modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.65);
+  background: rgba(15,23,42,0.45);
   backdrop-filter: blur(3px);
   z-index: 50;
   align-items: center;
@@ -396,6 +406,7 @@
   width: 100%;
   max-width: 420px;
   overflow: hidden;
+  box-shadow: 0 30px 70px -20px rgba(15,23,42,.28), 0 4px 18px rgba(15,23,42,.08);
   animation: modal-in 200ms var(--ease) both;
 }
 @keyframes modal-in {
@@ -403,24 +414,24 @@
   to   { opacity: 1; transform: none; }
 }
 .pab-modal__head {
-  padding: 16px 20px;
+  padding: 17px 20px;
   border-bottom: 1px solid var(--bd-subtle);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
 }
 .pab-modal__head-ico {
-  width: 30px; height: 30px;
+  width: 32px; height: 32px;
   border-radius: var(--r-sm);
   background: var(--red-d);
   border: 1px solid var(--red-bd);
   display: flex; align-items: center; justify-content: center;
   color: var(--red);
   flex-shrink: 0;
+  font-size: 15px;
 }
-.pab-modal__head-ico svg { width: 14px !important; height: 14px !important; display: block; }
-.pab-modal__head-title  { font-size: 13px; font-weight: 700; color: var(--tx-primary); }
-.pab-modal__head-sub    { font-size: 11px; color: var(--tx-muted); }
+.pab-modal__head-title  { font-size: 13.5px; font-weight: 800; color: var(--tx-primary); }
+.pab-modal__head-sub    { font-size: 11.5px; color: var(--tx-muted); margin-top: 1px; }
 .pab-modal__body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
 
 /* Textarea */
@@ -429,9 +440,9 @@
   font-size: 13px;
   color: var(--tx-primary);
   background: var(--bg-elevated);
-  border: 1px solid var(--bd-subtle);
+  border: 1.5px solid var(--bd-subtle);
   border-radius: var(--r-md);
-  padding: 9px 12px;
+  padding: 10px 13px;
   outline: none;
   width: 100%;
   resize: vertical;
@@ -443,32 +454,32 @@
 }
 .pab-textarea::placeholder { color: var(--tx-muted); font-size: 12.5px; }
 .pab-textarea:focus {
-  border-color: var(--bd-accent);
-  background: var(--bg-overlay);
-  box-shadow: 0 0 0 3px rgba(99,179,237,0.08);
+  border-color: var(--c-primary-lt, #06b6d4);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(6,182,212,.12);
 }
 
 .pab-modal__lbl {
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--tx-secondary);
   margin-bottom: 6px;
   display: block;
 }
 
 .pab-modal__foot {
-  padding: 14px 20px;
+  padding: 15px 20px;
   border-top: 1px solid var(--bd-subtle);
   display: flex;
   gap: 8px;
 }
-.pab-modal__foot .pab-btn { flex: 1; justify-content: center; padding: 9px; font-size: 12.5px; }
+.pab-modal__foot .pab-btn { flex: 1; justify-content: center; padding: 10px; font-size: 12.5px; }
 .pab-btn--cancel {
   background: var(--bg-elevated);
   color: var(--tx-secondary);
   border: 1px solid var(--bd-subtle);
 }
-.pab-btn--cancel:hover { border-color: var(--bd-default); color: var(--tx-primary); background: var(--bg-overlay); }
+.pab-btn--cancel:hover { border-color: var(--bd-accent); color: var(--tx-primary); background: #fff; }
 </style>
 
 <div class="pab-root">
@@ -504,19 +515,10 @@
       <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
       <button type="submit" class="pab-toggle <?= $pabOpen ? 'pab-toggle--close' : 'pab-toggle--open' ?>">
         <?php if ($pabOpen): ?>
-          <svg viewBox="0 0 14 14" width="13" height="13" fill="none" stroke="currentColor"
-               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="6.5" width="8" height="6" rx="1"/>
-            <path d="M5 6.5V4.5a2 2 0 014 0v2"/>
-          </svg>
+          <i class="ti ti-lock" aria-hidden="true"></i>
           Tutup PAB
         <?php else: ?>
-          <svg viewBox="0 0 14 14" width="13" height="13" fill="none" stroke="currentColor"
-               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="6.5" width="8" height="6" rx="1"/>
-            <path d="M5 6.5V4.5a2 2 0 014 0"/>
-            <path d="M9 4.5h1"/>
-          </svg>
+          <i class="ti ti-lock-open" aria-hidden="true"></i>
           Buka PAB
         <?php endif; ?>
       </button>
@@ -548,11 +550,7 @@
             <td colspan="6" style="padding:0;border:none;">
               <div class="pab-empty">
                 <div class="pab-empty__ico">
-                  <svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor"
-                       stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="9" cy="7" r="3.5"/>
-                    <path d="M2 16c0-3.87 3.13-7 7-7s7 3.13 7 7"/>
-                  </svg>
+                  <i class="ti ti-user-search" aria-hidden="true"></i>
                 </div>
                 <div class="pab-empty__title">Belum ada pendaftar</div>
                 <div class="pab-empty__sub">Data pendaftar PAB akan muncul di sini</div>
@@ -586,7 +584,7 @@
             <!-- No HP -->
             <td>
               <?php if (!empty($r['no_hp'])): ?>
-                <span style="font-family:var(--font-mono);font-size:11px;">
+                <span style="font-size:11.5px;font-weight:500;">
                   <?= htmlspecialchars($r['no_hp']) ?>
                 </span>
               <?php else: ?>
@@ -634,25 +632,19 @@
                       onsubmit="return confirm('Setujui pendaftar ini dan generate NIA?')">
                   <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
                   <button type="submit" class="pab-btn pab-btn--approve">
-                    <svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor"
-                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <path d="M2 6l2.5 2.5L10 3"/>
-                    </svg>
+                    <i class="ti ti-check" aria-hidden="true"></i>
                     Setujui
                   </button>
                 </form>
                 <!-- Reject -->
                 <button type="button" class="pab-btn pab-btn--reject"
                         onclick="openReject(<?= (int)$r['id'] ?>)">
-                  <svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor"
-                       stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M2 2l8 8M10 2L2 10"/>
-                  </svg>
+                  <i class="ti ti-x" aria-hidden="true"></i>
                   Tolak
                 </button>
               </div>
               <?php else: ?>
-                <span style="color:var(--tx-muted);font-size:11px;">—</span>
+                <span style="color:var(--tx-muted);font-size:11.5px;">—</span>
               <?php endif; ?>
             </td>
           </tr>
@@ -669,10 +661,7 @@
   <div class="pab-modal">
     <div class="pab-modal__head">
       <div class="pab-modal__head-ico">
-        <svg viewBox="0 0 14 14" width="14" height="14" fill="none" stroke="currentColor"
-             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M2 2l10 10M12 2L2 12"/>
-        </svg>
+        <i class="ti ti-x" aria-hidden="true"></i>
       </div>
       <div>
         <div class="pab-modal__head-title">Tolak Pendaftar</div>
@@ -695,10 +684,7 @@
           Batal
         </button>
         <button type="submit" class="pab-btn pab-btn--reject">
-          <svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor"
-               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M2 2l8 8M10 2L2 10"/>
-          </svg>
+          <i class="ti ti-x" aria-hidden="true"></i>
           Konfirmasi Tolak
         </button>
       </div>
