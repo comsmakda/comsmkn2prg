@@ -470,7 +470,7 @@
     <div class="topbar-left">
       <span class="lbl">Server</span>
       <div id="server-clock">--:--:--</div>
-      <span class="lbl">WIB</span>
+      <span class="lbl">WITA</span>
     </div>
     <div class="topbar-right">
       <?php if (!empty($settings['social_instagram']['value'])): ?>
@@ -757,7 +757,7 @@
 (function(){
   /* ── Clock ── */
   function tick(){
-    const d=new Date(), u=new Date(d.getTime()+7*3600000);
+    const d=new Date(), u=new Date(d.getTime()+8*3600000);
     const t=[u.getUTCHours(),u.getUTCMinutes(),u.getUTCSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
     ['server-clock','footer-clock'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=t; });
   }
