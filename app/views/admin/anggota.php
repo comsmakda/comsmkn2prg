@@ -1,41 +1,50 @@
 <?php // app/views/admin/anggota.php ?>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700;800&display=swap');
-
 /* ═══════════════════════════════════════
-   INHERIT DESIGN SYSTEM (same as dashboard)
+   INHERIT DESIGN SYSTEM (alias ke token global, sama seperti dashboard)
 ═══════════════════════════════════════ */
-:root {
-  --font-ui:   'Sora', sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
-  --bg-base:     #0a0c10;
-  --bg-surface:  #0f1117;
-  --bg-elevated: #141820;
-  --bg-overlay:  #1a1f2e;
-  --bg-active:   #1e2436;
-  --bd-subtle:   rgba(255,255,255,0.055);
-  --bd-default:  rgba(255,255,255,0.10);
-  --bd-accent:   rgba(99,179,237,0.35);
-  --tx-primary:  #e8ecf4;
-  --tx-secondary:#9aa3b8;
-  --tx-muted:    #4f5773;
-  --ac:          #63b3ed;
-  --ac-dim:      rgba(99,179,237,0.10);
-  --ac-glow:     rgba(99,179,237,0.15);
-  --blue:        #4f9eff;
-  --blue-d:      rgba(79,158,255,0.12);
-  --amber:       #f6c244;
-  --amber-d:     rgba(246,194,68,0.12);
-  --purple:      #b794f4;
-  --purple-d:    rgba(183,148,244,0.12);
-  --green:       #48bb78;
-  --green-d:     rgba(72,187,120,0.12);
-  --red:         #fc8181;
-  --red-d:       rgba(252,129,129,0.12);
-  --r-xs: 4px; --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px;
-  --ease: cubic-bezier(0.16,1,0.3,1);
-  --t-fast: 120ms; --t-base: 200ms; --t-slow: 350ms;
+.ang-root {
+  --font-ui:   var(--ff, 'Plus Jakarta Sans', sans-serif);
+  --font-mono: var(--ff, 'Plus Jakarta Sans', sans-serif);
+
+  --bg-base:     var(--c-page,  #eef2f6);
+  --bg-surface:  var(--c-white, #ffffff);
+  --bg-elevated: #f8fafc;
+  --bg-overlay:  #eef2f6;
+  --bg-active:   var(--c-primary-08, rgba(14,116,144,.08));
+
+  --bd-subtle:  var(--c-border, #e6ebf1);
+  --bd-default: var(--c-border, #e6ebf1);
+  --bd-accent:  var(--c-primary-25, rgba(14,116,144,.25));
+
+  --tx-primary:   var(--c-ink,    #0f172a);
+  --tx-secondary: var(--c-muted,  #64748b);
+  --tx-muted:     var(--c-muted2, #94a3b8);
+
+  --ac:      var(--c-primary,    #0e7490);
+  --ac-dim:  var(--c-primary-08, rgba(14,116,144,.08));
+  --ac-glow: var(--c-primary-12, rgba(14,116,144,.12));
+
+  --blue:    var(--c-primary,    #0e7490);
+  --blue-d:  var(--c-primary-08, rgba(14,116,144,.08));
+  --amber:   var(--c-amber-icon, #d9910c);
+  --amber-d: var(--c-amber-bg,   #fef6e2);
+  --purple:  var(--c-primary-dk, #0b5a70);
+  --purple-d:var(--c-primary-08, rgba(14,116,144,.08));
+  --green:   var(--c-green-text, #15803d);
+  --green-d: var(--c-green-bg,   #f0fdf4);
+  --red:     var(--c-red-text,   #b91c1c);
+  --red-d:   var(--c-red-bg,     #fef2f2);
+
+  --r-xs: 6px;
+  --r-sm: var(--radius-sm, 9px);
+  --r-md: var(--radius-sm, 9px);
+  --r-lg: var(--radius-md, 13px);
+  --r-xl: var(--radius-lg, 22px);
+
+  --ease: cubic-bezier(0.22,1,0.36,1);
+  --t-fast: 120ms; --t-base: 160ms; --t-slow: 300ms;
 }
 
 .ang-root * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -43,7 +52,7 @@
 .ang-root {
   font-family: var(--font-ui);
   color: var(--tx-primary);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -56,18 +65,17 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 28px;
+  margin-bottom: 26px;
   flex-wrap: wrap;
 }
 .ph__left {}
 .ph__eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ac);
   margin-bottom: 7px;
@@ -82,13 +90,13 @@
 .ph__title {
   font-size: 24px;
   font-weight: 800;
-  letter-spacing: -0.04em;
-  color: var(--tx-primary);
+  letter-spacing: -0.03em;
+  color: var(--c-primary-dk, #0b5a70);
   line-height: 1.1;
 }
 .ph__sub {
   font-size: 12.5px;
-  color: var(--tx-muted);
+  color: var(--tx-secondary);
   margin-top: 5px;
 }
 
@@ -105,39 +113,40 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 9px 16px;
+  padding: 10px 17px;
   background: var(--ac);
-  color: #0a0c10;
+  color: #fff;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   letter-spacing: -0.01em;
   border-radius: var(--r-md);
   border: none;
   cursor: pointer;
+  box-shadow: 0 6px 16px rgba(14,116,144,.22);
   transition:
     background var(--t-fast) var(--ease),
     box-shadow var(--t-base) var(--ease),
     transform  var(--t-fast) var(--ease);
 }
 .btn-pri:hover {
-  background: #7ec8f5;
-  box-shadow: 0 4px 20px rgba(99,179,237,0.30);
+  background: var(--c-primary-lt, #06b6d4);
+  box-shadow: 0 8px 20px rgba(6,182,212,.28);
   transform: translateY(-1px);
 }
-.btn-pri svg { width: 14px; height: 14px; }
+.btn-pri i { font-size: 14px; }
 
 /* Secondary/ghost button */
 .btn-sec {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
-  background: var(--bg-elevated);
+  padding: 9px 15px;
+  background: var(--bg-surface);
   color: var(--tx-secondary);
   font-family: var(--font-ui);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 12.5px;
+  font-weight: 700;
   border: 1px solid var(--bd-subtle);
   border-radius: var(--r-md);
   cursor: pointer;
@@ -147,11 +156,11 @@
     color        var(--t-fast) var(--ease);
 }
 .btn-sec:hover {
-  border-color: var(--bd-default);
-  background: var(--bg-overlay);
+  border-color: var(--bd-accent);
+  background: var(--bg-elevated);
   color: var(--tx-primary);
 }
-.btn-sec svg { width: 13px; height: 13px; }
+.btn-sec i { font-size: 13px; }
 
 /* ═══════════════════════════════════════
    SECTION LABEL
@@ -163,10 +172,9 @@
   margin-bottom: 12px;
 }
 .sec-label__text {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--tx-muted);
   white-space: nowrap;
@@ -182,30 +190,30 @@
 ═══════════════════════════════════════ */
 .stats-strip {
   display: flex;
-  gap: 10px;
-  margin-bottom: 24px;
+  gap: 12px;
+  margin-bottom: 22px;
   flex-wrap: wrap;
 }
 .stat-pill {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
+  gap: 11px;
+  padding: 12px 15px;
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   flex: 1;
-  min-width: 120px;
+  min-width: 130px;
 }
 .stat-pill__ico {
-  width: 28px; height: 28px;
+  width: 30px; height: 30px;
   border-radius: var(--r-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-.stat-pill__ico svg { width: 13px; height: 13px; }
+.stat-pill__ico i { font-size: 14px; }
 .stat-pill--blue   .stat-pill__ico { background: var(--blue-d);   color: var(--blue); }
 .stat-pill--green  .stat-pill__ico { background: var(--green-d);  color: var(--green); }
 .stat-pill--amber  .stat-pill__ico { background: var(--amber-d);  color: var(--amber); }
@@ -215,7 +223,7 @@
 .stat-pill__val {
   font-size: 18px;
   font-weight: 800;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   color: var(--tx-primary);
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -224,6 +232,7 @@
   font-size: 10.5px;
   color: var(--tx-muted);
   margin-top: 2px;
+  font-weight: 500;
 }
 
 /* ═══════════════════════════════════════
@@ -232,7 +241,7 @@
 .filter-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   flex-wrap: wrap;
   margin-bottom: 20px;
 }
@@ -244,32 +253,33 @@
 }
 .fi__icon {
   position: absolute;
-  left: 10px;
+  left: 11px;
   color: var(--tx-muted);
   pointer-events: none;
   display: flex;
+  font-size: 13px;
 }
-.fi__icon svg { width: 13px; height: 13px; }
 
 .fi input,
 .fi select {
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--tx-primary);
-  background: var(--bg-elevated);
-  border: 1px solid var(--bd-subtle);
+  background: var(--bg-surface);
+  border: 1.5px solid var(--bd-subtle);
   border-radius: var(--r-md);
-  padding: 8px 12px 8px 30px;
+  padding: 9px 14px 9px 32px;
   outline: none;
-  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
   -webkit-appearance: none;
 }
-.fi input { width: 220px; }
-.fi select { width: 160px; }
+.fi input { width: 230px; }
+.fi select { width: 165px; }
 .fi input:focus,
 .fi select:focus {
-  border-color: var(--bd-accent);
-  background: var(--bg-overlay);
+  border-color: var(--c-primary-lt, #06b6d4);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(6,182,212,.12);
 }
 .fi input::placeholder { color: var(--tx-muted); }
 
@@ -277,7 +287,7 @@
 .fi--select::after {
   content: '';
   position: absolute;
-  right: 10px;
+  right: 11px;
   width: 0; height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
@@ -289,13 +299,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
-  background: var(--bg-elevated);
+  padding: 9px 15px;
+  background: var(--bg-surface);
   color: var(--tx-secondary);
   font-family: var(--font-ui);
-  font-size: 12px;
-  font-weight: 600;
-  border: 1px solid var(--bd-subtle);
+  font-size: 12.5px;
+  font-weight: 700;
+  border: 1.5px solid var(--bd-subtle);
   border-radius: var(--r-md);
   cursor: pointer;
   transition: all var(--t-fast) var(--ease);
@@ -305,13 +315,13 @@
   background: var(--ac-dim);
   color: var(--ac);
 }
-.filter-btn svg { width: 13px; height: 13px; }
+.filter-btn i { font-size: 13px; }
 
 .filter-reset {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--tx-muted);
-  padding: 4px 8px;
+  padding: 5px 9px;
   border-radius: var(--r-xs);
   transition: color var(--t-fast) var(--ease);
 }
@@ -322,17 +332,17 @@
 ═══════════════════════════════════════ */
 .pending-banner {
   margin-bottom: 20px;
-  background: linear-gradient(135deg, rgba(246,194,68,0.06), rgba(246,194,68,0.02));
-  border: 1px solid rgba(246,194,68,0.22);
-  border-radius: var(--r-lg);
+  background: var(--amber-d);
+  border: 1px solid rgba(217,145,12,0.28);
+  border-radius: var(--r-xl);
   overflow: hidden;
 }
 .pending-banner__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(246,194,68,0.14);
+  padding: 13px 18px;
+  border-bottom: 1px solid rgba(217,145,12,0.18);
   gap: 8px;
 }
 .pending-banner__title {
@@ -341,47 +351,45 @@
   gap: 8px;
   font-size: 12.5px;
   font-weight: 700;
-  color: var(--amber);
+  color: var(--c-amber-text, #8a5a06);
 }
-.pending-banner__title svg { width: 14px; height: 14px; }
+.pending-banner__title i { font-size: 15px; }
 .pending-banner__count {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
-  background: var(--amber-d);
+  background: #fff;
   color: var(--amber);
-  padding: 2px 8px;
+  padding: 3px 9px;
   border-radius: var(--r-xs);
 }
 .pending-banner__body {
-  padding: 12px 16px;
+  padding: 13px 18px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .pending-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 11px;
+  padding: 11px 13px;
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   transition: border-color var(--t-fast) var(--ease);
 }
-.pending-item:hover { border-color: rgba(246,194,68,0.28); }
+.pending-item:hover { border-color: rgba(217,145,12,0.35); }
 
 .pending-item__ava {
-  width: 32px; height: 32px;
+  width: 34px; height: 34px;
   border-radius: var(--r-sm);
   background: var(--amber-d);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 11.5px;
+  font-weight: 800;
   color: var(--amber);
   flex-shrink: 0;
   text-transform: uppercase;
@@ -389,34 +397,35 @@
 .pending-item__info { flex: 1; min-width: 0; }
 .pending-item__name {
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--tx-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .pending-item__meta {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--tx-muted);
-  margin-top: 1px;
+  margin-top: 2px;
   display: flex;
-  gap: 8px;
+  gap: 9px;
   flex-wrap: wrap;
+  font-weight: 500;
 }
-.pending-item__meta span { display: inline-flex; align-items: center; gap: 3px; }
+.pending-item__meta span { display: inline-flex; align-items: center; gap: 4px; }
+.pending-item__meta i { font-size: 11px; }
 
 .btn-activate {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  background: var(--amber-d);
-  color: var(--amber);
+  padding: 7px 13px;
+  background: #fff;
+  color: var(--c-amber-text, #8a5a06);
   font-family: var(--font-ui);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
-  border: 1px solid rgba(246,194,68,0.25);
+  border: 1px solid rgba(217,145,12,0.3);
   border-radius: var(--r-sm);
   cursor: pointer;
   transition: all var(--t-fast) var(--ease);
@@ -424,11 +433,12 @@
   flex-shrink: 0;
 }
 .btn-activate:hover {
-  background: rgba(246,194,68,0.22);
+  background: var(--amber);
+  color: #fff;
   border-color: var(--amber);
-  box-shadow: 0 0 12px rgba(246,194,68,0.15);
+  box-shadow: 0 4px 14px rgba(217,145,12,0.25);
 }
-.btn-activate svg { width: 11px; height: 11px; }
+.btn-activate i { font-size: 12px; }
 
 /* ═══════════════════════════════════════
    MAIN TABLE PANEL
@@ -436,32 +446,32 @@
 .tpanel {
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-xl);
   overflow: hidden;
 }
 .tpanel__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 18px;
+  padding: 15px 20px;
   border-bottom: 1px solid var(--bd-subtle);
   gap: 10px;
   flex-wrap: wrap;
 }
 .tpanel__title {
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 800;
   color: var(--tx-primary);
   letter-spacing: -0.01em;
 }
 .tpanel__meta {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--tx-muted);
+  font-weight: 500;
 }
 .tpanel__meta strong {
   color: var(--tx-secondary);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* ─── Table ─────────────────────────── */
@@ -470,14 +480,13 @@
   background: var(--bg-elevated);
 }
 .mtbl th {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--tx-muted);
   text-align: left;
-  padding: 10px 14px;
+  padding: 11px 14px;
   border-bottom: 1px solid var(--bd-subtle);
   white-space: nowrap;
   user-select: none;
@@ -493,10 +502,10 @@
   transition: background var(--t-fast) var(--ease);
 }
 .mtbl tbody tr:last-child { border-bottom: none; }
-.mtbl tbody tr:hover { background: rgba(255,255,255,0.018); }
+.mtbl tbody tr:hover { background: rgba(14,116,144,.03); }
 
 .mtbl td {
-  padding: 11px 14px;
+  padding: 12px 14px;
   font-size: 12.5px;
   color: var(--tx-secondary);
   vertical-align: middle;
@@ -504,51 +513,49 @@
 
 /* ─── Cell types ─────────────────────── */
 .cell-nia {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 11.5px;
+  font-weight: 700;
   color: var(--ac);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 .cell-empty-nia {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--tx-muted);
 }
 
 .cell-name-wrap {}
 .cell-name {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--tx-primary);
   display: block;
   line-height: 1.3;
 }
 .cell-kelas-inline {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--tx-muted);
+  font-weight: 500;
 }
 
 .cell-mono {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--tx-muted);
+  font-weight: 500;
 }
 
 /* Avatar */
 .ava-wrap { display: flex; align-items: center; gap: 10px; }
 .ava {
-  width: 34px; height: 34px;
+  width: 36px; height: 36px;
   border-radius: var(--r-sm);
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   text-transform: uppercase;
-  background: var(--bg-overlay);
+  background: var(--bg-elevated);
   color: var(--tx-secondary);
   border: 1px solid var(--bd-subtle);
   overflow: hidden;
@@ -564,16 +571,15 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 3px 7px;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
   border-radius: var(--r-xs);
   text-transform: uppercase;
 }
-.src-chip--pab    { background: var(--blue-d);   color: var(--blue);   border: 1px solid rgba(79,158,255,0.20); }
-.src-chip--manual { background: var(--purple-d); color: var(--purple); border: 1px solid rgba(183,148,244,0.20); }
+.src-chip--pab    { background: var(--blue-d);   color: var(--blue);   border: 1px solid rgba(14,116,144,0.22); }
+.src-chip--manual { background: var(--purple-d); color: var(--purple); border: 1px solid rgba(11,90,112,0.22); }
 
 /* Status chip */
 .status-chip {
@@ -581,14 +587,14 @@
   align-items: center;
   gap: 4px;
   font-size: 10.5px;
-  font-weight: 600;
-  padding: 3px 8px;
+  font-weight: 700;
+  padding: 3px 9px;
   border-radius: var(--r-xs);
 }
 .status-chip__dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 .chip--aktif   { background: var(--green-d);  color: var(--green); }
 .chip--pending { background: var(--amber-d);  color: var(--amber); }
-.chip--non     { background: rgba(255,255,255,.05); color: var(--tx-muted); }
+.chip--non     { background: var(--bg-overlay); color: var(--tx-muted); }
 .chip--tolak   { background: var(--red-d);    color: var(--red); }
 
 /* Action buttons */
@@ -598,20 +604,20 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 10px;
+  padding: 6px 11px;
   font-family: var(--font-ui);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   border-radius: var(--r-sm);
   border: 1px solid var(--bd-subtle);
   cursor: pointer;
-  background: var(--bg-elevated);
+  background: var(--bg-surface);
   color: var(--tx-secondary);
   transition: all var(--t-fast) var(--ease);
   white-space: nowrap;
 }
-.act-btn:hover { border-color: var(--bd-default); color: var(--tx-primary); background: var(--bg-overlay); }
-.act-btn svg { width: 11px; height: 11px; }
+.act-btn:hover { border-color: var(--bd-accent); color: var(--tx-primary); background: var(--bg-elevated); }
+.act-btn i { font-size: 12px; }
 
 .act-btn--danger {
   background: transparent;
@@ -620,10 +626,10 @@
 }
 .act-btn--danger:hover {
   background: var(--red-d);
-  border-color: rgba(252,129,129,0.30);
+  border-color: rgba(185,28,28,0.3);
 }
 
-/* ── TAMBAHAN: Reset password button ── */
+/* ── Reset password button ── */
 .act-btn--reset {
   background: transparent;
   color: var(--ac);
@@ -642,13 +648,14 @@
   color: var(--tx-muted);
 }
 .tbl-empty__ico {
-  width: 40px; height: 40px;
-  opacity: .25;
-  margin: 0 auto 12px;
+  font-size: 38px;
+  opacity: .35;
+  margin-bottom: 12px;
+  display: block;
 }
 .tbl-empty__title {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--tx-secondary);
   margin-bottom: 4px;
 }
@@ -661,17 +668,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 18px;
+  padding: 13px 20px;
   border-top: 1px solid var(--bd-subtle);
   gap: 12px;
   flex-wrap: wrap;
 }
 .pagi-info {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--tx-muted);
+  font-weight: 500;
 }
-.pagi-info strong { color: var(--tx-secondary); }
+.pagi-info strong { color: var(--tx-secondary); font-weight: 700; }
 .pagi-pages {
   display: flex;
   align-items: center;
@@ -684,24 +691,23 @@
   min-width: 30px;
   height: 30px;
   padding: 0 6px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 11.5px;
+  font-weight: 700;
   border-radius: var(--r-sm);
   border: 1px solid var(--bd-subtle);
-  background: var(--bg-elevated);
+  background: var(--bg-surface);
   color: var(--tx-muted);
   cursor: pointer;
   transition: all var(--t-fast) var(--ease);
 }
-.pagi-btn:hover { border-color: var(--bd-default); color: var(--tx-primary); }
+.pagi-btn:hover { border-color: var(--bd-accent); color: var(--tx-primary); }
 .pagi-btn--active {
   background: var(--ac-dim);
   border-color: var(--bd-accent);
   color: var(--ac);
 }
 .pagi-btn--disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
-.pagi-btn svg { width: 11px; height: 11px; }
+.pagi-btn i { font-size: 12px; }
 
 /* ═══════════════════════════════════════
    CONFIRM DIALOG OVERLAY
@@ -710,7 +716,7 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.65);
+  background: rgba(15,23,42,.45);
   backdrop-filter: blur(4px);
   z-index: 9999;
   align-items: center;
@@ -718,13 +724,13 @@
 }
 .confirm-overlay.is-open { display: flex; }
 .confirm-box {
-  background: var(--bg-elevated);
-  border: 1px solid var(--bd-default);
+  background: var(--bg-surface);
+  border: 1px solid var(--bd-subtle);
   border-radius: var(--r-xl);
   padding: 28px;
   max-width: 380px;
   width: 90%;
-  box-shadow: 0 24px 60px rgba(0,0,0,.5);
+  box-shadow: 0 30px 70px -20px rgba(15,23,42,.28), 0 4px 18px rgba(15,23,42,.08);
   animation: pop-in var(--t-slow) var(--ease) both;
 }
 @keyframes pop-in {
@@ -732,19 +738,19 @@
   to   { transform: scale(1)   translateY(0);    opacity: 1; }
 }
 .confirm-box__ico {
-  width: 42px; height: 42px;
-  border-radius: var(--r-md);
+  width: 44px; height: 44px;
+  border-radius: var(--r-lg);
   background: var(--red-d);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--red);
   margin-bottom: 16px;
+  font-size: 20px;
 }
-.confirm-box__ico svg { width: 20px; height: 20px; }
 .confirm-box__title {
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 15.5px;
+  font-weight: 800;
   color: var(--tx-primary);
   margin-bottom: 6px;
   letter-spacing: -0.02em;
@@ -765,15 +771,14 @@
 /* ── Reset dialog: password badge ── */
 .pw-badge {
   display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   color: var(--ac);
   background: var(--ac-dim);
   border: 1px solid var(--bd-accent);
   border-radius: var(--r-xs);
-  padding: 2px 8px;
-  letter-spacing: 0.05em;
+  padding: 2px 9px;
+  letter-spacing: 0.03em;
 }
 
 /* ═══════════════════════════════════════
@@ -813,15 +818,11 @@
   </div>
   <div class="ph__actions">
     <a href="<?= BASE_URL ?>/admin/laporan/anggota" class="btn-sec">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M7 1v8M4 6l3 3 3-3M2 11h10"/>
-      </svg>
+      <i class="ti ti-download" aria-hidden="true"></i>
       Ekspor
     </a>
     <a href="<?= BASE_URL ?>/admin/anggota/tambah" class="btn-pri">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M7 2v10M2 7h10"/>
-      </svg>
+      <i class="ti ti-plus" aria-hidden="true"></i>
       Tambah Anggota
     </a>
   </div>
@@ -839,14 +840,7 @@
 <div class="stats-strip">
 
   <div class="stat-pill stat-pill--blue">
-    <div class="stat-pill__ico">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="5" cy="4" r="2.5"/>
-        <path d="M1 12c0-2.2 1.8-4 4-4s4 1.8 4 4"/>
-        <circle cx="11" cy="4.5" r="1.8"/>
-        <path d="M13 11c0-1.5-1-2.7-2.2-2.7"/>
-      </svg>
-    </div>
+    <div class="stat-pill__ico"><i class="ti ti-users" aria-hidden="true"></i></div>
     <div class="stat-pill__body">
       <div class="stat-pill__val"><?= number_format($totalAktif) ?></div>
       <div class="stat-pill__lbl">Anggota Aktif</div>
@@ -854,11 +848,7 @@
   </div>
 
   <div class="stat-pill stat-pill--amber">
-    <div class="stat-pill__ico">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v3l1.5 1.5"/>
-      </svg>
-    </div>
+    <div class="stat-pill__ico"><i class="ti ti-clock-hour-4" aria-hidden="true"></i></div>
     <div class="stat-pill__body">
       <div class="stat-pill__val"><?= number_format($totalPending) ?></div>
       <div class="stat-pill__lbl">Pending Aktivasi</div>
@@ -866,12 +856,7 @@
   </div>
 
   <div class="stat-pill stat-pill--green">
-    <div class="stat-pill__ico">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="1.5" y="1.5" width="11" height="11" rx="1.5"/>
-        <path d="M4 7l2 2 4-4"/>
-      </svg>
-    </div>
+    <div class="stat-pill__ico"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
     <div class="stat-pill__body">
       <div class="stat-pill__val"><?= number_format($totalPab) ?></div>
       <div class="stat-pill__lbl">Via PAB</div>
@@ -879,12 +864,7 @@
   </div>
 
   <div class="stat-pill stat-pill--purple">
-    <div class="stat-pill__ico">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M2 2h10a1 1 0 011 1v9a1 1 0 01-1 1H2a1 1 0 01-1-1V3a1 1 0 011-1z"/>
-        <path d="M4 5h6M4 7.5h4M4 10h3"/>
-      </svg>
-    </div>
+    <div class="stat-pill__ico"><i class="ti ti-file-text" aria-hidden="true"></i></div>
     <div class="stat-pill__body">
       <div class="stat-pill__val"><?= number_format($totalManual) ?></div>
       <div class="stat-pill__lbl">Input Manual</div>
@@ -900,9 +880,7 @@
 <div class="pending-banner">
   <div class="pending-banner__head">
     <div class="pending-banner__title">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v3"/><circle cx="7" cy="9.5" r=".5" fill="currentColor"/>
-      </svg>
+      <i class="ti ti-hourglass-high" aria-hidden="true"></i>
       Menunggu Aktivasi &amp; Generate NIA
     </div>
     <span class="pending-banner__count"><?= count($pending) ?> anggota</span>
@@ -917,25 +895,20 @@
         <div class="pending-item__name"><?= htmlspecialchars($p['nama_lengkap']) ?></div>
         <div class="pending-item__meta">
           <?php if (!empty($p['kelas'])): ?>
-            <span>
-              <svg width="10" height="10" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="1.5" width="11" height="11" rx="1.5"/></svg>
-              <?= htmlspecialchars($p['kelas']) ?>
-            </span>
+            <span><i class="ti ti-school" aria-hidden="true"></i> <?= htmlspecialchars($p['kelas']) ?></span>
           <?php endif; ?>
           <?php if (!empty($p['no_hp'])): ?>
-            <span><?= htmlspecialchars($p['no_hp']) ?></span>
+            <span><i class="ti ti-phone" aria-hidden="true"></i> <?= htmlspecialchars($p['no_hp']) ?></span>
           <?php endif; ?>
           <?php if (!empty($p['created_at'])): ?>
-            <span>Daftar: <?= htmlspecialchars($p['created_at']) ?></span>
+            <span><i class="ti ti-calendar" aria-hidden="true"></i> Daftar: <?= htmlspecialchars($p['created_at']) ?></span>
           <?php endif; ?>
         </div>
       </div>
       <form method="POST" action="<?= BASE_URL ?>/admin/anggota/<?= (int)$p['id'] ?>/activate">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
         <button type="submit" class="btn-activate">
-          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M2 7l3.5 3.5L12 3"/>
-          </svg>
+          <i class="ti ti-check" aria-hidden="true"></i>
           Aktifkan &amp; NIA
         </button>
       </form>
@@ -956,11 +929,7 @@
 <form method="GET" class="filter-bar" id="filter-form">
   <!-- Search -->
   <div class="fi">
-    <span class="fi__icon">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
-        <circle cx="6" cy="6" r="4.5"/><path d="M10 10l2.5 2.5"/>
-      </svg>
-    </span>
+    <span class="fi__icon"><i class="ti ti-search" aria-hidden="true"></i></span>
     <input type="text" name="search"
            value="<?= htmlspecialchars($filter['search'] ?? '') ?>"
            placeholder="Cari nama, NIA, No HP…"
@@ -969,11 +938,7 @@
 
   <!-- Kelas -->
   <div class="fi fi--select">
-    <span class="fi__icon">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
-        <rect x="1.5" y="1.5" width="11" height="11" rx="1.5"/>
-      </svg>
-    </span>
+    <span class="fi__icon"><i class="ti ti-school" aria-hidden="true"></i></span>
     <select name="kelas">
       <option value="">Semua Kelas</option>
       <?php foreach ($kelasList as $k): ?>
@@ -987,11 +952,7 @@
 
   <!-- Sumber -->
   <div class="fi fi--select">
-    <span class="fi__icon">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
-        <circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v3l1.5 1.5"/>
-      </svg>
-    </span>
+    <span class="fi__icon"><i class="ti ti-tag" aria-hidden="true"></i></span>
     <select name="sumber">
       <option value="">Semua Sumber</option>
       <option value="pab"    <?= ($filter['sumber'] ?? '') === 'pab'    ? 'selected' : '' ?>>PAB</option>
@@ -1000,9 +961,7 @@
   </div>
 
   <button type="submit" class="filter-btn">
-    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
-      <path d="M1.5 4h11M3.5 7h7M5.5 10h3"/>
-    </svg>
+    <i class="ti ti-filter" aria-hidden="true"></i>
     Filter
   </button>
 
@@ -1040,10 +999,7 @@
         <tr>
           <td colspan="7">
             <div class="tbl-empty">
-              <svg class="tbl-empty__ico" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
-                <circle cx="18" cy="18" r="13"/>
-                <path d="M28 28l8 8M18 12v6M18 21v2" stroke-linecap="round"/>
-              </svg>
+              <i class="ti ti-users-group tbl-empty__ico" aria-hidden="true"></i>
               <div class="tbl-empty__title">Tidak ada anggota ditemukan</div>
               <div class="tbl-empty__sub">Coba ubah filter atau tambah anggota baru.</div>
             </div>
@@ -1115,9 +1071,7 @@
 
               <!-- Edit -->
               <a href="<?= BASE_URL ?>/admin/anggota/<?= (int)$m['id'] ?>/edit" class="act-btn">
-                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z"/>
-                </svg>
+                <i class="ti ti-edit" aria-hidden="true"></i>
                 Edit
               </a>
 
@@ -1126,12 +1080,7 @@
                       data-reset-id="<?= (int)$m['id'] ?>"
                       data-reset-name="<?= htmlspecialchars($m['nama_lengkap'], ENT_QUOTES) ?>"
                       title="Reset Password">
-                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M2.5 7A4.5 4.5 0 0 1 11 4.5"/>
-                  <path d="M11.5 2v3h-3"/>
-                  <rect x="3" y="8" width="8" height="5" rx="1"/>
-                  <circle cx="7" cy="10.5" r=".8" fill="currentColor" stroke="none"/>
-                </svg>
+                <i class="ti ti-key" aria-hidden="true"></i>
               </button>
 
               <!-- Nonaktifkan -->
@@ -1139,9 +1088,7 @@
                       data-confirm-id="<?= (int)$m['id'] ?>"
                       data-confirm-name="<?= htmlspecialchars($m['nama_lengkap'], ENT_QUOTES) ?>"
                       title="Nonaktifkan">
-                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M2 4h10M5 4V2.5h4V4M5.5 7v3M8.5 7v3M3 4l.8 7.5a1 1 0 001 .9h4.4a1 1 0 001-.9L11 4"/>
-                </svg>
+                <i class="ti ti-user-off" aria-hidden="true"></i>
               </button>
 
             </div>
@@ -1166,7 +1113,7 @@
       <?php $hasPrev = $pagination['current_page'] > 1; ?>
       <a href="<?= $hasPrev ? BASE_URL . '/admin/anggota?page=' . ($pagination['current_page'] - 1) . '&' . http_build_query(array_filter(['search'=>$filter['search']??'','kelas'=>$filter['kelas']??'','sumber'=>$filter['sumber']??''])) : '#' ?>"
          class="pagi-btn <?= !$hasPrev ? 'pagi-btn--disabled' : '' ?>">
-        <svg viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 2L4 5.5 7 9"/></svg>
+        <i class="ti ti-chevron-left" aria-hidden="true"></i>
       </a>
 
       <?php for ($pg = 1; $pg <= $pagination['total_pages']; $pg++): ?>
@@ -1184,7 +1131,7 @@
       <?php $hasNext = $pagination['current_page'] < $pagination['total_pages']; ?>
       <a href="<?= $hasNext ? BASE_URL . '/admin/anggota?page=' . ($pagination['current_page'] + 1) . '&' . http_build_query(array_filter(['search'=>$filter['search']??'','kelas'=>$filter['kelas']??'','sumber'=>$filter['sumber']??''])) : '#' ?>"
          class="pagi-btn <?= !$hasNext ? 'pagi-btn--disabled' : '' ?>">
-        <svg viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2l3 3.5-3 3.5"/></svg>
+        <i class="ti ti-chevron-right" aria-hidden="true"></i>
       </a>
     </div>
   </div>
@@ -1198,9 +1145,7 @@
 <div class="confirm-overlay" id="confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
   <div class="confirm-box">
     <div class="confirm-box__ico">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M3 6h14M8 6V4.5a1.5 1.5 0 013 0V6M7 9l.5 6M13 9l-.5 6M5 6l.8 10.5A1 1 0 006.8 18h6.4a1 1 0 001-.9L15 6"/>
-      </svg>
+      <i class="ti ti-alert-triangle" aria-hidden="true"></i>
     </div>
     <div class="confirm-box__title" id="confirm-title">Nonaktifkan Anggota?</div>
     <div class="confirm-box__sub">
@@ -1211,7 +1156,7 @@
       <button type="button" class="btn-sec" id="confirm-cancel">Batal</button>
       <form method="POST" id="confirm-form">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
-        <button type="submit" class="btn-pri" style="background:var(--red);color:#fff;">
+        <button type="submit" class="btn-pri" style="background:var(--red);box-shadow:0 6px 16px rgba(185,28,28,.22);">
           Ya, Nonaktifkan
         </button>
       </form>
@@ -1225,12 +1170,7 @@
 <div class="confirm-overlay" id="reset-overlay" role="dialog" aria-modal="true" aria-labelledby="reset-title">
   <div class="confirm-box">
     <div class="confirm-box__ico" style="background:var(--ac-dim);color:var(--ac);">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M3.5 10A6.5 6.5 0 0 1 15 5.5"/>
-        <path d="M16 2.5v4h-4"/>
-        <rect x="4" y="11" width="12" height="7" rx="1.5"/>
-        <circle cx="10" cy="14.5" r="1.2" fill="currentColor" stroke="none"/>
-      </svg>
+      <i class="ti ti-key" aria-hidden="true"></i>
     </div>
     <div class="confirm-box__title" id="reset-title">Reset Password?</div>
     <div class="confirm-box__sub">
