@@ -21,7 +21,7 @@
       --c-muted2:      #94a3b8;
       --c-border:      #e6ebf1;
 
-      --c-primary:     #0e7490;   /* teal-800 accents, headings */
+      --c-primary:     #0e7490;
       --c-primary-dk:  #0b5a70;
       --c-primary-lt:  #06b6d4;
 
@@ -252,36 +252,49 @@
     /* ─── RIGHT: organization photo + logo + name, FIXED (no scroll) ─── */
     .auth-right {
       position: relative; overflow: hidden;
-      background-image:
-        linear-gradient(175deg, rgba(9,25,38,.35) 0%, rgba(9,45,64,.55) 45%, rgba(6,30,44,.88) 100%),
-        url('<?= BASE_URL ?>/assets/img/gedung-smkn2.jpg');
-      background-size: cover; background-position: center;
-      background-color: var(--c-primary-dk); /* fallback if photo missing */
+      background: linear-gradient(165deg, var(--c-primary-dk) 0%, #0a3a4c 100%); /* instant paint while photo loads */
       display: flex; flex-direction: column; justify-content: flex-end;
       padding: 2.4rem 2.2rem;
     }
-    .auth-right::after {
-      content: ''; position: absolute; inset: 0;
+    /* photo sits behind everything, fades in only once fully loaded */
+    .auth-right-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      opacity: 0; transition: opacity .5s ease;
+      z-index: 0;
+    }
+    .auth-right-img.is-loaded { opacity: 1; }
+    /* darken overlay so text stays readable regardless of photo */
+    .auth-right-overlay {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(175deg, rgba(9,25,38,.35) 0%, rgba(9,45,64,.55) 45%, rgba(6,30,44,.88) 100%);
+    }
+    .auth-right-glow {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
       background: radial-gradient(ellipse 90% 70% at 100% 100%, rgba(6,182,212,.18) 0%, transparent 60%);
-      pointer-events: none;
     }
-    .org-logo-badge {
-      width: 64px; height: 64px; border-radius: 16px;
-      background: rgba(255,255,255,.12); backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,.25);
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 1.1rem; overflow: hidden; position: relative; z-index: 1;
+
+    /* logo — no background box, just the mark itself */
+    .org-logo {
+      position: relative; z-index: 2;
+      max-width: 84px; max-height: 84px; width: auto; height: auto;
+      object-fit: contain; margin-bottom: 1.1rem;
+      filter: drop-shadow(0 3px 10px rgba(0,0,0,.35));
     }
-    .org-logo-badge img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
-    .org-logo-badge i { color: #fff; font-size: 28px; }
+    .org-logo-fallback {
+      position: relative; z-index: 2;
+      color: #fff; font-size: 40px; margin-bottom: 1.1rem;
+      filter: drop-shadow(0 3px 10px rgba(0,0,0,.35));
+      display: none;
+    }
     .org-name {
-      position: relative; z-index: 1;
+      position: relative; z-index: 2;
       font-size: 1.65rem; font-weight: 800; color: #fff;
       line-height: 1.25; letter-spacing: -.02em;
       text-shadow: 0 2px 18px rgba(0,0,0,.25);
     }
     .org-tag {
-      position: relative; z-index: 1;
+      position: relative; z-index: 2;
       font-size: .78rem; color: rgba(255,255,255,.75); margin-top: .6rem; line-height: 1.6;
       max-width: 300px;
     }
@@ -300,6 +313,7 @@
         order: -1; padding: 2rem 1.5rem 1.6rem; min-height: 190px;
       }
       .org-name { font-size: 1.3rem; }
+      .org-logo { max-width: 64px; max-height: 64px; }
       .auth-left { overflow-y: visible; padding: 1.9rem 1.4rem 2.2rem; }
       .login-title { font-size: 1.7rem; }
     }
@@ -467,11 +481,25 @@
 
     <!-- ═══ RIGHT: organization branding — FIXED, no scroll ═══ -->
     <div class="auth-right">
-      <div class="org-logo-badge">
-        <img src="<?= BASE_URL ?>/assets/img/logo-com.png" alt="Logo"
-             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <i class="ti ti-code" style="display:none"></i>
-      </div>
+      <img
+        class="auth-right-img"
+        id="auth-right-img"
+        src="<?= BASE_URL ?>/assets/img/gedung-smkn2.webp"
+        alt=""
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+        onload="this.classList.add('is-loaded')"
+        onerror="this.style.display='none'"
+      />
+      <div class="auth-right-overlay"></div>
+      <div class="auth-right-glow"></div>
+
+      <img src="<?= BASE_URL ?>/assets/img/logo-com.png" alt="Logo" class="org-logo"
+           loading="eager" decoding="async"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <i class="ti ti-code org-logo-fallback"></i>
+
       <h2 class="org-name"><?= htmlspecialchars($settings['org_name']['value'] ?? 'Community Programmer SMKN 2 Pinrang') ?></h2>
       <p class="org-tag">Wadah belajar dan berkarya di bidang teknologi bagi siswa SMKN 2 Pinrang.</p>
     </div>
@@ -539,6 +567,12 @@ tabAdmin.addEventListener('click',  function() { switchTab('admin'); });
   var saved = 'member';
   try { saved = sessionStorage.getItem('login_tab') || 'member'; } catch(e) {}
   if (saved === 'admin') switchTab('admin');
+})();
+
+/* if the org photo was already cached and loaded before this script ran, fade it in immediately */
+(function() {
+  var img = document.getElementById('auth-right-img');
+  if (img && img.complete && img.naturalWidth > 0) img.classList.add('is-loaded');
 })();
 
 function showAlert(msg) { jsAlertMsg.textContent = msg; jsAlert.style.display = 'flex'; }
