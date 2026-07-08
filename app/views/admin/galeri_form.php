@@ -6,30 +6,72 @@ $action = $isEdit
     : BASE_URL . '/admin/galeri/store';
 ?>
 <style>
-/* ── Base & Variables Fallback ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ═══════════════════════════════════════
+   SCOPE ROOT — alias ke Design System
+   (token asli didefinisikan global di layout;
+    fallback disertakan bila file ini dirender berdiri sendiri)
+═══════════════════════════════════════ */
+.gf-root {
+  --tx-primary:   var(--c-ink,    #0f172a);
+  --tx-secondary: var(--c-muted,  #64748b);
+  --tx-muted:     var(--c-muted2, #94a3b8);
+
+  --bg-surface: var(--c-white, #ffffff);
+  --bg-2:       #fbfcfe;
+  --bg-overlay: #eef2f6;
+  --bg-hover:   #f4f7fa;
+
+  --bd-subtle: var(--c-border, #e6ebf1);
+  --bd-strong: #d5dde6;
+
+  --ac:    var(--c-primary,    #0e7490);
+  --ac-dk: var(--c-primary-dk, #0b5a70);
+  --ac-lt: var(--c-primary-lt, #06b6d4);
+  --ac-lo: var(--c-primary-08, rgba(14,116,144,.08));
+  --ac-gl: rgba(6,182,212,.12);
+
+  --ok:     var(--c-green-text,   #15803d);
+  --ok-dim: var(--c-green-bg,     #f0fdf4);
+  --ok-bd:  var(--c-green-border, #bbf7d0);
+
+  --er:     var(--c-red-text,   #b91c1c);
+  --er-dim: var(--c-red-bg,     #fef2f2);
+  --er-bd:  var(--c-red-border, #fecaca);
+
+  --r-sm: var(--radius-sm, 9px);
+  --r-md: var(--radius-sm, 9px);
+  --r-lg: var(--radius-lg, 22px);
+
+  --font:      var(--font-ui, 'Plus Jakarta Sans', sans-serif);
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gf-root *, .gf-root *::before, .gf-root *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 .gf-page {
-  max-width: 1000px;
+  max-width: 1040px;
   margin: 0 auto;
   padding: 0 0 4rem;
-  font-family: var(--font, system-ui, -apple-system, sans-serif);
+  font-family: var(--font);
+  color: var(--tx-primary);
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 1.5rem;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ── Breadcrumb ── */
 .gf-breadcrumb {
   display: inline-flex; align-items: center; gap: .5rem;
-  font-family: var(--font-mono, monospace);
-  font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
-  color: var(--tx-muted, #6b7280);
+  font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--tx-muted);
 }
-.gf-breadcrumb a { color: var(--tx-muted, #6b7280); text-decoration: none; transition: color .2s; }
-.gf-breadcrumb a:hover { color: var(--tx-primary, #fff); }
-.gf-breadcrumb-sep { opacity: .4; }
-.gf-breadcrumb-current { color: var(--ac, #60a5fa); }
+.gf-breadcrumb a { color: var(--tx-muted); text-decoration: none; transition: color .2s var(--ease); }
+.gf-breadcrumb a:hover { color: var(--ac); }
+.gf-breadcrumb-sep { opacity: .5; }
+.gf-breadcrumb-current { color: var(--ac); }
 
 /* ── Header ── */
 .gf-header {
@@ -38,168 +80,190 @@ $action = $isEdit
 .gf-header-left { display: flex; flex-direction: column; gap: 0.25rem; }
 .gf-eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
-  font-family: var(--font-mono, monospace); font-size: .75rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .08em; color: var(--ac, #60a5fa);
+  font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--ac);
 }
 .gf-eyebrow__dot {
-  width: 6px; height: 6px; border-radius: 50%; background: var(--ac, #60a5fa);
-  box-shadow: 0 0 8px var(--ac, #60a5fa); animation: gf-pulse 2s ease-in-out infinite;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--ac);
+  box-shadow: 0 0 6px var(--ac);
 }
-@keyframes gf-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--ac, #60a5fa); }
-  50%      { opacity: 0.4; transform: scale(0.6); box-shadow: 0 0 2px var(--ac, #60a5fa); }
-}
-.gf-title { font-size: 1.75rem; font-weight: 800; color: var(--tx-primary, #ffffff); letter-spacing: -.03em; line-height: 1.2; margin: 0; }
-.gf-sub { font-size: .875rem; color: var(--tx-muted, #9ca3af); display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-top: .2rem; }
+.gf-title { font-size: 1.5rem; font-weight: 800; color: var(--ac-dk); letter-spacing: -.03em; line-height: 1.2; margin: 0; }
+.gf-sub { font-size: .8rem; color: var(--tx-secondary); display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-top: .25rem; }
 
 /* Status Pill Header */
 .gf-st {
-  display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 99px;
-  font-size: .65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  border: 1px solid; background: rgba(0,0,0,0.2);
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 99px;
+  font-size: .66rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  border: 1px solid;
 }
 .gf-st-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.gf-st--pub { color: var(--ok, #34d399); border-color: rgba(16,185,129,0.2); }
-.gf-st--pub .gf-st-dot { background: var(--ok, #10b981); box-shadow: 0 0 6px var(--ok, #10b981); animation: gf-pulse 2.2s infinite; }
-.gf-st--dft { color: var(--tx-muted, #9ca3af); border-color: rgba(255,255,255,0.1); }
-.gf-st--dft .gf-st-dot { background: var(--tx-muted, #6b7280); }
+.gf-st--pub { color: var(--ok); background: var(--ok-dim); border-color: var(--ok-bd); }
+.gf-st--pub .gf-st-dot { background: var(--ok); box-shadow: 0 0 5px var(--ok); }
+.gf-st--dft { color: var(--tx-muted); background: var(--bg-overlay); border-color: var(--bd-subtle); }
+.gf-st--dft .gf-st-dot { background: var(--tx-muted); }
 
 /* Buttons */
 .bn-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  height: 38px; padding: 0 16px; border-radius: var(--r-md, 8px);
-  font-size: .875rem; font-weight: 600; text-decoration: none; font-family: inherit;
-  border: 1px solid transparent; cursor: pointer; transition: all .2s ease;
+  height: 38px; padding: 0 16px; border-radius: var(--r-md);
+  font-size: .82rem; font-weight: 700; text-decoration: none; font-family: inherit;
+  border: 1.5px solid transparent; cursor: pointer; transition: all .18s var(--ease);
 }
-.bn-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
-.bn-btn--back { background: transparent; color: var(--tx-secondary, #d1d5db); border-color: rgba(255,255,255,0.15); }
-.bn-btn--back:hover { background: rgba(255,255,255,0.05); }
+.bn-btn i { font-size: 15px; }
+.bn-btn--back { background: #fff; color: var(--tx-primary); border-color: var(--bd-subtle); }
+.bn-btn--back:hover { background: var(--bg-hover); border-color: var(--bd-strong); }
 
 /* Flash */
 .gf-flash {
-  display: flex; align-items: center; gap: .75rem; padding: 1rem 1.25rem;
-  border-radius: var(--r-md, 8px); font-size: .875rem; font-weight: 600;
-  border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: flex; align-items: center; gap: .7rem; padding: .8rem 1.1rem;
+  border-radius: var(--r-lg); font-size: .82rem; font-weight: 500;
+  border: 1px solid;
 }
-.gf-flash--success { background: rgba(16,185,129,0.1); color: var(--ok, #34d399); border-color: rgba(16,185,129,0.2); }
-.gf-flash--error   { background: rgba(239,68,68,0.1); color: var(--er, #f87171); border-color: rgba(239,68,68,0.2); }
+.gf-flash i { font-size: 17px; flex-shrink: 0; }
+.gf-flash--success { background: var(--ok-dim); color: var(--ok); border-color: var(--ok-bd); }
+.gf-flash--error   { background: var(--er-dim); color: var(--er); border-color: var(--er-bd); }
 
 /* ── Grid Layout ── */
 .gf-grid {
-  display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem; align-items: start;
+  display: grid; grid-template-columns: 1fr 320px; gap: 1.25rem; align-items: start;
 }
-.gf-col { display: flex; flex-direction: column; gap: 1.5rem; }
-.gf-col--sidebar { position: sticky; top: 1.5rem; }
+.gf-col { display: flex; flex-direction: column; gap: 1.15rem; }
+.gf-col--sidebar { position: sticky; top: 1rem; }
 
 /* ── Panels ── */
 .gf-panel {
-  background: var(--bg-surface, #0f172a);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: var(--r-lg, 12px);
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+  background: var(--bg-surface);
+  border: 1px solid var(--bd-subtle);
+  border-radius: var(--r-lg);
   overflow: hidden;
 }
 .gf-panel-head {
-  padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  font-family: var(--font-mono, monospace); font-size: .65rem; font-weight: 700;
-  color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: .12em;
-  display: flex; align-items: center; gap: 10px;
+  padding: 1rem 1.25rem; border-bottom: 1px solid var(--bd-subtle);
+  font-size: .68rem; font-weight: 700;
+  color: var(--ac); text-transform: uppercase; letter-spacing: .1em;
+  display: flex; align-items: center; gap: 8px;
 }
-.gf-panel-head::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.03); }
-.gf-panel-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+.gf-panel-head::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, var(--ac-lt), transparent); }
+.gf-panel-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.2rem; }
 
 /* ── Forms & Fields ── */
-.gf-field { display: flex; flex-direction: column; gap: .5rem; }
+.gf-field { display: flex; flex-direction: column; gap: .45rem; }
 .gf-field-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-.gf-label { font-size: .875rem; font-weight: 600; color: var(--tx-secondary, #d1d5db); }
-.gf-label-req { color: var(--er, #f87171); margin-left: 2px; }
-.gf-label-opt { font-size: .75rem; font-weight: 400; color: rgba(255,255,255,0.3); font-style: italic; margin-left: 6px; }
-.gf-counter { font-family: var(--font-mono, monospace); font-size: .7rem; color: rgba(255,255,255,0.4); }
+.gf-label { font-size: .81rem; font-weight: 700; color: var(--tx-primary); }
+.gf-label-req { color: var(--er); margin-left: 2px; }
+.gf-label-opt { font-size: .72rem; font-weight: 400; color: var(--tx-muted); margin-left: 6px; }
+.gf-counter { font-family: var(--font-mono); font-size: .68rem; color: var(--tx-muted); }
 
 .gf-input, .gf-textarea {
-  width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15);
-  border-radius: var(--r-sm, 6px); padding: 0 14px; font-family: inherit; font-size: .875rem;
-  color: var(--tx-primary, #fff); transition: all .2s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  width: 100%; background: var(--bg-2); border: 1.5px solid var(--bd-subtle);
+  border-radius: var(--r-sm); padding: 0 14px; font-family: inherit; font-size: .85rem;
+  color: var(--tx-primary); transition: border-color .16s var(--ease), background .16s var(--ease), box-shadow .16s var(--ease);
 }
-.gf-input { height: 40px; }
-.gf-input--title { font-size: 1rem; font-weight: 600; }
-.gf-textarea { padding: 12px 14px; resize: vertical; min-height: 120px; line-height: 1.6; }
+.gf-input { height: 42px; }
+.gf-input--title { font-size: 1rem; font-weight: 700; }
+.gf-textarea { padding: 12px 14px; resize: vertical; min-height: 110px; line-height: 1.65; }
 .gf-input:focus, .gf-textarea:focus {
-  outline: none; border-color: var(--ac, #3b82f6); background: rgba(0,0,0,0.3);
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 0 0 3px rgba(59, 130, 246, 0.25);
+  outline: none; border-color: var(--ac-lt); background: #fff;
+  box-shadow: 0 0 0 3px var(--ac-gl);
 }
-.gf-input::placeholder, .gf-textarea::placeholder { color: rgba(255,255,255,0.3); }
+.gf-input::placeholder, .gf-textarea::placeholder { color: var(--tx-muted); font-size: .8rem; }
 
 /* Hint */
-.gf-hint { font-size: .75rem; color: rgba(255,255,255,0.4); line-height: 1.5; display: flex; align-items: flex-start; gap: 6px; }
-.gf-hint svg { flex-shrink: 0; margin-top: 2px; color: rgba(255,255,255,0.2); }
+.gf-hint { font-size: .74rem; color: var(--tx-muted); line-height: 1.55; display: flex; align-items: flex-start; gap: 6px; }
+.gf-hint i { flex-shrink: 0; margin-top: 1px; font-size: 14px; color: var(--tx-muted); }
 
 /* ── Dropzone Cover ── */
 .gf-drop {
-  border: 2px dashed rgba(255,255,255,0.15); border-radius: var(--r-md, 8px);
-  padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; transition: all .2s ease;
-  background: rgba(0,0,0,0.2); position: relative;
+  border: 1.5px dashed var(--bd-strong); border-radius: var(--r-md);
+  padding: 2rem 1.5rem; text-align: center; cursor: pointer; transition: all .18s var(--ease);
+  background: var(--bg-hover); position: relative;
 }
-.gf-drop:hover, .gf-drop.is-over { border-color: var(--ac, #3b82f6); background: rgba(59,130,246,0.05); }
-.gf-drop-icon { width: 36px; height: 36px; color: rgba(255,255,255,0.3); margin: 0 auto 1rem; display: block; }
-.gf-drop-lbl { font-size: .9rem; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: .4rem; }
-.gf-drop-sub { font-size: .75rem; color: rgba(255,255,255,0.4); }
-.gf-drop-sub b { color: var(--ac, #60a5fa); font-weight: 600; }
+.gf-drop:hover, .gf-drop.is-over { border-color: var(--ac-lt); background: var(--ac-lo); }
+.gf-drop-icon {
+  width: 36px; height: 36px; border-radius: var(--r-sm);
+  background: var(--bg-overlay); color: var(--tx-muted);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1rem;
+}
+.gf-drop-icon i { font-size: 17px; }
+.gf-drop-lbl { font-size: .87rem; font-weight: 700; color: var(--tx-secondary); margin-bottom: .35rem; }
+.gf-drop-sub { font-size: .72rem; color: var(--tx-muted); }
+.gf-drop-sub b { color: var(--ac); font-weight: 700; }
 
 /* ── Thumbnails ── */
-.gf-thumb-wrap { position: relative; border-radius: var(--r-md, 8px); overflow: hidden; aspect-ratio: 16/9; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.gf-thumb-wrap { position: relative; border-radius: var(--r-md); overflow: hidden; aspect-ratio: 16/9; background: var(--bg-2); border: 1px solid var(--bd-subtle); }
 .gf-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.gf-badge { position: absolute; top: 10px; right: 10px; padding: 4px 10px; border-radius: 99px; font-family: var(--font-mono, monospace); font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; backdrop-filter: blur(4px); }
-.gf-badge--cur { background: rgba(0,0,0,0.6); color: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.1); }
-.gf-badge--new { background: rgba(16,185,129,0.8); color: #fff; }
-.gf-btn-clear { position: absolute; bottom: 10px; right: 10px; padding: 6px 12px; background: rgba(0,0,0,0.7); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; font-size: .75rem; font-weight: 600; cursor: pointer; transition: all .2s; backdrop-filter: blur(4px); }
-.gf-btn-clear:hover { background: var(--er, #ef4444); border-color: var(--er, #ef4444); }
+.gf-badge { position: absolute; top: 10px; right: 10px; padding: 3px 10px; border-radius: 99px; font-size: .64rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; backdrop-filter: blur(4px); }
+.gf-badge--cur { background: rgba(15,23,42,.65); color: #fff; }
+.gf-badge--new { background: rgba(21,128,61,.8); color: #fff; }
+.gf-btn-clear {
+  position: absolute; bottom: 10px; right: 10px; padding: 6px 12px;
+  background: rgba(15,23,42,.7); color: #fff; border: none; border-radius: var(--r-sm);
+  font-size: .72rem; font-weight: 700; cursor: pointer; transition: background .18s var(--ease);
+  backdrop-filter: blur(4px); display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font);
+}
+.gf-btn-clear i { font-size: 13px; }
+.gf-btn-clear:hover { background: var(--er); }
 
 /* ── Status Toggle ── */
-.gf-status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
-.gf-radio { display: none; }
+.gf-status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; }
+.gf-radio { position: absolute; opacity: 0; pointer-events: none; }
 .gf-radio-lbl {
-  display: flex; align-items: center; gap: .75rem; padding: 1rem;
-  border: 1px solid rgba(255,255,255,0.1); border-radius: var(--r-md, 8px); cursor: pointer;
-  background: rgba(0,0,0,0.2); transition: all .2s ease;
+  display: flex; align-items: center; gap: .65rem; padding: .9rem;
+  border: 1.5px solid var(--bd-subtle); border-radius: var(--r-md); cursor: pointer;
+  background: var(--bg-2); transition: all .18s var(--ease);
 }
-.gf-radio-lbl:hover { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.2); }
-.gf-radio:checked + .gf-radio-lbl { border-color: var(--ac, #3b82f6); background: rgba(59,130,246,0.1); box-shadow: 0 0 0 1px var(--ac, #3b82f6); }
-.gf-radio-indicator { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; border: 2px solid transparent; }
-.gf-radio-indicator--pub { background: var(--ok, #10b981); box-shadow: 0 0 8px rgba(16,185,129,0.5); }
-.gf-radio-indicator--dft { background: rgba(255,255,255,0.2); }
-.gf-radio:checked + .gf-radio-lbl .gf-radio-indicator--dft { background: var(--tx-muted, #9ca3af); }
-.gf-radio-text h4 { margin: 0 0 4px 0; font-size: .875rem; font-weight: 700; color: var(--tx-primary, #fff); }
-.gf-radio-text p { margin: 0; font-size: .7rem; color: rgba(255,255,255,0.5); }
+.gf-radio-lbl:hover { border-color: var(--bd-strong); background: var(--bg-hover); }
+.gf-radio:checked + .gf-radio-lbl { border-color: var(--ac-lt); background: var(--ac-lo); box-shadow: 0 0 0 1px var(--ac-lt); }
+.gf-radio-indicator { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+.gf-radio-indicator--pub { background: var(--ok); box-shadow: 0 0 0 3px var(--ok-dim); }
+.gf-radio-indicator--dft { background: var(--tx-muted); box-shadow: 0 0 0 3px var(--bg-overlay); }
+.gf-radio-text h4 { margin: 0 0 3px 0; font-size: .81rem; font-weight: 700; color: var(--tx-primary); }
+.gf-radio-text p { margin: 0; font-size: .68rem; color: var(--tx-muted); }
 
 /* ── Actions Sidebar ── */
 .gf-btn-submit {
   width: 100%; display: flex; align-items: center; justify-content: center; gap: .5rem;
-  padding: 12px 18px; background: var(--ac, #3b82f6); color: #fff;
-  border: 1px solid rgba(255,255,255,0.1); border-radius: var(--r-md, 8px);
-  font-size: .9rem; font-weight: 700; cursor: pointer; transition: all .2s ease;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); font-family: inherit;
+  padding: 12px 18px; background: var(--ac); color: #fff;
+  border: none; border-radius: var(--r-sm);
+  font-size: .85rem; font-weight: 800; cursor: pointer; transition: all .18s var(--ease);
+  box-shadow: 0 8px 22px rgba(14,116,144,.25); font-family: inherit;
 }
-.gf-btn-submit:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4); }
-.gf-btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+.gf-btn-submit i { font-size: 16px; }
+.gf-btn-submit:hover { background: var(--ac-lt); transform: translateY(-2px); box-shadow: 0 12px 28px rgba(6,182,212,.3); }
+.gf-btn-submit:active { transform: translateY(0); }
+.gf-btn-submit:disabled { opacity: .65; cursor: not-allowed; transform: none; }
 
 .gf-btn-secondary {
   width: 100%; display: flex; align-items: center; justify-content: center; gap: .5rem;
-  padding: 10px 14px; background: transparent; border: 1px solid rgba(255,255,255,0.15);
-  border-radius: var(--r-md, 8px); font-size: .875rem; font-weight: 600; color: var(--tx-secondary, #d1d5db);
-  text-decoration: none; transition: all .2s; cursor: pointer; font-family: inherit;
+  padding: 10px 14px; background: #fff; border: 1.5px solid var(--bd-subtle);
+  border-radius: var(--r-sm); font-size: .82rem; font-weight: 700; color: var(--tx-primary);
+  text-decoration: none; transition: all .18s var(--ease); cursor: pointer; font-family: inherit;
 }
-.gf-btn-secondary:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.25); color: #fff; }
-.gf-btn-view { color: var(--ac-bright, #93c5fd); border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.05); }
-.gf-btn-view:hover { background: rgba(59,130,246,0.15); border-color: var(--ac, #60a5fa); color: #fff; }
+.gf-btn-secondary i { font-size: 15px; }
+.gf-btn-secondary:hover { background: var(--bg-hover); border-color: var(--bd-strong); }
+.gf-btn-view { color: var(--ac-dk); border-color: rgba(14,116,144,.25); background: var(--ac-lo); }
+.gf-btn-view:hover { background: rgba(14,116,144,.14); border-color: var(--ac); }
 
 /* ── Info Table Sidebar ── */
 .gf-info-list { display: flex; flex-direction: column; gap: 0; }
-.gf-info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.gf-info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--bd-subtle); }
 .gf-info-row:last-child { border-bottom: none; padding-bottom: 0; }
 .gf-info-row:first-child { padding-top: 0; }
-.gf-info-lbl { font-size: .75rem; color: rgba(255,255,255,0.4); }
-.gf-info-val { font-family: var(--font-mono, monospace); font-size: .8rem; font-weight: 600; color: rgba(255,255,255,0.8); }
+.gf-info-lbl { font-size: .74rem; color: var(--tx-muted); }
+.gf-info-val { font-family: var(--font-mono); font-size: .78rem; font-weight: 700; color: var(--tx-primary); }
+
+/* ── Tip card ── */
+.gf-tip {
+  background: var(--ac-lo);
+  border: 1px solid rgba(14,116,144,.25);
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 1rem 1.1rem;
+}
+.gf-tip i { color: var(--ac); flex-shrink: 0; margin-top: 1px; font-size: 16px; }
+.gf-tip span { font-size: .76rem; line-height: 1.55; color: var(--tx-secondary); }
+.gf-tip strong { color: var(--tx-primary); font-weight: 700; }
 
 @media (max-width: 880px) {
   .gf-grid { grid-template-columns: 1fr; }
@@ -210,6 +274,7 @@ $action = $isEdit
 }
 </style>
 
+<div class="gf-root">
 <div class="gf-page">
 
   <nav class="gf-breadcrumb" aria-label="breadcrumb">
@@ -241,18 +306,14 @@ $action = $isEdit
       </div>
     </div>
     <a href="<?= BASE_URL ?>/admin/galeri" class="bn-btn bn-btn--back">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <i class="ti ti-arrow-left" aria-hidden="true"></i>
       Kembali
     </a>
   </div>
 
   <?php if (!empty($flash)): ?>
   <div class="gf-flash gf-flash--<?= htmlspecialchars($flash['type']) ?>">
-    <?php if ($flash['type'] === 'success'): ?>
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-    <?php else: ?>
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-    <?php endif; ?>
+    <i class="ti <?= $flash['type'] === 'success' ? 'ti-circle-check' : 'ti-alert-circle' ?>" aria-hidden="true"></i>
     <span><?= htmlspecialchars($flash['msg']) ?></span>
   </div>
   <?php endif; ?>
@@ -265,16 +326,16 @@ $action = $isEdit
       <div class="gf-col">
 
         <div class="gf-panel">
-          <div class="gf-panel-head">Informasi Dasar</div>
+          <div class="gf-panel-head"><i class="ti ti-info-square-rounded" aria-hidden="true"></i> Informasi Dasar</div>
           <div class="gf-panel-body">
-            
+
             <div class="gf-field">
               <div class="gf-field-head">
                 <label class="gf-label" for="gf-judul">Nama Album <span class="gf-label-req">*</span></label>
                 <span class="gf-counter" id="gf-jc"><?= strlen($album['judul'] ?? '') ?>/160</span>
               </div>
-              <input type="text" id="gf-judul" name="judul" class="gf-input gf-input--title" 
-                     value="<?= htmlspecialchars($album['judul'] ?? '') ?>" 
+              <input type="text" id="gf-judul" name="judul" class="gf-input gf-input--title"
+                     value="<?= htmlspecialchars($album['judul'] ?? '') ?>"
                      placeholder="cth. Dokumentasi Kegiatan 2025" required maxlength="160" autocomplete="off" oninput="gfCount(this,'gf-jc',160)">
             </div>
 
@@ -283,11 +344,11 @@ $action = $isEdit
                 <label class="gf-label" for="gf-desk">Keterangan <span class="gf-label-opt">(opsional)</span></label>
                 <span class="gf-counter" id="gf-dc"><?= strlen($album['deskripsi'] ?? '') ?>/500</span>
               </div>
-              <textarea id="gf-desk" name="deskripsi" class="gf-textarea" rows="4" maxlength="500" 
+              <textarea id="gf-desk" name="deskripsi" class="gf-textarea" rows="4" maxlength="500"
                         placeholder="Keterangan singkat tentang album ini..." oninput="gfCount(this,'gf-dc',500)"><?= htmlspecialchars($album['deskripsi'] ?? '') ?></textarea>
               <div class="gf-hint">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <span>Ditampilkan di halaman galeri publik sebagai deksripsi album.</span>
+                <i class="ti ti-info-circle" aria-hidden="true"></i>
+                <span>Ditampilkan di halaman galeri publik sebagai deskripsi album.</span>
               </div>
             </div>
 
@@ -295,9 +356,9 @@ $action = $isEdit
         </div>
 
         <div class="gf-panel">
-          <div class="gf-panel-head">Foto Cover</div>
+          <div class="gf-panel-head"><i class="ti ti-photo" aria-hidden="true"></i> Foto Cover</div>
           <div class="gf-panel-body">
-            
+
             <?php if (!empty($album['cover'])): ?>
               <div class="gf-field" style="margin-bottom: 1rem;">
                 <label class="gf-label">Cover Saat Ini</label>
@@ -309,13 +370,13 @@ $action = $isEdit
               <label class="gf-label">Ganti Cover <span class="gf-label-opt">(opsional)</span></label>
             <?php endif; ?>
 
-            <div class="gf-drop" id="gf-drop" 
-                 onclick="document.getElementById('gf-cover-file').click()" 
-                 ondragover="event.preventDefault(); this.classList.add('is-over');" 
-                 ondragleave="this.classList.remove('is-over');" 
+            <div class="gf-drop" id="gf-drop"
+                 onclick="document.getElementById('gf-cover-file').click()"
+                 ondragover="event.preventDefault(); this.classList.add('is-over');"
+                 ondragleave="this.classList.remove('is-over');"
                  ondrop="handleDrop(event)">
               <input type="file" name="cover" id="gf-cover-file" accept="image/jpeg,image/png,image/webp" style="display:none;" aria-label="Upload foto cover">
-              <svg class="gf-drop-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              <div class="gf-drop-icon"><i class="ti ti-cloud-upload" aria-hidden="true"></i></div>
               <div class="gf-drop-lbl" id="gf-drop-label">Klik atau seret foto ke sini</div>
               <div class="gf-drop-sub">Format JPG, PNG, WebP &mdash; Maks. <b>2 MB</b></div>
             </div>
@@ -324,12 +385,14 @@ $action = $isEdit
               <div class="gf-thumb-wrap">
                 <img id="gf-thumb-img" src="" alt="Preview cover baru">
                 <span class="gf-badge gf-badge--new">Preview Baru</span>
-                <button type="button" class="gf-btn-clear" onclick="gfClearCover()">× Hapus</button>
+                <button type="button" class="gf-btn-clear" onclick="gfClearCover()">
+                  <i class="ti ti-x" aria-hidden="true"></i> Hapus
+                </button>
               </div>
             </div>
 
             <div class="gf-hint">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <i class="ti ti-info-circle" aria-hidden="true"></i>
               <span>Jika dikosongkan, sistem akan otomatis menggunakan foto pertama yang diupload ke dalam album ini.</span>
             </div>
 
@@ -339,14 +402,14 @@ $action = $isEdit
       </div><div class="gf-col gf-col--sidebar">
 
         <div class="gf-panel">
-          <div class="gf-panel-head">Pengaturan & Publikasi</div>
+          <div class="gf-panel-head"><i class="ti ti-send" aria-hidden="true"></i> Pengaturan &amp; Publikasi</div>
           <div class="gf-panel-body">
 
             <div class="gf-field">
               <label class="gf-label">Status Penayangan</label>
               <?php $curStatus = $album['status'] ?? 'published'; ?>
               <div class="gf-status-grid">
-                
+
                 <input type="radio" name="status" id="st-pub" value="published" class="gf-radio" <?= $curStatus === 'published' ? 'checked' : '' ?>>
                 <label for="st-pub" class="gf-radio-lbl">
                   <span class="gf-radio-indicator gf-radio-indicator--pub"></span>
@@ -374,21 +437,16 @@ $action = $isEdit
               <div class="gf-hint" style="margin-top:2px;">Angka terkecil (0) akan tampil paling atas/awal.</div>
             </div>
 
-            <div style="height:1px; background:rgba(255,255,255,0.05); margin: .5rem 0;"></div>
+            <div style="height:1px; background:var(--bd-subtle); margin: .5rem 0;"></div>
 
             <button type="submit" class="gf-btn-submit" id="gf-submit-btn">
-              <?php if ($isEdit): ?>
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                Simpan Perubahan
-              <?php else: ?>
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Buat Album Baru
-              <?php endif; ?>
+              <i class="ti <?= $isEdit ? 'ti-device-floppy' : 'ti-plus' ?>" aria-hidden="true"></i>
+              <?= $isEdit ? 'Simpan Perubahan' : 'Buat Album Baru' ?>
             </button>
 
             <?php if ($isEdit): ?>
               <a href="<?= BASE_URL ?>/galeri/<?= htmlspecialchars($album['slug'] ?? '') ?>" target="_blank" rel="noopener" class="gf-btn-secondary gf-btn-view">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <i class="ti ti-eye" aria-hidden="true"></i>
                 Lihat di Publik
               </a>
             <?php endif; ?>
@@ -398,7 +456,7 @@ $action = $isEdit
 
         <?php if ($isEdit): ?>
         <div class="gf-panel">
-          <div class="gf-panel-head">Informasi Metadata</div>
+          <div class="gf-panel-head"><i class="ti ti-info-circle" aria-hidden="true"></i> Informasi Metadata</div>
           <div class="gf-panel-body" style="padding-top:1rem; padding-bottom:1rem;">
             <div class="gf-info-list">
               <?php foreach ([
@@ -416,9 +474,18 @@ $action = $isEdit
         </div>
         <?php endif; ?>
 
+        <!-- Tip -->
+        <div class="gf-panel gf-tip">
+          <i class="ti ti-bulb" aria-hidden="true"></i>
+          <span><strong>Tips:</strong> gunakan foto cover berorientasi landscape (16:9) agar tampil rapi di thumbnail galeri publik.</span>
+        </div>
+
       </div></div></form>
 
-</div><script>
+</div>
+</div>
+
+<script>
 (function () {
   'use strict';
 
@@ -428,7 +495,7 @@ $action = $isEdit
     if (!counter) return;
     var n = el.value.length;
     counter.textContent = n + '/' + max;
-    counter.style.color = n > max * 0.9 ? 'var(--er, #f87171)' : 'inherit';
+    counter.style.color = n > max * 0.9 ? 'var(--er)' : '';
   };
 
   /* ─ Elements ─ */
@@ -481,13 +548,13 @@ $action = $isEdit
   if (form && submitBtn) {
     form.addEventListener('submit', function () {
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Menyimpan...';
+      submitBtn.innerHTML = '<i class="ti ti-loader-2" style="animation:gf-spin 0.8s linear infinite" aria-hidden="true"></i> Menyimpan...';
     });
   }
 
   /* ─ Spinner Animation CSS ─ */
   var style = document.createElement('style');
-  style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+  style.textContent = '@keyframes gf-spin { to { transform: rotate(360deg); } }';
   document.head.appendChild(style);
 })();
 </script>
