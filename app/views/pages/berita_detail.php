@@ -430,6 +430,81 @@ textarea.f-field { resize: vertical; min-height: 100px; }
 .rel-link:hover, .rel-link:focus-visible { color: var(--c-sky); }
 .rel-date { font-family: var(--font-mono); font-size: .57rem; color: var(--c-muted); margin-top: 4px; }
 
+/* ── Sidebar: Info Artikel (stats) — always rendered so sidebar is never empty ── */
+.stat-list { display: flex; flex-direction: column; }
+.stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .6rem .2rem;
+  border-bottom: 1px solid var(--c-border);
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .74rem;
+  color: var(--c-muted);
+}
+.stat-label svg { opacity: .6; flex-shrink: 0; }
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: .76rem;
+  font-weight: 700;
+  color: var(--c-text);
+  white-space: nowrap;
+}
+.stat-value.is-liked { color: #f87171; }
+
+/* ── Sidebar: fallback CTA when there is no related news ── */
+.sb-cta {
+  padding: 1.4rem 1.1rem;
+  text-align: center;
+}
+.sb-cta p {
+  font-size: .78rem;
+  color: var(--c-muted);
+  line-height: 1.6;
+  margin: 0 0 .9rem;
+}
+.sb-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 7px;
+  background: var(--c-sky);
+  color: #fff;
+  font-size: .78rem;
+  font-weight: 700;
+  text-decoration: none;
+  font-family: var(--font-body);
+  transition: background .18s, transform .15s;
+}
+.sb-cta-btn:hover { background: var(--c-sky-light); transform: translateY(-1px); }
+
+/* ── Sidebar: kategori quick links ── */
+.sb-cat-list { display: flex; flex-wrap: wrap; gap: .5rem; padding: .2rem; }
+.sb-cat-chip {
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  font-weight: 600;
+  color: var(--c-muted2);
+  background: var(--c-surface3);
+  border: 1px solid var(--c-border);
+  border-radius: 99px;
+  padding: 5px 12px;
+  text-decoration: none;
+  transition: color .18s, border-color .18s, background .18s;
+}
+.sb-cat-chip:hover, .sb-cat-chip:focus-visible {
+  color: var(--c-sky);
+  border-color: rgba(14,165,233,.4);
+  background: rgba(14,165,233,.08);
+}
+
 /* ── Responsive (mobile-first overrides, satu breakpoint utama) ── */
 @media (max-width: 960px) {
   .bd-grid { grid-template-columns: 1fr; }
@@ -649,6 +724,54 @@ textarea.f-field { resize: vertical; min-height: 100px; }
          ═══════════════════════════════════ -->
     <aside class="bd-sidebar" aria-label="Sidebar">
 
+      <!-- Info Artikel: selalu tampil agar sidebar tidak pernah kosong -->
+      <div class="sb-block">
+        <div class="sb-head">
+          <div class="sb-head-label">Info Artikel</div>
+        </div>
+        <div class="sb-body">
+          <div class="stat-list">
+            <div class="stat-row">
+              <span class="stat-label">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Dipublikasikan
+              </span>
+              <span class="stat-value"><?= $berita['published_at'] ? date('d M Y', strtotime($berita['published_at'])) : '-' ?></span>
+            </div>
+            <?php if ($berita['penulis_nama']): ?>
+            <div class="stat-row">
+              <span class="stat-label">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Penulis
+              </span>
+              <span class="stat-value"><?= htmlspecialchars($berita['penulis_nama']) ?></span>
+            </div>
+            <?php endif; ?>
+            <div class="stat-row">
+              <span class="stat-label">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Dilihat
+              </span>
+              <span class="stat-value"><?= number_format($berita['views']) ?> kali</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">
+                <svg width="13" height="13" fill="<?= $isLiked ? 'currentColor' : 'none' ?>" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                Disukai
+              </span>
+              <span class="stat-value <?= $isLiked ? 'is-liked' : '' ?>"><?= number_format($totalLikes) ?> orang</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Komentar
+              </span>
+              <span class="stat-value"><?= count($komentar) ?> komentar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <?php if (!empty($related)): ?>
       <div class="sb-block">
         <div class="sb-head">
@@ -679,6 +802,19 @@ textarea.f-field { resize: vertical; min-height: 100px; }
             </div>
           </div>
           <?php endforeach; ?>
+        </div>
+      </div>
+      <?php else: ?>
+      <div class="sb-block">
+        <div class="sb-head">
+          <div class="sb-head-label">Jelajahi Lainnya</div>
+        </div>
+        <div class="sb-cta">
+          <p>Belum ada berita terkait untuk topik ini. Lihat berita lain dari Com SMKN 2 Pinrang.</p>
+          <a href="<?= BASE_URL ?>/berita" class="sb-cta-btn">
+            Lihat Semua Berita
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
         </div>
       </div>
       <?php endif; ?>
