@@ -1,61 +1,61 @@
 <?php // app/views/admin/dashboard.php ?>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700;800&display=swap');
-
 /* ═══════════════════════════════════════
-   ROOT & RESET
+   SCOPE ROOT — alias ke Design System
+   (token asli didefinisikan global di layout;
+    fallback disertakan bila file ini dirender berdiri sendiri)
 ═══════════════════════════════════════ */
-:root {
-  --font-ui:   'Sora', sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
+.dash-root {
+  /* Text */
+  --tx-primary:   var(--c-ink,    #0f172a);
+  --tx-secondary: var(--c-muted,  #64748b);
+  --tx-muted:     var(--c-muted2, #94a3b8);
 
   /* Surface */
-  --bg-base:     #0a0c10;
-  --bg-surface:  #0f1117;
-  --bg-elevated: #141820;
-  --bg-overlay:  #1a1f2e;
-  --bg-active:   #1e2436;
+  --bg-surface:  var(--c-white, #ffffff);
+  --bg-elevated: #f8fafc;
+  --bg-overlay:  #eef2f6;
+  --bg-active:   var(--c-primary-08, rgba(14,116,144,.08));
 
   /* Border */
-  --bd-subtle:  rgba(255,255,255,0.055);
-  --bd-default: rgba(255,255,255,0.10);
-  --bd-accent:  rgba(99,179,237,0.35);
+  --bd-subtle:  var(--c-border, #e6ebf1);
+  --bd-default: var(--c-border, #e6ebf1);
+  --bd-accent:  var(--c-primary-25, rgba(14,116,144,.25));
 
-  /* Text */
-  --tx-primary:   #e8ecf4;
-  --tx-secondary: #9aa3b8;
-  --tx-muted:     #4f5773;
+  /* Accent (satu-satunya warna aksen dekoratif) */
+  --ac:      var(--c-primary,    #0e7490);
+  --ac-dim:  var(--c-primary-08, rgba(14,116,144,.08));
+  --ac-glow: var(--c-primary-12, rgba(14,116,144,.12));
 
-  /* Accent */
-  --ac:        #63b3ed;
-  --ac-dim:    rgba(99,179,237,0.10);
-  --ac-glow:   rgba(99,179,237,0.15);
-
-  /* Brand colors */
-  --blue:   #4f9eff;
-  --blue-d: rgba(79,158,255,0.12);
-  --amber:  #f6c244;
-  --amber-d:rgba(246,194,68,0.12);
-  --purple: #b794f4;
-  --purple-d:rgba(183,148,244,0.12);
-  --green:  #48bb78;
-  --green-d:rgba(72,187,120,0.12);
-  --red:    #fc8181;
-  --red-d:  rgba(252,129,129,0.12);
+  /* Kategori KPI/feed — tetap dalam keluarga primary + warna status */
+  --blue:    var(--c-primary,    #0e7490);
+  --blue-d:  var(--c-primary-08, rgba(14,116,144,.08));
+  --amber:   var(--c-amber-icon, #d9910c);
+  --amber-d: var(--c-amber-bg,   #fef6e2);
+  --purple:  var(--c-primary-dk, #0b5a70);
+  --purple-d:var(--c-primary-08, rgba(14,116,144,.08));
+  --green:   var(--c-green-text, #15803d);
+  --green-d: var(--c-green-bg,   #f0fdf4);
+  --red:     var(--c-red-text,   #b91c1c);
+  --red-d:   var(--c-red-bg,     #fef2f2);
 
   /* Radius */
-  --r-xs: 4px;
-  --r-sm: 6px;
-  --r-md: 10px;
-  --r-lg: 14px;
-  --r-xl: 20px;
+  --r-xs: 6px;
+  --r-sm: var(--radius-sm, 9px);
+  --r-md: var(--radius-sm, 9px);
+  --r-lg: var(--radius-md, 13px);
+  --r-xl: var(--radius-lg, 22px);
+
+  /* Font — satu keluarga font di seluruh sistem */
+  --font-ui:   var(--ff, 'Plus Jakarta Sans', sans-serif);
+  --font-mono: var(--ff, 'Plus Jakarta Sans', sans-serif);
 
   /* Motion */
-  --ease:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease:  cubic-bezier(0.22, 1, 0.36, 1);
   --t-fast: 120ms;
-  --t-base: 200ms;
-  --t-slow: 350ms;
+  --t-base: 160ms;
+  --t-slow: 300ms;
 }
 
 /* Base reset for dashboard scope */
@@ -64,7 +64,7 @@
 .dash-root {
   font-family: var(--font-ui);
   color: var(--tx-primary);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -77,7 +77,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
   flex-wrap: wrap;
 }
 
@@ -86,11 +86,10 @@
 .dh__eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ac);
   margin-bottom: 8px;
@@ -110,17 +109,17 @@
 .dh__title {
   font-size: 26px;
   font-weight: 800;
-  letter-spacing: -0.04em;
-  color: var(--tx-primary);
+  letter-spacing: -0.03em;
+  color: var(--c-primary-dk, #0b5a70);
   line-height: 1.1;
 }
 .dh__sub {
   font-size: 13px;
-  color: var(--tx-muted);
+  color: var(--tx-secondary);
   margin-top: 6px;
   font-weight: 400;
 }
-.dh__sub strong { color: var(--tx-secondary); font-weight: 600; }
+.dh__sub strong { color: var(--tx-primary); font-weight: 700; }
 
 .dh__right {
   display: flex;
@@ -133,27 +132,26 @@
 .dh__clock {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 7px 12px;
-  background: var(--bg-elevated);
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
   border-radius: var(--r-md);
 }
 .dh__clock-time {
-  font-family: var(--font-mono);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--tx-primary);
-  letter-spacing: 0.04em;
-  min-width: 44px;
+  letter-spacing: 0.02em;
+  min-width: 50px;
+  font-variant-numeric: tabular-nums;
 }
 .dh__clock-date {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--tx-muted);
-  letter-spacing: 0.02em;
+  font-weight: 500;
   border-left: 1px solid var(--bd-subtle);
-  padding-left: 8px;
+  padding-left: 9px;
 }
 
 /* ═══════════════════════════════════════
@@ -166,10 +164,9 @@
   margin-bottom: 14px;
 }
 .sec-label__text {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--tx-muted);
   white-space: nowrap;
@@ -180,10 +177,10 @@
   background: linear-gradient(to right, var(--bd-subtle), transparent);
 }
 .sec-label__num {
-  font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   color: var(--tx-muted);
-  opacity: .5;
+  opacity: .6;
+  font-weight: 600;
 }
 
 /* ═══════════════════════════════════════
@@ -191,9 +188,9 @@
 ═══════════════════════════════════════ */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
 }
 
 .kpi {
@@ -201,7 +198,7 @@
   padding: 18px 18px 14px;
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-xl);
   overflow: hidden;
   cursor: default;
   transition:
@@ -211,7 +208,7 @@
 }
 .kpi:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+  box-shadow: 0 16px 36px -14px rgba(15,23,42,.18), 0 4px 14px rgba(15,23,42,.05);
 }
 
 /* Accent bar top */
@@ -219,8 +216,8 @@
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 2px;
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  height: 3px;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
 }
 
 /* Ambient glow */
@@ -237,25 +234,25 @@
 .kpi:hover::after { opacity: 1; }
 
 /* Color variants */
-.kpi--blue  { border-color: rgba(79,158,255,0.18); }
-.kpi--amber { border-color: rgba(246,194,68,0.18); }
-.kpi--purple{ border-color: rgba(183,148,244,0.18); }
-.kpi--green { border-color: rgba(72,187,120,0.18); }
+.kpi--blue  { border-color: rgba(14,116,144,0.20); }
+.kpi--amber { border-color: rgba(217,145,12,0.20); }
+.kpi--purple{ border-color: rgba(11,90,112,0.20); }
+.kpi--green { border-color: rgba(21,128,61,0.20); }
 
 .kpi--blue::before   { background: var(--blue); }
 .kpi--amber::before  { background: var(--amber); }
 .kpi--purple::before { background: var(--purple); }
 .kpi--green::before  { background: var(--green); }
 
-.kpi--blue::after   { background: radial-gradient(circle, rgba(79,158,255,0.08), transparent 70%); }
-.kpi--amber::after  { background: radial-gradient(circle, rgba(246,194,68,0.08), transparent 70%); }
-.kpi--purple::after { background: radial-gradient(circle, rgba(183,148,244,0.08), transparent 70%); }
-.kpi--green::after  { background: radial-gradient(circle, rgba(72,187,120,0.08), transparent 70%); }
+.kpi--blue::after   { background: radial-gradient(circle, rgba(14,116,144,.10), transparent 70%); }
+.kpi--amber::after  { background: radial-gradient(circle, rgba(217,145,12,.10), transparent 70%); }
+.kpi--purple::after { background: radial-gradient(circle, rgba(11,90,112,.10), transparent 70%); }
+.kpi--green::after  { background: radial-gradient(circle, rgba(21,128,61,.10), transparent 70%); }
 
-.kpi:hover.kpi--blue   { border-color: rgba(79,158,255,0.35); }
-.kpi:hover.kpi--amber  { border-color: rgba(246,194,68,0.35); }
-.kpi:hover.kpi--purple { border-color: rgba(183,148,244,0.35); }
-.kpi:hover.kpi--green  { border-color: rgba(72,187,120,0.35); }
+.kpi:hover.kpi--blue   { border-color: rgba(14,116,144,0.4); }
+.kpi:hover.kpi--amber  { border-color: rgba(217,145,12,0.4); }
+.kpi:hover.kpi--purple { border-color: rgba(11,90,112,0.4); }
+.kpi:hover.kpi--green  { border-color: rgba(21,128,61,0.4); }
 
 .kpi__row {
   display: flex;
@@ -265,32 +262,30 @@
 }
 .kpi__label {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--tx-muted);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 .kpi__icon {
-  width: 32px; height: 32px;
+  width: 34px; height: 34px;
   border-radius: var(--r-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-.kpi__icon svg { width: 15px; height: 15px; }
+.kpi__icon i { font-size: 16px; }
 
-.kpi--blue  .kpi__icon { background: var(--blue-d);   color: var(--blue); }
-.kpi--amber .kpi__icon { background: var(--amber-d);  color: var(--amber); }
-.kpi--purple.kpi__icon { background: var(--purple-d); color: var(--purple); }
-.kpi--green .kpi__icon { background: var(--green-d);  color: var(--green); }
-/* repeated explicitly for specificity */
+.kpi--blue   .kpi__icon { background: var(--blue-d);   color: var(--blue); }
+.kpi--amber  .kpi__icon { background: var(--amber-d);  color: var(--amber); }
 .kpi--purple .kpi__icon { background: var(--purple-d); color: var(--purple); }
+.kpi--green  .kpi__icon { background: var(--green-d);  color: var(--green); }
 
 .kpi__val {
   font-size: 32px;
   font-weight: 800;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.03em;
   color: var(--tx-primary);
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -308,21 +303,20 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 8px;
   border-radius: var(--r-xs);
 }
-.kpi__badge svg { width: 9px; height: 9px; }
-.kpi__badge--up   { background: rgba(72,187,120,0.12); color: var(--green); }
-.kpi__badge--flat { background: rgba(255,255,255,0.05); color: var(--tx-muted); }
+.kpi__badge i { font-size: 11px; }
+.kpi__badge--up   { background: var(--green-d); color: var(--green); }
+.kpi__badge--flat { background: var(--bg-overlay); color: var(--tx-muted); }
 .kpi__badge--warn { background: var(--amber-d); color: var(--amber); }
 
 .kpi__sublabel {
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--tx-muted);
-  font-family: var(--font-mono);
+  font-weight: 500;
 }
 
 /* ═══════════════════════════════════════
@@ -330,9 +324,9 @@
 ═══════════════════════════════════════ */
 .main-grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 12px;
-  margin-bottom: 12px;
+  grid-template-columns: 1fr 350px;
+  gap: 14px;
+  margin-bottom: 14px;
 }
 @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
 
@@ -342,43 +336,42 @@
 .panel {
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-xl);
   overflow: hidden;
 }
 .panel__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 18px;
+  padding: 15px 20px;
   border-bottom: 1px solid var(--bd-subtle);
   gap: 8px;
 }
 .panel__title {
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 800;
   color: var(--tx-primary);
   letter-spacing: -0.01em;
 }
 .panel__title-sub {
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--tx-muted);
   font-weight: 400;
   margin-left: 8px;
 }
 .panel__action {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   color: var(--ac);
-  padding: 4px 8px;
+  padding: 5px 10px;
   border: 1px solid var(--bd-accent);
   border-radius: var(--r-xs);
   transition: background var(--t-fast) var(--ease);
   white-space: nowrap;
 }
 .panel__action:hover { background: var(--ac-dim); }
-.panel__body { padding: 16px 18px; }
+.panel__body { padding: 18px 20px; }
 
 /* ═══════════════════════════════════════
    QUICK ACCESS
@@ -386,7 +379,7 @@
 .qa-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 10px;
 }
 @media (max-width: 640px) { .qa-grid { grid-template-columns: repeat(2, 1fr); } }
 
@@ -394,8 +387,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 14px;
-  border-radius: var(--r-md);
+  padding: 15px;
+  border-radius: var(--r-lg);
   background: var(--bg-elevated);
   border: 1px solid var(--bd-subtle);
   position: relative;
@@ -410,21 +403,11 @@
   border-color: var(--bd-accent);
   background: var(--bg-active);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,.30);
+  box-shadow: 0 10px 24px rgba(15,23,42,.09);
 }
-.qa-item::before {
-  content: '';
-  position: absolute;
-  bottom: -1px; right: -1px;
-  width: 40px; height: 40px;
-  border-radius: var(--r-md) 0;
-  background: var(--bd-subtle);
-  transition: background var(--t-base) var(--ease);
-}
-.qa-item:hover::before { background: var(--bd-accent); }
 
 .qa-item__icon {
-  width: 34px; height: 34px;
+  width: 36px; height: 36px;
   border-radius: var(--r-sm);
   display: flex;
   align-items: center;
@@ -434,17 +417,17 @@
   flex-shrink: 0;
   transition: color var(--t-base) var(--ease), background var(--t-base) var(--ease);
 }
-.qa-item__icon svg { width: 15px; height: 15px; }
+.qa-item__icon i { font-size: 16px; }
 .qa-item:hover .qa-item__icon { background: var(--ac-glow); color: var(--ac); }
 
 .qa-item__title {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--tx-primary);
   line-height: 1.2;
 }
 .qa-item__desc {
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--tx-muted);
   line-height: 1.4;
 }
@@ -458,7 +441,6 @@
   position: relative;
 }
 
-/* vertical timeline line */
 .feed::before {
   content: '';
   position: absolute;
@@ -495,27 +477,26 @@
   flex-shrink: 0;
 }
 
-.feed__dot--blue   { color: var(--blue);   background: rgba(79,158,255,.25); }
-.feed__dot--green  { color: var(--green);  background: rgba(72,187,120,.25); }
-.feed__dot--amber  { color: var(--amber);  background: rgba(246,194,68,.25); }
-.feed__dot--purple { color: var(--purple); background: rgba(183,148,244,.25); }
-.feed__dot--red    { color: var(--red);    background: rgba(252,129,129,.25); }
+.feed__dot--blue   { color: var(--blue);   background: rgba(14,116,144,.18); }
+.feed__dot--green  { color: var(--green);  background: rgba(21,128,61,.18); }
+.feed__dot--amber  { color: var(--amber);  background: rgba(217,145,12,.18); }
+.feed__dot--purple { color: var(--purple); background: rgba(11,90,112,.18); }
+.feed__dot--red    { color: var(--red);    background: rgba(185,28,28,.18); }
 
 .feed__body { flex: 1; min-width: 0; }
 .feed__action {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--tx-secondary);
   line-height: 1.5;
 }
-.feed__action strong { color: var(--tx-primary); font-weight: 600; }
+.feed__action strong { color: var(--tx-primary); font-weight: 700; }
 .feed__action em {
   font-style: normal;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--ac);
   background: var(--ac-dim);
-  padding: 1px 5px;
-  border-radius: 3px;
+  padding: 1px 6px;
+  border-radius: var(--r-xs);
 }
 .feed__meta {
   display: flex;
@@ -524,16 +505,16 @@
   margin-top: 3px;
 }
 .feed__time {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--tx-muted);
+  font-weight: 500;
 }
 .feed__type {
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 1px 6px;
+  padding: 1px 7px;
   border-radius: var(--r-xs);
 }
 .feed__type--pab     { background: var(--blue-d);   color: var(--blue); }
@@ -546,13 +527,14 @@
   text-align: center;
   padding: 40px 20px;
   color: var(--tx-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
-.feed__empty svg {
-  width: 32px; height: 32px;
+.feed__empty i {
+  font-size: 30px;
   color: var(--tx-muted);
-  opacity: .4;
+  opacity: .5;
   margin-bottom: 10px;
+  display: block;
 }
 
 /* ═══════════════════════════════════════
@@ -569,26 +551,26 @@
 }
 .sysinfo-row:last-child { border-bottom: none; }
 .sysinfo__key {
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--tx-muted);
   flex-shrink: 0;
+  font-weight: 500;
 }
 .sysinfo__val {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: var(--tx-secondary);
   text-align: right;
+  font-weight: 600;
 }
 
 .sys-badge {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  padding: 3px 8px;
+  letter-spacing: 0.02em;
+  padding: 3px 9px;
   border-radius: var(--r-xs);
 }
 .sys-badge__led {
@@ -608,10 +590,9 @@
   border-top: 1px solid var(--bd-subtle);
 }
 .usage-title {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--tx-muted);
   margin-bottom: 12px;
@@ -624,14 +605,14 @@
   align-items: center;
   margin-bottom: 5px;
 }
-.pbar-label { font-size: 11px; color: var(--tx-muted); }
+.pbar-label { font-size: 11.5px; color: var(--tx-muted); }
 .pbar-pct {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--tx-secondary);
+  font-weight: 700;
 }
 .pbar-track {
-  height: 3px;
+  height: 4px;
   background: var(--bg-overlay);
   border-radius: 99px;
   overflow: hidden;
@@ -642,38 +623,28 @@
   position: relative;
   transition: width 0.8s var(--ease);
 }
-.pbar-fill::after {
-  content: '';
-  position: absolute;
-  right: 0; top: 0; bottom: 0;
-  width: 8px;
-  background: rgba(255,255,255,.3);
-  border-radius: 99px;
-  filter: blur(2px);
-}
-.pbar-fill--blue   { background: linear-gradient(to right, rgba(79,158,255,.5), var(--blue)); }
-.pbar-fill--amber  { background: linear-gradient(to right, rgba(246,194,68,.5), var(--amber)); }
-.pbar-fill--green  { background: linear-gradient(to right, rgba(72,187,120,.5), var(--green)); }
+.pbar-fill--blue   { background: linear-gradient(to right, rgba(14,116,144,.45), var(--blue)); }
+.pbar-fill--amber  { background: linear-gradient(to right, rgba(217,145,12,.45), var(--amber)); }
+.pbar-fill--green  { background: linear-gradient(to right, rgba(21,128,61,.45), var(--green)); }
 
 /* ═══════════════════════════════════════
-   BOTTOM ROW (second main grid)
+   BOTTOM ROW
 ═══════════════════════════════════════ */
 .bottom-grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 12px;
+  grid-template-columns: 1fr 350px;
+  gap: 14px;
 }
 @media (max-width: 1024px) { .bottom-grid { grid-template-columns: 1fr; } }
 
 /* ═══════════════════════════════════════
-   ANGGOTA TABLE (compact)
+   ANGGOTA TABLE
 ═══════════════════════════════════════ */
 .atbl { width: 100%; border-collapse: collapse; }
 .atbl th {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--tx-muted);
   text-align: left;
@@ -681,25 +652,25 @@
   border-bottom: 1px solid var(--bd-subtle);
 }
 .atbl td {
-  padding: 10px 10px 10px 0;
+  padding: 11px 10px 11px 0;
   border-bottom: 1px solid var(--bd-subtle);
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--tx-secondary);
   vertical-align: middle;
 }
 .atbl tr:last-child td { border-bottom: none; }
-.atbl tr:hover td { background: rgba(255,255,255,.015); }
+.atbl tr:hover td { background: rgba(14,116,144,.03); }
 
-.atbl__name { color: var(--tx-primary); font-weight: 600; display: block; margin-bottom: 1px; }
-.atbl__nim  { font-family: var(--font-mono); font-size: 10px; color: var(--tx-muted); }
+.atbl__name { color: var(--tx-primary); font-weight: 700; display: block; margin-bottom: 1px; }
+.atbl__nim  { font-size: 10.5px; color: var(--tx-muted); }
 
 .status-chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
   border-radius: var(--r-xs);
   white-space: nowrap;
 }
@@ -707,14 +678,13 @@
 .chip--aktif  { background: var(--green-d);  color: var(--green); }
 .chip--pending{ background: var(--amber-d);  color: var(--amber); }
 .chip--tolak  { background: var(--red-d);    color: var(--red); }
-.chip--non    { background: rgba(255,255,255,.05); color: var(--tx-muted); }
+.chip--non    { background: var(--bg-overlay); color: var(--tx-muted); }
 
 .atbl__empty {
   text-align: center;
   padding: 30px;
   color: var(--tx-muted);
-  font-size: 12px;
-  font-style: italic;
+  font-size: 12.5px;
 }
 
 /* ═══════════════════════════════════════
@@ -724,52 +694,49 @@
 .pab-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 0;
+  gap: 11px;
+  padding: 11px 0;
   border-bottom: 1px solid var(--bd-subtle);
 }
 .pab-item:last-child { border-bottom: none; }
 .pab-item__ava {
-  width: 32px; height: 32px;
+  width: 34px; height: 34px;
   border-radius: var(--r-sm);
-  background: var(--bg-overlay);
+  background: var(--ac-dim);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 11.5px;
+  font-weight: 800;
   color: var(--ac);
   flex-shrink: 0;
   text-transform: uppercase;
 }
 .pab-item__info { flex: 1; min-width: 0; }
 .pab-item__name {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 12.5px;
+  font-weight: 700;
   color: var(--tx-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .pab-item__sub {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--tx-muted);
   margin-top: 1px;
 }
 .pab-item__since {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--tx-muted);
   flex-shrink: 0;
+  font-weight: 500;
 }
 .pab-empty {
   text-align: center;
   padding: 30px;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--tx-muted);
-  font-style: italic;
 }
 
 /* ═══════════════════════════════════════
@@ -778,7 +745,7 @@
 @media (max-width: 640px) {
   .kpi-grid  { grid-template-columns: repeat(2, 1fr); }
   .dh__clock { display: none; }
-  .dh__title { font-size: 20px; }
+  .dh__title { font-size: 21px; }
 }
 @media (max-width: 400px) {
   .kpi-grid { grid-template-columns: 1fr; }
@@ -804,9 +771,7 @@
   </div>
   <div class="dh__right">
     <div class="dh__clock">
-      <div>
-        <div class="dh__clock-time" id="js-clock-time">--:--</div>
-      </div>
+      <div class="dh__clock-time" id="js-clock-time">--:--</div>
       <div class="dh__clock-date" id="js-clock-date">-- --- ----</div>
     </div>
   </div>
@@ -827,19 +792,12 @@
   <div class="kpi kpi--blue">
     <div class="kpi__row">
       <span class="kpi__label">Anggota Aktif</span>
-      <span class="kpi__icon">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="5.5" cy="5" r="2.5"/>
-          <path d="M1 14c0-2.485 2.015-4.5 4.5-4.5S10 11.515 10 14"/>
-          <circle cx="12" cy="5.5" r="2"/>
-          <path d="M14.5 12.5c0-1.657-1.12-3-2.5-3"/>
-        </svg>
-      </span>
+      <span class="kpi__icon"><i class="ti ti-users" aria-hidden="true"></i></span>
     </div>
     <div class="kpi__val"><?= number_format($stats['total_anggota'] ?? 0) ?></div>
     <div class="kpi__footer">
       <span class="kpi__badge kpi__badge--up">
-        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 8L8 2M8 2H4M8 2v4"/></svg>
+        <i class="ti ti-trending-up" aria-hidden="true"></i>
         Terdaftar
       </span>
       <span class="kpi__sublabel">total</span>
@@ -850,17 +808,12 @@
   <div class="kpi kpi--amber">
     <div class="kpi__row">
       <span class="kpi__label">Antrian PAB</span>
-      <span class="kpi__icon" style="background:var(--amber-d);color:var(--amber);">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="2" y="2" width="12" height="12" rx="1.5"/>
-          <path d="M5 8l2 2 4-4"/>
-        </svg>
-      </span>
+      <span class="kpi__icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></span>
     </div>
     <div class="kpi__val"><?= number_format($stats['pending_pab'] ?? 0) ?></div>
     <div class="kpi__footer">
       <span class="kpi__badge kpi__badge--warn">
-        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="5" r="4"/><path d="M5 3v2.5"/><circle cx="5" cy="7" r=".5" fill="currentColor"/></svg>
+        <i class="ti ti-clock-hour-4" aria-hidden="true"></i>
         Menunggu
       </span>
       <span class="kpi__sublabel">verifikasi</span>
@@ -871,17 +824,12 @@
   <div class="kpi kpi--purple">
     <div class="kpi__row">
       <span class="kpi__label">Pending Manual</span>
-      <span class="kpi__icon" style="background:var(--purple-d);color:var(--purple);">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="8" cy="8" r="6"/>
-          <path d="M8 5v3.5l2 1.5"/>
-        </svg>
-      </span>
+      <span class="kpi__icon"><i class="ti ti-hourglass" aria-hidden="true"></i></span>
     </div>
     <div class="kpi__val"><?= number_format($stats['pending_manual'] ?? 0) ?></div>
     <div class="kpi__footer">
       <span class="kpi__badge kpi__badge--flat">
-        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 5h6M6 3l2 2-2 2"/></svg>
+        <i class="ti ti-arrow-right" aria-hidden="true"></i>
         Perlu Aksi
       </span>
       <span class="kpi__sublabel">entri</span>
@@ -892,17 +840,12 @@
   <div class="kpi kpi--green">
     <div class="kpi__row">
       <span class="kpi__label">Sesi Absensi</span>
-      <span class="kpi__icon" style="background:var(--green-d);color:var(--green);">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="2" y="2.5" width="12" height="12" rx="1.5"/>
-          <path d="M2 6.5h12M5.5 1v3.5M10.5 1v3.5"/>
-        </svg>
-      </span>
+      <span class="kpi__icon"><i class="ti ti-calendar-event" aria-hidden="true"></i></span>
     </div>
     <div class="kpi__val"><?= number_format($stats['total_sesi'] ?? 0) ?></div>
     <div class="kpi__footer">
       <span class="kpi__badge kpi__badge--up">
-        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 8L8 2M8 2H4M8 2v4"/></svg>
+        <i class="ti ti-trending-up" aria-hidden="true"></i>
         Aktif
       </span>
       <span class="kpi__sublabel">sesi dibuat</span>
@@ -935,43 +878,43 @@
             'href'  => '/admin/pab',
             'title' => 'Verifikasi PAB',
             'desc'  => 'Setujui pendaftar baru',
-            'icon'  => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M5 8l2 2 4-4"/></svg>',
+            'icon'  => 'ti-clipboard-check',
           ],
           [
             'href'  => '/admin/anggota/tambah',
             'title' => 'Tambah Anggota',
             'desc'  => 'Input data manual',
-            'icon'  => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="5.5" r="2.5"/><path d="M1.5 13.5c0-2.485 2.015-4.5 4.5-4.5"/><path d="M12 8v5M9.5 10.5H14.5"/></svg>',
+            'icon'  => 'ti-user-plus',
           ],
           [
             'href'  => '/admin/absensi',
             'title' => 'Kelola Absensi',
             'desc'  => 'Buat sesi & daftar hadir',
-            'icon'  => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2.5" width="12" height="12" rx="1.5"/><path d="M2 6.5h12M5.5 1v3.5M10.5 1v3.5"/></svg>',
+            'icon'  => 'ti-calendar-event',
           ],
           [
             'href'  => '/admin/anggota',
             'title' => 'Data Anggota',
             'desc'  => 'Lihat & kelola semua',
-            'icon'  => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="5" r="2.5"/><path d="M1 14c0-2.485 2.015-4.5 4.5-4.5S10 11.515 10 14"/><circle cx="12" cy="5.5" r="2"/></svg>',
+            'icon'  => 'ti-users',
           ],
           [
             'href'  => '/admin/settings',
             'title' => 'Pengaturan CMS',
             'desc'  => 'Update konten website',
-            'icon'  => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.25"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1.05 1.05M11.55 11.55l1.05 1.05M3.4 12.6l1.05-1.05M11.55 4.45l1.05-1.05"/></svg>',
+            'icon'  => 'ti-settings',
           ],
           [
             'href'  => '/admin/laporan',
             'title' => 'Laporan & Ekspor',
             'desc'  => 'Cetak & unduh data',
-            'icon'  => '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 6h6M5 8.5h4M5 11h3"/></svg>',
+            'icon'  => 'ti-file-analytics',
           ],
         ];
         foreach ($links as $l):
         ?>
         <a href="<?= BASE_URL . htmlspecialchars($l['href']) ?>" class="qa-item">
-          <span class="qa-item__icon" aria-hidden="true"><?= $l['icon'] ?></span>
+          <span class="qa-item__icon" aria-hidden="true"><i class="ti <?= htmlspecialchars($l['icon']) ?>"></i></span>
           <span class="qa-item__title"><?= htmlspecialchars($l['title']) ?></span>
           <span class="qa-item__desc"><?= htmlspecialchars($l['desc']) ?></span>
         </a>
@@ -981,7 +924,7 @@
   </div>
 
   <!-- RIGHT: Activity Feed + System Info -->
-  <div style="display:flex;flex-direction:column;gap:12px;">
+  <div style="display:flex;flex-direction:column;gap:14px;">
 
     <!-- Activity Feed — NO dummy data -->
     <div class="panel">
@@ -1009,9 +952,7 @@
 
         <?php if (empty($activities)): ?>
           <div class="feed__empty">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" style="display:block;margin:0 auto 10px;">
-              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <i class="ti ti-inbox" aria-hidden="true"></i>
             Belum ada aktivitas tercatat.
           </div>
         <?php else: ?>
@@ -1125,7 +1066,7 @@
 <!-- ─────────────────────────────────────
      BOTTOM ROW: Anggota Terbaru + Antrian PAB
 ───────────────────────────────────────── -->
-<div class="sec-label" style="margin-top:12px;">
+<div class="sec-label" style="margin-top:14px;">
   <span class="sec-label__text">Data Terkini</span>
   <span class="sec-label__line"></span>
   <span class="sec-label__num">03</span>
@@ -1139,7 +1080,7 @@
       <span class="panel__title">Anggota Terbaru <span class="panel__title-sub">— baru didaftarkan</span></span>
       <a href="<?= BASE_URL ?>/admin/anggota" class="panel__action">Semua data →</a>
     </div>
-    <div class="panel__body" style="padding:0 18px;">
+    <div class="panel__body" style="padding:0 20px;">
       <?php
         /*
          * $latestAnggota → array dari controller, contoh per baris:
