@@ -3,57 +3,62 @@
 <style>
   /* ─── Page heading ─── */
   .page-title {
-    font-size    : 20px;
-    font-weight  : 650;
-    color        : var(--color-text-1);
+    font-size    : 21px;
+    font-weight  : 800;
+    color        : var(--c-primary-dk);
     letter-spacing: -0.4px;
     margin-bottom: 20px;
     line-height  : 1.3;
   }
 
-  /* ─── Two-column grid ─── */
+  /* ─── Two-column grid — dilebarkan & dibuat seimbang ─── */
   .profile-grid {
     display              : grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap                  : 14px;
-    max-width            : 840px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    align-items          : stretch;   /* kartu di baris yang sama menyamakan tinggi */
+    gap                  : 16px;
+    max-width            : 960px;
+    margin               : 0 auto;    /* center di layar lebar */
   }
 
   /* ─── Card ─── */
   .profile-card {
-    background   : var(--color-surface-2);
-    border       : 1px solid var(--color-border);
+    display      : flex;
+    flex-direction: column;
+    background   : var(--c-white);
+    border       : 1px solid var(--c-border);
     border-radius: var(--radius-lg);
-    padding      : 20px 22px;
+    padding      : 24px 26px;
+    box-shadow   : 0 20px 46px -18px rgba(15,23,42,.14), 0 3px 12px rgba(15,23,42,.05);
   }
 
   .profile-card__header {
     display      : flex;
     align-items  : center;
-    gap          : 8px;
+    gap          : 10px;
     margin-bottom: 18px;
     padding-bottom: 14px;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--c-border);
   }
 
   .profile-card__header-icon {
-    width          : 28px;
-    height         : 28px;
+    width          : 30px;
+    height         : 30px;
     border-radius  : var(--radius-sm);
-    background     : var(--color-accent-dim);
-    border         : 1px solid var(--color-accent-border);
+    background     : rgba(14,116,144,.08);
+    border         : 1px solid rgba(14,116,144,.22);
     display        : flex;
     align-items    : center;
     justify-content: center;
-    color          : var(--color-accent);
+    color          : var(--c-primary);
     flex-shrink    : 0;
+    font-size      : 15px;
   }
-  .profile-card__header-icon svg { width: 14px; height: 14px; }
 
   .profile-card__title {
-    font-size  : 14px;
-    font-weight: 600;
-    color      : var(--color-text-1);
+    font-size  : 14.5px;
+    font-weight: 700;
+    color      : var(--c-ink);
   }
 
   /* ─── User identity row ─── */
@@ -63,32 +68,32 @@
     gap          : 12px;
     margin-bottom: 18px;
     padding      : 12px 14px;
-    background   : var(--color-surface);
-    border       : 1px solid var(--color-border);
+    background   : #f4f7fa;
+    border       : 1px solid var(--c-border);
     border-radius: var(--radius-md);
   }
 
   .user-identity__avatar {
-    width          : 42px;
-    height         : 42px;
+    width          : 44px;
+    height         : 44px;
     border-radius  : 50%;
     object-fit     : cover;
-    border         : 2px solid var(--color-accent-border);
+    border         : 2px solid rgba(14,116,144,.3);
     flex-shrink    : 0;
   }
 
   .user-identity__avatar-fallback {
-    width          : 42px;
-    height         : 42px;
+    width          : 44px;
+    height         : 44px;
     border-radius  : 50%;
-    background     : var(--color-accent-dim);
-    border         : 2px solid var(--color-accent-border);
+    background     : rgba(14,116,144,.12);
+    border         : 2px solid rgba(14,116,144,.3);
     display        : flex;
     align-items    : center;
     justify-content: center;
-    font-size      : 16px;
-    font-weight    : 700;
-    color          : var(--color-accent);
+    font-size      : 17px;
+    font-weight    : 800;
+    color          : var(--c-primary);
     flex-shrink    : 0;
     text-transform : uppercase;
   }
@@ -97,8 +102,8 @@
 
   .user-identity__name {
     font-size    : 14px;
-    font-weight  : 600;
-    color        : var(--color-text-1);
+    font-weight  : 700;
+    color        : var(--c-ink);
     white-space  : nowrap;
     overflow     : hidden;
     text-overflow: ellipsis;
@@ -107,22 +112,22 @@
 
   .user-identity__nia {
     font-size    : 11.5px;
-    font-weight  : 500;
-    color        : var(--color-accent);
+    font-weight  : 700;
+    color        : var(--c-primary);
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.04em;
     line-height  : 1.3;
   }
 
   /* ─── Form ─── */
-  .form-stack { display: flex; flex-direction: column; gap: 14px; }
+  .form-stack { display: flex; flex-direction: column; gap: 14px; flex: 1; }
 
   .form-field { display: flex; flex-direction: column; gap: 5px; }
 
   .form-field label {
     font-size    : 12px;
-    font-weight  : 550;
-    color        : var(--color-text-2);
+    font-weight  : 700;
+    color        : var(--c-muted);
     letter-spacing: 0.01em;
   }
 
@@ -130,59 +135,60 @@
   .form-field input[type="tel"],
   .form-field input[type="password"] {
     width        : 100%;
-    height       : 36px;
-    padding      : 0 11px;
-    background   : var(--color-surface);
-    border       : 1px solid var(--color-border-2);
+    height       : 40px;
+    padding      : 0 13px;
+    background   : #fbfcfe;
+    border       : 1.5px solid var(--c-border);
     border-radius: var(--radius-sm);
-    color        : var(--color-text-1);
+    color        : var(--c-ink);
     font-family  : inherit;
     font-size    : 13.5px;
     outline      : none;
-    transition   : border-color 150ms ease, box-shadow 150ms ease;
+    transition   : border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
   }
 
   .form-field input:hover {
-    border-color: rgba(255,255,255,0.18);
+    border-color: #cbd5e1;
   }
 
   .form-field input:focus {
-    border-color: var(--color-accent-border);
-    box-shadow  : 0 0 0 3px var(--color-accent-dim);
+    border-color: var(--c-primary-lt);
+    box-shadow  : 0 0 0 3px rgba(6,182,212,.12);
+    background  : #fff;
   }
 
-  .form-field input::placeholder { color: var(--color-text-3); }
+  .form-field input::placeholder { color: var(--c-muted2); }
 
   /* File input */
   .file-field {
     display      : flex;
     align-items  : center;
     gap          : 10px;
-    padding      : 9px 12px;
-    background   : var(--color-surface);
-    border       : 1px dashed var(--color-border-2);
+    padding      : 10px 13px;
+    background   : #fbfcfe;
+    border       : 1.5px dashed var(--c-border);
     border-radius: var(--radius-sm);
     cursor       : pointer;
     transition   : border-color 150ms, background 150ms;
   }
   .file-field:hover {
-    border-color: var(--color-accent-border);
-    background  : var(--color-accent-dim);
+    border-color: var(--c-primary-lt);
+    background  : rgba(6,182,212,.05);
   }
 
   .file-field__icon {
-    width          : 28px;
-    height         : 28px;
-    border-radius  : var(--radius-xs);
-    background     : var(--color-surface-2);
-    border         : 1px solid var(--color-border);
+    width          : 30px;
+    height         : 30px;
+    border-radius  : var(--radius-sm);
+    background     : #eef2f6;
+    border         : 1px solid var(--c-border);
     display        : flex;
     align-items    : center;
     justify-content: center;
-    color          : var(--color-text-2);
+    color          : var(--c-muted);
     flex-shrink    : 0;
+    font-size      : 14px;
   }
-  .file-field__icon svg { width: 13px; height: 13px; }
 
   .file-field__label {
     flex      : 1;
@@ -191,12 +197,12 @@
   .file-field__label span {
     display  : block;
     font-size: 12.5px;
-    font-weight: 500;
-    color    : var(--color-text-2);
+    font-weight: 600;
+    color    : var(--c-ink);
   }
   .file-field__label small {
     font-size: 11px;
-    color    : var(--color-text-3);
+    color    : var(--c-muted2);
   }
 
   .file-field input[type="file"] {
@@ -206,31 +212,42 @@
     height  : 0;
   }
 
-  /* Submit button */
+  /* Submit button — Design System §5.3 */
   .btn-submit {
     display        : flex;
     align-items    : center;
     justify-content: center;
-    gap            : 7px;
+    gap            : 8px;
     width          : 100%;
-    height         : 36px;
+    height         : 42px;
     border-radius  : var(--radius-sm);
-    background     : var(--color-accent);
+    background     : var(--c-primary);
     border         : none;
     color          : #fff;
     font-family    : inherit;
     font-size      : 13.5px;
-    font-weight    : 600;
+    font-weight    : 800;
     cursor         : pointer;
-    transition     : opacity 150ms, transform 100ms;
-    margin-top     : 4px;
+    box-shadow     : 0 8px 22px rgba(14,116,144,.25);
+    transition     : background 180ms, transform 120ms, box-shadow 180ms;
+    margin-top     : auto;
+    padding-top    : 4px;
   }
-  .btn-submit:hover   { opacity: 0.88; }
-  .btn-submit:active  { transform: scale(0.98); }
-  .btn-submit svg     { width: 14px; height: 14px; }
+  .btn-submit:hover {
+    background: var(--c-primary-lt);
+    transform : translateY(-2px);
+    box-shadow: 0 12px 28px rgba(6,182,212,.3);
+  }
+  .btn-submit:active  { transform: translateY(0) scale(0.98); }
+  .btn-submit i { font-size: 15px; }
 
   /* ─── Flash inside page (if needed) ─── */
-  .flash-local { margin-bottom: 16px; max-width: 840px; }
+  .flash-local { margin-bottom: 16px; max-width: 960px; margin-left: auto; margin-right: auto; }
+
+  /* ─── Responsif — 1 kolom di layar sempit ─── */
+  @media (max-width: 700px) {
+    .profile-grid { grid-template-columns: 1fr; }
+  }
 </style>
 
 <p class="page-title">Profil Saya</p>
@@ -239,17 +256,10 @@
   <?php
     $type = $flash['type'] ?? 'info';
     $safeType = in_array($type, ['success','danger','error','warning','info']) ? $type : 'info';
-    function inlineAlertIcon(string $t): string {
-      return match($t) {
-        'success'        => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" style="width:15px;height:15px;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>',
-        'danger','error' => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" style="width:15px;height:15px;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>',
-        default          => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" style="width:15px;height:15px;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg>',
-      };
-    }
   ?>
   <div class="flash-local">
     <div class="alert alert--<?= $safeType ?>" role="alert">
-      <?= inlineAlertIcon($type) ?>
+      <?= alertIcon($type) ?>
       <span><?= htmlspecialchars($flash['msg'] ?? '') ?></span>
     </div>
   </div>
@@ -262,11 +272,7 @@
 
     <div class="profile-card__header">
       <div class="profile-card__header-icon" aria-hidden="true">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-             stroke-width="1.75" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/>
-        </svg>
+        <i class="ti ti-edit"></i>
       </div>
       <h2 class="profile-card__title">Edit Data Diri</h2>
     </div>
@@ -289,7 +295,7 @@
     </div>
 
     <form method="POST" action="<?= BASE_URL ?>/member/profile/update"
-          enctype="multipart/form-data" autocomplete="off">
+          enctype="multipart/form-data" autocomplete="off" style="display:flex; flex-direction:column; flex:1;">
       <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
 
       <div class="form-stack">
@@ -319,11 +325,7 @@
           <label>Ganti Foto Profil</label>
           <label class="file-field" for="foto_upload">
             <div class="file-field__icon" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                   stroke-width="1.75" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/>
-              </svg>
+              <i class="ti ti-upload"></i>
             </div>
             <div class="file-field__label">
               <span id="file-label-text">Pilih gambar…</span>
@@ -336,11 +338,7 @@
         </div>
 
         <button type="submit" class="btn-submit">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-               stroke-width="2" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/>
-          </svg>
+          <i class="ti ti-device-floppy"></i>
           Simpan Perubahan
         </button>
 
@@ -353,17 +351,13 @@
 
     <div class="profile-card__header">
       <div class="profile-card__header-icon" aria-hidden="true">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-             stroke-width="1.75" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/>
-        </svg>
+        <i class="ti ti-lock"></i>
       </div>
       <h2 class="profile-card__title">Ganti Password</h2>
     </div>
 
     <form method="POST" action="<?= BASE_URL ?>/member/profile/change-password"
-          autocomplete="off">
+          autocomplete="off" style="display:flex; flex-direction:column; flex:1;">
       <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
 
       <div class="form-stack">
@@ -386,12 +380,14 @@
                  required placeholder="Ulangi password baru">
         </div>
 
+        <!-- Info box pengisi ruang kosong sekaligus panduan — menjaga tinggi kartu seimbang dengan kartu Edit Data Diri -->
+        <div class="alert alert--info" style="margin-top: 2px;">
+          <i class="ti ti-info-circle"></i>
+          <span>Gunakan kombinasi huruf & angka agar password lebih kuat dan mudah diingat.</span>
+        </div>
+
         <button type="submit" class="btn-submit">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-               stroke-width="2" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>
-          </svg>
+          <i class="ti ti-shield-check"></i>
           Ubah Password
         </button>
 
