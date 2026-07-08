@@ -56,6 +56,7 @@ $router->post('/admin/anggota/:id/activate',            [AdminController::class,
 $router->get('/admin/anggota/:id/edit',                 [AdminController::class, 'anggotaEdit']);
 $router->post('/admin/anggota/:id/update',              [AdminController::class, 'anggotaUpdate']);
 $router->post('/admin/anggota/:id/delete',              [AdminController::class, 'anggotaDelete']);
+$router->post('/admin/anggota/:id/reset-password',      [AdminController::class, 'anggotaResetPassword']);
 
 // PAB verifikasi
 $router->get('/admin/pab',                              [AdminController::class, 'pab']);
