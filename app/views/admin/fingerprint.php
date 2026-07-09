@@ -290,7 +290,7 @@ form.fp-inline { display: inline-flex; margin: 0; }
 
   <div class="fp-header">
     <div class="fp-eyebrow">Perangkat</div>
-    <h1 class="fp-title"><?= htmlspecialchars($title) ?></h1>
+    <h1 class="fp-title"><?= htmlspecialchars($title ?? 'Perangkat Fingerprint') ?></h1>
   </div>
 
   <?php if (!empty($flash)): ?>

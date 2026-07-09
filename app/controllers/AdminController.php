@@ -386,15 +386,16 @@ class AdminController extends Controller
     //  FINGERPRINT (GEISA X107)
     // ================================================================
     public function fingerprint(): void
-    {
-        $this->requireAdmin();
-        $fpModel = new FingerprintModel();
-        $health  = $fpModel->checkDeviceHealth();
-        $anggota = $fpModel->getAnggotaAktifDenganStatus();
-        $flash   = $this->getFlash();
-        $csrf    = $this->csrfToken();
-        $this->view('admin/fingerprint', compact('health', 'anggota', 'flash', 'csrf'), 'admin');
-    }
+{
+    $this->requireAdmin();
+    $title   = 'Perangkat Fingerprint';
+    $fpModel = new FingerprintModel();
+    $health  = $fpModel->checkDeviceHealth();
+    $anggota = $fpModel->getAnggotaAktifDenganStatus();
+    $flash   = $this->getFlash();
+    $csrf    = $this->csrfToken();
+    $this->view('admin/fingerprint', compact('title', 'health', 'anggota', 'flash', 'csrf'), 'admin');
+}
 
     public function fingerprintPush(string $id): void
     {
