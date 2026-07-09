@@ -165,10 +165,10 @@ class AdminController extends Controller
             $this->redirect('/admin/anggota');
         }
 
-        $newHash = password_hash('cosmakda', PASSWORD_BCRYPT, ['cost' => 12]);
+        $newHash = password_hash('comsmakda', PASSWORD_BCRYPT, ['cost' => 12]);
         (new UserModel())->updatePassword((int)$id, $newHash);
 
-        $this->flash('success', 'Password <strong>' . htmlspecialchars($anggota['nama_lengkap']) . '</strong> berhasil direset ke <strong>cosmakda</strong>.');
+        $this->flash('success', 'Password <strong>' . htmlspecialchars($anggota['nama_lengkap']) . '</strong> berhasil direset ke <strong>comsmakda</strong>.');
         $this->redirect('/admin/anggota');
     }
 

@@ -1175,7 +1175,7 @@
     <div class="confirm-box__title" id="reset-title">Reset Password?</div>
     <div class="confirm-box__sub">
       Password <strong id="reset-name-display">—</strong> akan direset ke
-      <span class="pw-badge">cosmakda</span>.
+      <span class="pw-badge">comsmakda</span>.
       Anggota wajib mengganti password setelah login kembali.
     </div>
     <div class="confirm-box__acts">
