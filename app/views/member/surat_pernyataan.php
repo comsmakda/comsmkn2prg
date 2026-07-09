@@ -262,12 +262,19 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   display: flex;
   gap: 20px;
   align-items: flex-start;
+  justify-content: flex-start; /* pastikan rata kiri, bukan space-between */
   margin: 6px 0 10px;
 }
 .id-table {
-  flex: 1;
+  flex: 1 1 auto;
+  max-width: 480px; /* batasi lebar tabel agar foto tidak terlalu jauh ke kanan */
   border-collapse: collapse;
   font-size: 11.5pt;
+}
+.id-foto {
+  flex-shrink: 0;
+  text-align: center;
+  margin-left: 8px; /* geser sedikit ke kiri, mendekat ke tabel identitas */
 }
 .id-table td {
   padding: 3.5px 0;
@@ -277,7 +284,6 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 .id-table td:first-child { width: 165px; font-weight: normal; }
 .id-table td:nth-child(2) { width: 18px; padding: 3.5px 6px; text-align: center; }
 
-.id-foto { flex-shrink: 0; text-align: center; }
 .id-foto img {
   width: 86px; height: 108px;
   object-fit: cover;
