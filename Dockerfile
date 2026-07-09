@@ -1,6 +1,15 @@
 FROM php:8.2-apache
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+# curl diperlukan untuk komunikasi PHP -> Sync Agent (push user, pull log fingerprint)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libcurl4-openssl-dev \
+    && docker-php-ext-install mysqli pdo pdo_mysql curl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Timezone WITA (Pinrang, Sulawesi Selatan) - penting untuk akurasi jam masuk/pulang di rekap fingerprint
+RUN ln -snf /usr/share/zoneinfo/Asia/Makassar /etc/localtime \
+    && echo "Asia/Makassar" > /etc/timezone
+RUN echo "date.timezone = Asia/Makassar" > /usr/local/etc/php/conf.d/timezone.ini
 
 RUN a2enmod rewrite headers
 

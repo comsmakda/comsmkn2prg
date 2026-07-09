@@ -74,6 +74,15 @@ $router->post('/admin/absensi/create',                  [AdminController::class,
 $router->get('/admin/absensi/:id/print',                [AdminController::class, 'absensiPrint']);
 $router->post('/admin/absensi/:id/delete',              [AdminController::class, 'absensiDelete']);
 
+// Fingerprint GEISA X107
+$router->get('/admin/fingerprint',                      [AdminController::class, 'fingerprint']);
+$router->post('/admin/fingerprint/:id/push',            [AdminController::class, 'fingerprintPush']);
+$router->post('/admin/fingerprint/push-bulk',           [AdminController::class, 'fingerprintPushBulk']);
+$router->post('/admin/fingerprint/:id/delete',          [AdminController::class, 'fingerprintDelete']);
+$router->post('/admin/fingerprint/sync-logs',           [AdminController::class, 'fingerprintSyncLogs']);
+$router->get('/admin/fingerprint/rekap',                [AdminController::class, 'fingerprintRekap']);
+$router->get('/admin/fingerprint/rekap/print',          [AdminController::class, 'fingerprintRekapPrint']);
+
 // Profil Admin
 $router->get('/admin/profil',               [AdminController::class, 'profil']);
 $router->post('/admin/profil/simpan',       [AdminController::class, 'profilSimpan']);

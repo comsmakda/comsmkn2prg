@@ -3,6 +3,7 @@
 
 require_once APP_PATH . '/models/BeritaModel.php';
 require_once APP_PATH . '/models/GaleriModel.php';
+require_once APP_PATH . '/models/FingerprintModel.php';
 
 class AdminController extends Controller
 {
@@ -379,6 +380,134 @@ class AdminController extends Controller
         (new AttendanceModel())->deleteSession((int)$id);
         $this->flash('success', 'Sesi dihapus.');
         $this->redirect('/admin/absensi');
+    }
+
+    // ================================================================
+    //  FINGERPRINT (GEISA X107)
+    // ================================================================
+    public function fingerprint(): void
+    {
+        $this->requireAdmin();
+        $fpModel = new FingerprintModel();
+        $health  = $fpModel->checkDeviceHealth();
+        $anggota = $fpModel->getAnggotaAktifDenganStatus();
+        $flash   = $this->getFlash();
+        $csrf    = $this->csrfToken();
+        $this->view('admin/fingerprint', compact('health', 'anggota', 'flash', 'csrf'), 'admin');
+    }
+
+    public function fingerprintPush(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $ok = (new FingerprintModel())->pushUser((int)$id);
+
+        if ($ok) {
+            $this->flash('success', 'Anggota berhasil disinkronkan ke mesin fingerprint.');
+        } else {
+            $this->flash('error', 'Gagal menyinkronkan anggota ke mesin fingerprint. Cek status koneksi mesin.');
+        }
+
+        $this->redirect('/admin/fingerprint');
+    }
+
+    public function fingerprintPushBulk(): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $fpModel = new FingerprintModel();
+        $userIds = $fpModel->getUserIdsBelumSyncAtauGagal();
+
+        if (empty($userIds)) {
+            $this->flash('info', 'Tidak ada anggota yang perlu disinkronkan.');
+            $this->redirect('/admin/fingerprint');
+        }
+
+        $summary = $fpModel->pushBulk($userIds);
+
+        $this->flash(
+            $summary['gagal'] === 0 ? 'success' : 'warning',
+            sprintf(
+                'Push selesai: %d berhasil, %d gagal dari %d anggota.',
+                $summary['sukses'],
+                $summary['gagal'],
+                count($userIds)
+            )
+        );
+
+        $this->redirect('/admin/fingerprint');
+    }
+
+    public function fingerprintDelete(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $user = (new UserModel())->find((int)$id);
+        if (!$user) {
+            $this->flash('error', 'Anggota tidak ditemukan.');
+            $this->redirect('/admin/fingerprint');
+        }
+
+        $ok = (new FingerprintModel())->deleteUser($user['nia']);
+
+        if ($ok) {
+            $this->flash('success', 'Anggota berhasil dihapus dari mesin fingerprint.');
+        } else {
+            $this->flash('error', 'Gagal menghapus anggota dari mesin fingerprint.');
+        }
+
+        $this->redirect('/admin/fingerprint');
+    }
+
+    public function fingerprintSyncLogs(): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $result = (new FingerprintModel())->pullAndSaveLogs();
+
+        if ($result['success']) {
+            $this->flash('success', sprintf('%d log scan baru berhasil ditarik dari mesin.', $result['jumlah_baru']));
+        } else {
+            $this->flash('error', 'Gagal menarik log dari mesin: ' . $result['error']);
+        }
+
+        $this->redirect('/admin/fingerprint');
+    }
+
+    public function fingerprintRekap(): void
+    {
+        $this->requireAdmin();
+
+        $tanggalMulai = $_GET['tanggal_mulai'] ?? date('Y-m-d');
+        $tanggalAkhir = $_GET['tanggal_akhir'] ?? date('Y-m-d');
+        $kelas        = $_GET['kelas'] ?? '';
+        $filter       = ['kelas' => $kelas];
+
+        $rekap     = (new FingerprintModel())->getRekapHarian($tanggalMulai, $tanggalAkhir, $filter);
+        $kelasList = (new UserModel())->getKelasList();
+        $flash     = $this->getFlash();
+        $csrf      = $this->csrfToken();
+
+        $this->view('admin/fingerprint_rekap', compact('rekap', 'tanggalMulai', 'tanggalAkhir', 'kelas', 'kelasList', 'flash', 'csrf'), 'admin');
+    }
+
+    public function fingerprintRekapPrint(): void
+    {
+        $this->requireAdmin();
+
+        $tanggalMulai = $_GET['tanggal_mulai'] ?? date('Y-m-d');
+        $tanggalAkhir = $_GET['tanggal_akhir'] ?? date('Y-m-d');
+        $kelas        = $_GET['kelas'] ?? '';
+        $filter       = ['kelas' => $kelas];
+
+        $rekap    = (new FingerprintModel())->getRekapHarian($tanggalMulai, $tanggalAkhir, $filter);
+        $settings = (new SettingModel())->getAll();
+
+        $this->view('admin/fingerprint_rekap_print', compact('rekap', 'tanggalMulai', 'tanggalAkhir', 'kelas', 'settings'), 'print');
     }
 
     // ================================================================

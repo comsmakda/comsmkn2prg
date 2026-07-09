@@ -575,6 +575,12 @@ button { font-family: inherit; cursor: pointer; }
               'label' => 'Absensi Pertemuan',
               'icon'  => 'ti-users-group',
             ],
+            [
+              'href'  => '/admin/fingerprint',
+              'label' => 'Absensi Fingerprint',
+              'icon'  => 'ti-fingerprint',
+              'new'   => true,
+            ],
           ],
 
           'Sistem' => [

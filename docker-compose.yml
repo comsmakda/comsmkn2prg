@@ -1,0 +1,38 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # Sesuaikan volume ini dengan path persistent storage upload foto
+    # yang sudah kamu konfigurasi sebelumnya (jangan sampai beda, nanti foto lama "hilang")
+    volumes:
+      - uploads-data:/var/www/html/public/uploads
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - FP_SYNC_AGENT_URL=http://fp-sync-agent:8000
+      - FP_SYNC_API_KEY=${FP_SYNC_API_KEY}
+    # Domain/FQDN untuk app ini diatur lewat Coolify UI (General tab),
+    # bukan di sini - sama seperti setup Cloudflare Tunnel yang sudah jalan.
+
+  fp-sync-agent:
+    build:
+      context: ./fp-sync-agent
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - DEVICE_IP=${FP_DEVICE_IP}
+      - DEVICE_PORT=4370
+      - PHP_APP_CALLBACK_URL=http://app/api/fp/callback
+      - PHP_APP_API_KEY=${FP_SYNC_API_KEY}
+      - PULL_LOG_INTERVAL_MINUTES=15
+    # SENGAJA tidak ada "ports" atau domain di sini.
+    # Tanpa port mapping/domain, Coolify TIDAK akan expose service ini ke publik -
+    # hanya bisa diakses dari service lain dalam network yang sama (yaitu "app").
+    # Ini penting: mesin fingerprint di LAN sekolah tidak boleh punya jalur dari internet.
+
+volumes:
+  uploads-data:
