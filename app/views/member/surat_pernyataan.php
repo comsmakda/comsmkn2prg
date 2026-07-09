@@ -19,68 +19,65 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   UI SHELL  (tidak ikut cetak)
+   UI SHELL — mengikuti design token halaman member lainnya
 ═══════════════════════════════════════════════════════════ */
-.sp-page { max-width: 980px; margin: 0 auto; }
+.sp-page { max-width: 900px; margin: 0 auto; }
 
 .sp-header {
   display: flex; align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 18px; gap: 14px; flex-wrap: wrap;
 }
 .sp-header__title h1 {
-  font-size: 20px; font-weight: 700;
-  color: var(--color-text-1); margin-bottom: 4px; letter-spacing: -0.3px;
+  font-size: 18px; font-weight: 800;
+  color: var(--c-ink); margin-bottom: 3px; letter-spacing: -0.3px;
 }
-.sp-header__title p { font-size: 13px; color: var(--color-text-3); }
+.sp-header__title p { font-size: 12.5px; color: var(--c-muted); }
 .sp-header__actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .btn {
   display: inline-flex; align-items: center; gap: 7px;
-  padding: 9px 18px; border-radius: var(--radius-md);
-  font-size: 13px; font-weight: 600; border: 1px solid transparent;
-  cursor: pointer; font-family: inherit; transition: all 150ms ease;
+  padding: 9px 16px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 700; border: 1px solid transparent;
+  cursor: pointer; font-family: inherit; transition: background 150ms var(--ease),
+  color 150ms var(--ease), border-color 150ms var(--ease), transform 120ms var(--ease-spring);
   white-space: nowrap; text-decoration: none;
 }
-.btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+.btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+.btn:active { transform: translateY(1px); }
 .btn-primary {
-  background: var(--color-accent); color: #fff;
-  box-shadow: 0 0 18px var(--color-accent-glow);
+  background: var(--c-primary); color: #fff;
 }
-.btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.btn-primary:hover { background: var(--c-primary-dk); }
 .btn-ghost {
-  background: var(--color-surface-2); color: var(--color-text-2);
-  border-color: var(--color-border-2);
+  background: var(--c-white); color: var(--c-muted);
+  border-color: var(--c-border);
 }
-.btn-ghost:hover { background: var(--color-surface-3); color: var(--color-text-1); }
+.btn-ghost:hover { background: #f4f7fa; color: var(--c-ink); border-color: rgba(14,116,144,.25); }
+.btn[disabled] { opacity: .6; cursor: not-allowed; }
 
 .sp-shell {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--c-white);
+  border: 1px solid var(--c-border);
   border-radius: var(--radius-lg); overflow: hidden;
 }
 .sp-bar {
   display: flex; align-items: center; justify-content: space-between;
   padding: 9px 16px;
-  background: var(--color-surface-2); border-bottom: 1px solid var(--color-border);
+  background: #f4f7fa; border-bottom: 1px solid var(--c-border);
 }
 .sp-bar__dots { display: flex; gap: 6px; }
 .sp-bar__dots span {
-  width: 10px; height: 10px; border-radius: 50%; display: block;
+  width: 9px; height: 9px; border-radius: 50%; display: block; opacity: .55;
 }
-.sp-bar__dots span:nth-child(1) { background: #ef4444; }
-.sp-bar__dots span:nth-child(2) { background: #f59e0b; }
-.sp-bar__dots span:nth-child(3) { background: #22c55e; }
-.sp-bar__label { font-size: 11.5px; color: var(--color-text-3); font-weight: 500; }
-.sp-scroll { overflow-x: auto; padding: 32px 24px; background: #7f8ea3; }
-
-/* Tambahan: pastikan surat-inner punya padding saat print (bukan di preview) */
-@media screen {
-  #surat-preview { padding: 32px 48px 52px 48px; }
-}
-@media print {
-  #surat-preview { padding: 0 !important; }
-  .surat-inner   { padding: 0 !important; }
+.sp-bar__dots span:nth-child(1) { background: var(--c-red-text); }
+.sp-bar__dots span:nth-child(2) { background: var(--c-amber-icon); }
+.sp-bar__dots span:nth-child(3) { background: var(--c-green-text); }
+.sp-bar__label { font-size: 11.5px; color: var(--c-muted2); font-weight: 600; }
+.sp-scroll {
+  overflow-x: auto;
+  padding: 24px;
+  background: var(--c-page);
 }
 
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -93,8 +90,8 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   min-height: 1123px;
   margin: 0 auto;
   background: #ffffff;
-  box-shadow: 0 10px 56px rgba(0,0,0,0.4);
-  padding: 32px 48px 52px 48px;
+  box-shadow: 0 4px 20px rgba(15,23,42,.12), 0 1px 4px rgba(15,23,42,.08);
+  padding: 30px 46px 46px 46px;
   font-family: 'Times New Roman', Times, Georgia, serif;
   font-size: 12pt;
   line-height: 1.6;
@@ -107,7 +104,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 #surat-preview::before {
   content: '';
   position: absolute;
-  inset: 10px;
+  inset: 9px;
   border: 1px solid #1a1a6e;
   pointer-events: none;
   z-index: 0;
@@ -115,7 +112,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 #surat-preview::after {
   content: '';
   position: absolute;
-  inset: 13px;
+  inset: 12px;
   border: 3px double #1a1a6e;
   pointer-events: none;
   z-index: 0;
@@ -129,25 +126,25 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding-bottom: 10px;
+  padding-bottom: 9px;
 }
 
 .kop__logo {
   flex-shrink: 0;
-  width: 80px;
+  width: 78px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .kop__logo img {
-  height: 80px;
+  height: 78px;
   width: auto;
-  max-width: 80px;
+  max-width: 78px;
   object-fit: contain;
   display: block;
 }
 .kop__logo-fallback {
-  width: 76px; height: 76px;
+  width: 74px; height: 74px;
   border: 2px solid #1a1a6e;
   border-radius: 50%;
   display: none;
@@ -174,7 +171,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 }
 .kop__school {
   font-family: Arial Black, 'Arial Bold', Arial, sans-serif;
-  font-size: 16pt;
+  font-size: 15.5pt;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -196,31 +193,31 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   margin-top: 1px;
 }
 
-/* Garis kop tebal + tipis (standar surat dinas) */
 .kop-divider { margin: 8px 0 0 0; }
 .kop-divider-thick { height: 3.5px; background: #1a1a6e; }
 .kop-divider-thin  { height: 1px;   background: #1a1a6e; margin-top: 2px; }
 
-/* ── NOMOR SURAT ────────────────────────────────────────── */
-.nomor-surat {
-  text-align: center;
+/* ── NOMOR SURAT & TEMPAT/TANGGAL ───────────────────────── */
+.info-surat {
+  display: flex;
+  justify-content: space-between;
   font-family: Arial, sans-serif;
   font-size: 9pt;
-  color: #333;
-  margin: 6px 0 0 0;
+  color: #222;
+  margin: 8px 0 0 0;
 }
 
 /* ── JUDUL SURAT ────────────────────────────────────────── */
 .surat-judul {
   text-align: center;
-  margin: 20px 0 6px;
+  margin: 20px 0 4px;
 }
 .surat-judul h2 {
   font-family: Arial Black, 'Arial Bold', Arial, sans-serif;
   font-size: 13pt;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   text-decoration: underline;
   text-underline-offset: 4px;
   color: #000;
@@ -235,7 +232,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 
 /* ── TUBUH SURAT ────────────────────────────────────────── */
 .surat-body {
-  margin-top: 16px;
+  margin-top: 14px;
   text-align: justify;
   hyphens: auto;
 }
@@ -245,11 +242,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   text-align: justify;
   line-height: 1.75;
 }
-
-/* Indentasi paragraf seperti surat resmi */
-.surat-body p.indent {
-  text-indent: 2em;
-}
+.surat-body p.indent { text-indent: 2em; }
 
 /* ── JUDUL SEKSI ────────────────────────────────────────── */
 .seksi-judul {
@@ -258,7 +251,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   font-size: 10.5pt;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  margin: 18px 0 6px;
+  margin: 16px 0 6px;
   padding: 4px 8px;
   background: #1a1a6e;
   color: #fff;
@@ -269,7 +262,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   display: flex;
   gap: 20px;
   align-items: flex-start;
-  margin: 8px 0 12px;
+  margin: 6px 0 10px;
 }
 .id-table {
   flex: 1;
@@ -281,20 +274,12 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   vertical-align: top;
   line-height: 1.5;
 }
-.id-table td:first-child {
-  width: 155px;
-  font-weight: normal;
-}
-.id-table td:nth-child(2) {
-  width: 18px;
-  padding: 3.5px 6px;
-  text-align: center;
-}
+.id-table td:first-child { width: 165px; font-weight: normal; }
+.id-table td:nth-child(2) { width: 18px; padding: 3.5px 6px; text-align: center; }
 
 .id-foto { flex-shrink: 0; text-align: center; }
 .id-foto img {
-  width: 86px;
-  height: 108px;
+  width: 86px; height: 108px;
   object-fit: cover;
   border: 1px solid #555;
   display: block;
@@ -321,7 +306,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   width: 100%;
   border-collapse: collapse;
   font-size: 11pt;
-  margin: 8px 0 6px;
+  margin: 6px 0 4px;
 }
 .jadwal-table th {
   background: #1a1a6e;
@@ -349,12 +334,12 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   font-size: 8.5pt;
   color: #555;
   font-style: italic;
-  margin: 2px 0 14px;
+  margin: 2px 0 12px;
 }
 
 /* ── DAFTAR PERNYATAAN ──────────────────────────────────── */
 .pernyataan-list {
-  margin: 8px 0 12px;
+  margin: 6px 0 10px;
   padding-left: 0;
   list-style: none;
   font-size: 11.5pt;
@@ -378,13 +363,19 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
-  margin-top: 30px;
+  margin-top: 26px;
   font-family: Arial, sans-serif;
   font-size: 10.5pt;
 }
 .ttd-col { text-align: center; }
 .ttd-col p { margin: 0; line-height: 1.6; }
-.ttd-space { height: 72px; }
+.ttd-meterai {
+  font-size: 8.5pt;
+  color: #777;
+  font-style: italic;
+  margin-top: 8px;
+}
+.ttd-space { height: 60px; }
 .ttd-name-box {
   display: inline-block;
   min-width: 200px;
@@ -404,7 +395,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 
 /* ── FOOTER DOKUMEN ─────────────────────────────────────── */
 .surat-footer {
-  margin-top: 24px;
+  margin-top: 22px;
   padding-top: 8px;
   border-top: 1px dashed #bbb;
   text-align: center;
@@ -414,28 +405,22 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PRINT  –  fixed blank-page bug
+   PRINT
 ═══════════════════════════════════════════════════════════ */
 @media print {
   @page {
     size: A4 portrait;
     margin: 15mm 18mm 18mm 20mm;
   }
-
-  /* 1. Sembunyikan UI shell saja — JANGAN sembunyikan body */
   .sp-header { display: none !important; }
   .sp-bar    { display: none !important; }
-
-  /* 2. Hilangkan chrome/background dari wrapper scroll */
-  .sp-page  { max-width: 100% !important; margin: 0 !important; }
-  .sp-shell { border: none !important; border-radius: 0 !important; box-shadow: none !important; }
+  .sp-page   { max-width: 100% !important; margin: 0 !important; }
+  .sp-shell  { border: none !important; border-radius: 0 !important; box-shadow: none !important; }
   .sp-scroll {
     padding: 0 !important;
     background: #fff !important;
     overflow: visible !important;
   }
-
-  /* 3. Reset surat preview agar mengalir normal */
   #surat-preview {
     width: 100% !important;
     min-height: auto !important;
@@ -443,44 +428,46 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
     padding: 0 !important;
     box-shadow: none !important;
   }
-
-  /* 4. Hapus bingkai dekoratif (absolute positioning = masalah di print) */
   #surat-preview::before,
   #surat-preview::after { display: none !important; }
-
-  /* 5. Paksa warna latar ikut tercetak */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIF
+═══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .sp-header { flex-direction: column; }
   .sp-header__actions { width: 100%; }
   .btn { flex: 1; justify-content: center; }
+  .sp-scroll { padding: 14px; }
 }
 </style>
 
 <!-- ═══════════════════════════════════════════════════════
-     UI SHELL
+     UI SHELL — konten ini dirender di dalam <main class="page-content">
+     milik layout member (main_member.php), sehingga sidebar & topbar
+     tetap tampil seperti halaman lain.
 ════════════════════════════════════════════════════════ -->
 <div class="sp-page">
 
   <div class="sp-header">
     <div class="sp-header__title">
       <h1>Surat Pernyataan &amp; Izin Orang Tua</h1>
-      <p>Dokumen resmi keanggotaan &mdash; No: <?= $nomorSurat ?></p>
+      <p>Dokumen resmi keanggotaan &mdash; Nomor: <?= $nomorSurat ?></p>
     </div>
     <div class="sp-header__actions">
-      <button class="btn btn-ghost" onclick="window.print()">
+      <button class="btn btn-ghost" type="button" onclick="window.print()">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round"
             d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.75 19.5m10.56-5.671.72.096m-.72-.096L17.25 19.5M9 10.5h.008v.008H9V10.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 0h.008v.008H13.5V10.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM6 7.5H4.875a1.875 1.875 0 0 0-1.875 1.875v6c0 1.036.84 1.875 1.875 1.875h14.25A1.875 1.875 0 0 0 21 15.375v-6A1.875 1.875 0 0 0 19.125 7.5H18M6 7.5V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v1.5m-12 0h12"/>
         </svg>
         Cetak
       </button>
-      <button class="btn btn-primary" onclick="downloadPDF()">
+      <button class="btn btn-primary" type="button" onclick="downloadPDF()">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round"
             d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
@@ -507,8 +494,6 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 
           <!-- ── KOP SURAT ─────────────────────────────── -->
           <div class="kop">
-
-            <!-- Logo kiri: SMK Negeri 2 Pinrang -->
             <div class="kop__logo">
               <img src="<?= BASE_URL ?>/assets/img/logo.png"
                    alt="Logo SMK Negeri 2 Pinrang"
@@ -516,32 +501,30 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
               <div class="kop__logo-fallback">S2P</div>
             </div>
 
-            <!-- Teks tengah -->
             <div class="kop__text">
               <div class="kop__org"><?= $orgName ?></div>
               <div class="kop__school">SMK Negeri 2 Pinrang</div>
-              <div class="kop__address">JL. Kesehatan, Kel. Salo, Kec. Wattang Sawitto, Kab. Pinrang</div>
-              <div class="kop__email"><em>E-mail : <?= $emailOrg ?></em></div>
+              <div class="kop__address">Jalan Kesehatan, Kelurahan Salo, Kecamatan Wattang Sawitto, Kabupaten Pinrang</div>
+              <div class="kop__email">Surel: <?= $emailOrg ?></div>
             </div>
 
-            <!-- Logo kanan: COM -->
             <div class="kop__logo">
               <img src="<?= BASE_URL ?>/assets/img/logo-com.png"
                    alt="Logo <?= $orgName ?>"
                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
               <div class="kop__logo-fallback">COM</div>
             </div>
-
           </div><!-- /.kop -->
 
-          <!-- Garis kop: tebal + tipis -->
           <div class="kop-divider">
             <div class="kop-divider-thick"></div>
             <div class="kop-divider-thin"></div>
           </div>
 
-          <!-- Nomor surat di bawah garis kop -->
-          <div class="nomor-surat">Nomor: <?= $nomorSurat ?></div>
+          <div class="info-surat">
+            <span>Nomor&nbsp;: <?= $nomorSurat ?></span>
+            <span>Perihal&nbsp;: Pernyataan Keanggotaan dan Izin Orang Tua</span>
+          </div>
 
           <!-- ── JUDUL SURAT ─────────────────────────────── -->
           <div class="surat-judul">
@@ -550,12 +533,12 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
           </div>
 
           <!-- ── PEMBUKA ──────────────────────────────────── -->
-          <div class="surat-body" style="margin-top: 18px;">
+          <div class="surat-body" style="margin-top: 16px;">
             <p class="indent">
-              Yang bertanda tangan di bawah ini, menerangkan bahwa surat ini dibuat
-              sebagai bukti persetujuan resmi untuk bergabung dan aktif berpartisipasi
-              dalam kegiatan <strong><?= $orgName ?></strong>, SMK Negeri 2 Pinrang,
-              Kabupaten Pinrang, Provinsi Sulawesi Selatan.
+              Yang bertanda tangan di bawah ini, dengan menyadari sepenuhnya makna dan
+              konsekuensi dari pernyataan ini, menyatakan hal-hal sebagai berikut sehubungan
+              dengan keikutsertaan sebagai anggota <strong><?= $orgName ?></strong>
+              SMK Negeri 2 Pinrang, Kabupaten Pinrang, Provinsi Sulawesi Selatan.
             </p>
           </div>
 
@@ -581,7 +564,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
                   <td><?= $kelas ?></td>
                 </tr>
                 <tr>
-                  <td>Nomor HP / WhatsApp</td>
+                  <td>Nomor Telepon/WhatsApp</td>
                   <td>:</td>
                   <td><?= $noHp ?></td>
                 </tr>
@@ -593,7 +576,6 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
               </tbody>
             </table>
 
-            <!-- Foto 3×4 -->
             <div class="id-foto">
               <?php if ($fotoUrl): ?>
                 <img src="<?= $fotoUrl ?>" alt="Foto <?= $namaLengkap ?>">
@@ -618,18 +600,19 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
             <tbody>
               <tr>
                 <td>Kamis</td>
-                <td>Setelah jam pelajaran &ndash; pukul <strong>17.00 WITA</strong></td>
-                <td>Laboratorium Komputer SMKN 2 Pinrang</td>
+                <td>Pukul 17.00 WITA, setelah jam pelajaran berakhir</td>
+                <td>Laboratorium Komputer SMK Negeri 2 Pinrang</td>
               </tr>
               <tr>
                 <td>Jumat</td>
-                <td>Setelah jam pelajaran &ndash; pukul <strong>17.00 WITA</strong></td>
-                <td>Laboratorium Komputer SMKN 2 Pinrang</td>
+                <td>Pukul 17.00 WITA, setelah jam pelajaran berakhir</td>
+                <td>Laboratorium Komputer SMK Negeri 2 Pinrang</td>
               </tr>
             </tbody>
           </table>
           <p class="catatan-jadwal">
-            * Jadwal dapat berubah sewaktu-waktu dan akan dikomunikasikan terlebih dahulu kepada anggota dan orang tua/wali.
+            Catatan: Jadwal dapat berubah sewaktu-waktu dan akan dikomunikasikan terlebih
+            dahulu kepada anggota beserta orang tua/wali.
           </p>
 
           <!-- ── C. PERNYATAAN ANGGOTA ─────────────────────── -->
@@ -637,9 +620,8 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 
           <div class="surat-body">
             <p class="indent">
-              Saya yang bertanda tangan di bawah ini, <strong><?= $namaLengkap ?></strong>
-              (Nomor Induk Anggota: <strong><?= $nia ?></strong>),
-              dengan ini menyatakan dengan sesungguhnya bahwa:
+              Berdasarkan identitas tersebut di atas, saya menyatakan dengan sesungguhnya
+              bahwa:
             </p>
           </div>
 
@@ -647,8 +629,8 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
             <li>
               <span class="num">1.</span>
               <span>
-                Saya adalah anggota resmi <strong><?= $orgName ?></strong> SMK Negeri 2 Pinrang
-                yang terdaftar dengan Nomor Induk Anggota (NIA) <strong><?= $nia ?></strong>.
+                Saya merupakan anggota resmi <strong><?= $orgName ?></strong> SMK Negeri 2
+                Pinrang yang terdaftar dengan Nomor Induk Anggota (NIA) <strong><?= $nia ?></strong>.
               </span>
             </li>
             <li>
@@ -661,70 +643,66 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
             <li>
               <span class="num">3.</span>
               <span>
-                Saya bersedia hadir dan berpartisipasi aktif dalam setiap kegiatan
-                serta pertemuan rutin yang diselenggarakan oleh <?= $orgName ?>.
+                Saya bersedia hadir dan berpartisipasi aktif dalam setiap kegiatan dan
+                pertemuan rutin yang diselenggarakan oleh <?= $orgName ?>.
               </span>
             </li>
             <li>
               <span class="num">4.</span>
               <span>
-                Seluruh data dan informasi yang tercantum dalam surat ini adalah benar
-                dan dapat dipertanggungjawabkan. Apabila terdapat ketidaksesuaian,
-                saya bersedia menerima sanksi sesuai ketentuan yang berlaku.
+                Seluruh data dan informasi yang tercantum dalam surat ini adalah benar dan
+                dapat dipertanggungjawabkan. Apabila di kemudian hari terdapat
+                ketidaksesuaian, saya bersedia menerima sanksi sesuai dengan ketentuan yang
+                berlaku.
               </span>
             </li>
           </ol>
 
           <!-- ── D. IZIN ORANG TUA / WALI ──────────────────── -->
-          <div class="seksi-judul">D.&nbsp;&nbsp;Pernyataan Izin Orang Tua / Wali</div>
+          <div class="seksi-judul">D.&nbsp;&nbsp;Pernyataan Izin Orang Tua/Wali</div>
 
           <div class="surat-body">
             <p class="indent">
-              Saya selaku orang tua/wali dari <strong><?= $namaLengkap ?></strong>
-              menyatakan memberikan <strong>izin sepenuhnya</strong> kepada anak/wali kami
-              untuk bergabung dan aktif mengikuti seluruh kegiatan
-              <strong><?= $orgName ?></strong>, SMK Negeri 2 Pinrang,
-              termasuk pertemuan rutin setiap hari <strong>Kamis</strong> dan
-              <strong>Jumat</strong> hingga pukul <strong>17.00 WITA</strong>.
+              Saya yang bertindak selaku orang tua/wali dari <strong><?= $namaLengkap ?></strong>
+              dengan ini menyatakan memberikan izin sepenuhnya kepada anak/wali kami untuk
+              bergabung dan mengikuti seluruh kegiatan <strong><?= $orgName ?></strong>
+              SMK Negeri 2 Pinrang, termasuk pertemuan rutin setiap hari <strong>Kamis</strong>
+              dan <strong>Jumat</strong> hingga pukul <strong>17.00 WITA</strong>.
             </p>
             <p class="indent">
               Kami menyanggupi untuk memastikan kepulangan anak/wali kami dengan aman
               setelah kegiatan selesai, serta mendukung penuh partisipasi anak/wali kami
-              dalam setiap program yang diselenggarakan oleh organisasi.
+              dalam setiap program yang diselenggarakan oleh organisasi tersebut.
             </p>
           </div>
 
           <!-- ── PENUTUP ────────────────────────────────────── -->
-          <div class="surat-body" style="margin-top:10px;">
+          <div class="surat-body" style="margin-top:8px;">
             <p class="indent">
-              Demikian surat pernyataan dan izin ini dibuat dengan penuh kesadaran,
-              kejujuran, dan tanpa paksaan dari pihak mana pun, untuk dapat dipergunakan
-              sebagaimana mestinya.
+              Demikian surat pernyataan dan izin ini dibuat dengan sadar, jujur, dan tanpa
+              paksaan dari pihak mana pun, untuk dapat dipergunakan sebagaimana mestinya.
             </p>
           </div>
 
           <!-- ── TANDA TANGAN ───────────────────────────────── -->
           <div class="ttd-grid">
-
-            <!-- Kiri: Orang Tua / Wali -->
             <div class="ttd-col">
-              <p>Orang Tua / Wali,</p>
+              <p>Orang Tua/Wali,</p>
               <div class="ttd-space"></div>
               <span class="ttd-name-box">
-                (<?= $namaOrangtua ?: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' ?>)
+                <?= $namaOrangtua ?: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' ?>
               </span>
-              <span class="ttd-sub">Orang Tua / Wali Murid</span>
+              <span class="ttd-sub">Orang Tua/Wali Murid</span>
             </div>
 
-            <!-- Kanan: Anggota -->
             <div class="ttd-col">
               <p>Pinrang, <?= $today ?></p>
               <p style="margin-top:2px;">Yang Membuat Pernyataan,</p>
-              <div class="ttd-space"></div>
+              <p class="ttd-meterai">(Meterai Rp10.000 jika diperlukan)</p>
+              <div class="ttd-space" style="height:36px;"></div>
               <span class="ttd-name-box"><?= $namaLengkap ?></span>
               <span class="ttd-sub">NIA: <?= $nia ?></span>
             </div>
-
           </div><!-- /.ttd-grid -->
 
           <!-- ── FOOTER ─────────────────────────────────────── -->
@@ -742,7 +720,6 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 
 </div><!-- /.sp-page -->
 
-<!-- html2pdf CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
         integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -756,9 +733,6 @@ function downloadPDF() {
 
   btn.disabled = true;
   btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px;animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>&nbsp;Menyiapkan...';
-
-  /* Sembunyikan bingkai dekoratif sementara agar tidak muncul di PDF */
-  el.style.setProperty('--border-hide', 'none');
 
   var opt = {
     margin      : [10, 12, 10, 12],
