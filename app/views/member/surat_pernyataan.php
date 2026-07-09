@@ -570,7 +570,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
                   <td><?= $kelas ?></td>
                 </tr>
                 <tr>
-                  <td>Nomor Telepon/WhatsApp</td>
+                  <td>Nomor Wa</td>
                   <td>:</td>
                   <td><?= $noHp ?></td>
                 </tr>

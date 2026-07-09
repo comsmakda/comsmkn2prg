@@ -98,6 +98,6 @@ class MemberController extends Controller
         }
 
         // Render halaman cetak
-        $this->view('/member/surat_pernyataan', compact('user', 'settings'), 'print');
+        $this->view('/member/surat_pernyataan', compact('user', 'settings'), 'member');
     }
 }
