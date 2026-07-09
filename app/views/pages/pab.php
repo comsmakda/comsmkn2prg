@@ -59,10 +59,9 @@ $extra_head .= '
 
   min-height: calc(100svh - 68px);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 1.25rem 5rem;
+  padding: 3.5rem 1.5rem;
   position: relative;
   overflow: hidden;
   background: var(--bg-page);
@@ -76,8 +75,8 @@ $extra_head .= '
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 55% 45% at 75% 10%, rgba(14,116,144,.06) 0%, transparent 65%),
-    radial-gradient(ellipse 40% 40% at 10% 85%, rgba(14,116,144,.05) 0%, transparent 60%);
+    radial-gradient(ellipse 55% 45% at 80% 8%, rgba(14,116,144,.07) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 45% at 6% 90%, rgba(14,116,144,.055) 0%, transparent 60%);
   z-index: 0;
 }
 .pab-wrap::after {
@@ -93,96 +92,136 @@ $extra_head .= '
   z-index: 0;
 }
 
-.pab-container {
+/* ── Shell: two-column balance on desktop, single column on mobile ── */
+.pab-shell {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 520px;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: clamp(2rem, 4vw, 4.5rem);
+  align-items: start;
 }
 
-/* ── Header ── */
-.pab-header { text-align: center; margin-bottom: 2rem; }
+/* ── Side panel (branding / info) ── */
+.pab-side {
+  position: sticky;
+  top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
 
-.pab-logo-wrap { display: flex; justify-content: center; align-items: center; margin-bottom: 1.25rem; }
+.pab-logo-wrap { display: flex; align-items: center; gap: .85rem; }
 .pab-logo {
-  height: 88px;
+  height: 52px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 3px 10px rgba(15,23,42,.18));
-  animation: logo-float 4s ease-in-out infinite;
+  filter: drop-shadow(0 3px 10px rgba(15,23,42,.14));
+  flex-shrink: 0;
 }
-@keyframes logo-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
-
-.pab-tagline { font-size:.85rem; color:var(--tx-secondary); line-height:1.75; margin-bottom:.75rem; letter-spacing:.01em; }
-.pab-tagline strong { color: var(--ac-dk); font-weight:600; }
+.pab-logo-org { font-size: .78rem; font-weight: 800; color: var(--tx-primary); letter-spacing: -.01em; line-height: 1.3; }
+.pab-logo-sub { font-size: .68rem; color: var(--tx-muted); font-weight: 600; letter-spacing: .02em; }
 
 .pab-badge {
-  display: inline-flex; align-items:center; gap:8px;
-  padding:5px 14px;
+  display: inline-flex; align-items: center; gap: 8px;
+  width: fit-content;
+  padding: 5px 14px;
   background: rgba(14,116,144,.08);
   border: 1px solid rgba(14,116,144,.22);
   border-radius: 99px;
   font-size: .68rem; color: var(--ac);
   font-weight: 700;
-  letter-spacing:.07em; text-transform:uppercase;
-  margin-bottom: 1rem;
+  letter-spacing: .07em; text-transform: uppercase;
 }
-.pab-badge-pulse { width:6px; height:6px; border-radius:50%; background:var(--ac-lt); animation:pulse-glow 2s ease-in-out infinite; flex-shrink:0; }
+.pab-badge-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--ac-lt); animation: pulse-glow 2s ease-in-out infinite; flex-shrink: 0; }
 @keyframes pulse-glow { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(6,182,212,.4)} 50%{opacity:.7;box-shadow:0 0 0 5px rgba(6,182,212,0)} }
 
 .pab-title {
-  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  font-size: clamp(1.7rem, 2.6vw, 2.15rem);
   font-weight: 800; color: var(--ac-dk);
-  letter-spacing:-.035em; line-height:1.1;
-  margin-bottom:.65rem;
+  letter-spacing: -.035em; line-height: 1.12;
 }
 .pab-title .t-grad {
   background: linear-gradient(130deg, var(--ac) 0%, var(--ac-dk) 100%);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
-.pab-info { font-size:.87rem; color:var(--tx-secondary); line-height:1.7; margin-bottom:.5rem; }
+.pab-tagline { font-size: .87rem; color: var(--tx-secondary); line-height: 1.75; letter-spacing: .01em; }
+.pab-tagline strong { color: var(--ac-dk); font-weight: 700; }
+.pab-info { font-size: .84rem; color: var(--tx-secondary); line-height: 1.7; }
+
 .pab-deadline {
-  display:inline-flex; align-items:center; gap:6px;
-  font-size:.7rem; font-weight: 700; color: var(--amber);
-  background: var(--amber-bg); border:1px solid var(--amber-bd);
-  border-radius:99px; padding:4px 12px; margin-top:.25rem;
+  display: inline-flex; align-items: center; gap: 6px;
+  width: fit-content;
+  font-size: .72rem; font-weight: 700; color: var(--amber);
+  background: var(--amber-bg); border: 1px solid var(--amber-bd);
+  border-radius: 99px; padding: 5px 13px;
 }
 
-/* ── Alert (§5.5) ── */
-.pab-alert {
-  border-radius: var(--r-md); padding:.9rem 1.1rem; font-size:.84rem;
-  margin-bottom:1.25rem; border:1px solid;
-  display:flex; align-items:flex-start; gap:9px;
-  font-weight: 500;
+/* Benefit list — memberi konteks singkat kenapa bergabung */
+.pab-benefits { display: flex; flex-direction: column; gap: .8rem; }
+.pab-benefit {
+  display: flex; align-items: flex-start; gap: 11px;
 }
-.pab-alert-icon { flex-shrink:0; margin-top:1px; }
-.pab-alert.success { background: var(--green-bg); border-color: var(--green-bd); color: var(--green); }
-.pab-alert.error   { background: var(--red-bg);   border-color: var(--red-bd);   color: var(--red); }
-.pab-alert.info    { background: rgba(14,116,144,.07); border-color: rgba(14,116,144,.22); color: var(--ac); }
+.pab-benefit-icon {
+  width: 30px; height: 30px; border-radius: 9px;
+  background: var(--bg-surface);
+  border: 1px solid var(--bd-subtle);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ac); flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(15,23,42,.04);
+}
+.pab-benefit-text { font-size: .81rem; color: var(--tx-secondary); line-height: 1.55; padding-top: 4px; }
+.pab-benefit-text strong { color: var(--tx-primary); font-weight: 700; }
 
-/* ── Persyaratan (info card sebelum form) ── */
+/* ── Persyaratan (info card) — tinggal di side panel ── */
 .pab-req {
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
   border-radius: var(--r-md);
-  padding: 1.2rem 1.4rem;
-  margin-bottom: 1.25rem;
+  padding: 1.25rem 1.4rem;
   box-shadow: 0 4px 18px rgba(15,23,42,.05);
 }
 .pab-req-title {
-  display:flex; align-items:center; gap:8px;
-  font-size:.85rem; font-weight:800; color: var(--tx-primary);
-  margin-bottom:.75rem;
+  display: flex; align-items: center; gap: 8px;
+  font-size: .82rem; font-weight: 800; color: var(--tx-primary);
+  margin-bottom: .8rem;
 }
-.pab-req-title svg { color: var(--ac); flex-shrink:0; }
-.pab-req-list { display:flex; flex-direction:column; gap:.55rem; }
+.pab-req-title svg { color: var(--ac); flex-shrink: 0; }
+.pab-req-list { display: flex; flex-direction: column; gap: .55rem; }
 .pab-req-item {
-  display:flex; align-items:flex-start; gap:9px;
-  font-size:.8rem; color:var(--tx-secondary); line-height:1.55;
+  display: flex; align-items: flex-start; gap: 9px;
+  font-size: .79rem; color: var(--tx-secondary); line-height: 1.55;
 }
-.pab-req-item svg { flex-shrink:0; margin-top:2px; color: var(--green); }
+.pab-req-item svg { flex-shrink: 0; margin-top: 2px; color: var(--green); }
 
-/* ── Card (§5.1) ── */
+.pab-back { margin-top: .25rem; }
+.pab-back a {
+  font-size: .82rem; color: var(--tx-secondary); text-decoration: none;
+  transition: color .2s;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-weight: 600;
+}
+.pab-back a:hover { color: var(--ac); }
+
+/* ── Main column ── */
+.pab-main { min-width: 0; }
+
+/* ── Flash alert ── */
+.pab-alert {
+  border-radius: var(--r-md); padding: .9rem 1.1rem; font-size: .84rem;
+  margin-bottom: 1.25rem; border: 1px solid;
+  display: flex; align-items: flex-start; gap: 9px;
+  font-weight: 500;
+}
+.pab-alert-icon { flex-shrink: 0; margin-top: 1px; }
+.pab-alert.success { background: var(--green-bg); border-color: var(--green-bd); color: var(--green); }
+.pab-alert.error   { background: var(--red-bg);   border-color: var(--red-bd);   color: var(--red); }
+.pab-alert.info    { background: rgba(14,116,144,.07); border-color: rgba(14,116,144,.22); color: var(--ac); }
+
+/* ── Card ── */
 .pab-card {
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
@@ -191,176 +230,176 @@ $extra_head .= '
   box-shadow: 0 30px 70px -20px rgba(15,23,42,.16), 0 4px 18px rgba(15,23,42,.05);
 }
 .pab-card-head {
-  padding: 1.4rem 1.8rem;
+  padding: 1.5rem 2rem;
   border-bottom: 1px solid var(--bd-subtle);
-  display:flex; align-items:center; gap:.75rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1.25rem; flex-wrap: wrap;
   background: var(--bg-elevated);
 }
+.pab-card-head-left { display: flex; align-items: center; gap: .75rem; }
 .pab-card-head-icon {
-  width:36px; height:36px; border-radius: var(--r-sm);
+  width: 38px; height: 38px; border-radius: var(--r-sm);
   background: rgba(14,116,144,.1);
-  display:flex; align-items:center; justify-content:center;
-  color: var(--ac); flex-shrink:0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ac); flex-shrink: 0;
 }
-.pab-card-head h2 { font-size:.97rem; font-weight:800; color: var(--tx-primary); }
-.pab-card-head span { font-size:.68rem; color: var(--tx-muted); letter-spacing:.03em; }
-.pab-card-body { padding: 1.8rem; }
+.pab-card-head h2 { font-size: .98rem; font-weight: 800; color: var(--tx-primary); }
+.pab-card-head span { font-size: .69rem; color: var(--tx-muted); letter-spacing: .03em; }
+.pab-card-body { padding: 2rem; }
 
 /* ── Closed state ── */
-.pab-closed { text-align:center; padding:3rem 1.8rem; }
+.pab-closed { text-align: center; padding: 3.5rem 2rem; }
 .pab-closed-icon {
-  width:64px; height:64px;
+  width: 64px; height: 64px;
   background: var(--red-bg);
-  border:1px solid var(--red-bd);
-  border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  margin:0 auto 1.25rem; color: var(--red);
+  border: 1px solid var(--red-bd);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.25rem; color: var(--red);
 }
-.pab-closed h2 { font-size:1.2rem; font-weight:800; color: var(--tx-primary); margin-bottom:.5rem; }
-.pab-closed p { font-size:.84rem; color:var(--tx-secondary); line-height:1.75; }
+.pab-closed h2 { font-size: 1.2rem; font-weight: 800; color: var(--tx-primary); margin-bottom: .5rem; }
+.pab-closed p { font-size: .84rem; color: var(--tx-secondary); line-height: 1.75; max-width: 380px; margin: 0 auto; }
 
-/* ── Form fields (§5.2) ── */
-.pab-form { display:flex; flex-direction:column; gap:1.1rem; }
-.pab-field { display:flex; flex-direction:column; gap:.45rem; }
-.pab-label { font-size:.78rem; font-weight:700; color:var(--tx-primary); letter-spacing:-.01em; }
-.pab-label span { color: var(--red); margin-left:2px; }
-.pab-hint { font-size:.68rem; color:var(--tx-muted); letter-spacing:.01em; }
+/* ── Step indicator ── */
+.pab-steps { display: flex; align-items: center; gap: 0; margin-bottom: 1.9rem; }
+.pab-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; position: relative; }
+.pab-step::after { content: ''; position: absolute; top: 14px; left: 50%; width: 100%; height: 1px; background: var(--bd-subtle); }
+.pab-step:last-child::after { display: none; }
+.pab-step-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #fbfcfe; border: 1px solid var(--bd-subtle);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .68rem; font-weight: 700; color: var(--tx-muted);
+  position: relative; z-index: 1; transition: all .3s;
+}
+.pab-step.active .pab-step-dot { background: var(--ac); border-color: var(--ac); color: #fff; box-shadow: 0 0 0 4px rgba(14,116,144,.15); }
+.pab-step.done .pab-step-dot { background: var(--green-bg); border-color: var(--green-bd); color: var(--green); }
+.pab-step-label { font-size: .62rem; color: var(--tx-muted); font-weight: 700; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
+.pab-step.active .pab-step-label { color: var(--ac); }
+.pab-step.done  .pab-step-label  { color: var(--green); }
+
+/* ── Form fields ── */
+.pab-form { display: flex; flex-direction: column; gap: 1.15rem; }
+.pab-field { display: flex; flex-direction: column; gap: .45rem; }
+.pab-label { font-size: .78rem; font-weight: 700; color: var(--tx-primary); letter-spacing: -.01em; }
+.pab-label span { color: var(--red); margin-left: 2px; }
+.pab-hint { font-size: .68rem; color: var(--tx-muted); letter-spacing: .01em; }
 
 .pab-input {
-  width:100%;
+  width: 100%;
   background: #fbfcfe;
-  border:1.5px solid var(--bd-subtle);
+  border: 1.5px solid var(--bd-subtle);
   border-radius: var(--r-sm);
-  padding:12px 15px;
-  font-size:.9rem; color:var(--tx-primary);
+  padding: 12px 15px;
+  font-size: .9rem; color: var(--tx-primary);
   font-family: inherit;
-  outline:none;
+  outline: none;
   transition: border-color .16s, box-shadow .16s, background .16s;
-  appearance:none;
+  appearance: none;
 }
 .pab-input::placeholder { color: var(--tx-muted); }
 .pab-input:hover  { border-color: var(--c-muted2, #94a3b8); }
-.pab-input:focus  { border-color: var(--ac-lt); box-shadow: 0 0 0 3px rgba(6,182,212,.12); background:#fff; }
+.pab-input:focus  { border-color: var(--ac-lt); box-shadow: 0 0 0 3px rgba(6,182,212,.12); background: #fff; }
 
-.pab-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.pab-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
-.pab-pass-hint { font-size:.68rem; color:var(--tx-muted); margin-top:3px; letter-spacing:.01em; }
+.pab-pass-hint { font-size: .68rem; color: var(--tx-muted); margin-top: 3px; letter-spacing: .01em; }
 
 .pab-divider {
-  display:flex; align-items:center; gap:.75rem;
-  color:var(--tx-muted); font-size:.72rem; font-weight: 700;
-  letter-spacing:.06em; text-transform:uppercase;
-  margin:.25rem 0;
+  display: flex; align-items: center; gap: .75rem;
+  color: var(--tx-muted); font-size: .72rem; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  margin: .25rem 0;
 }
-.pab-divider::before, .pab-divider::after { content:''; flex:1; height:1px; background:var(--bd-subtle); }
+.pab-divider::before, .pab-divider::after { content: ''; flex: 1; height: 1px; background: var(--bd-subtle); }
 
 /* ── Dropzone ── */
 .pab-dropzone {
-  width:100%;
-  border:1.5px dashed var(--bd-subtle);
+  width: 100%;
+  border: 1.5px dashed var(--bd-subtle);
   border-radius: var(--r-sm);
   background: #fbfcfe;
-  cursor:pointer;
+  cursor: pointer;
   transition: border-color .2s, background .2s;
-  overflow:hidden; position:relative;
-  min-height:120px;
-  display:flex; align-items:center; justify-content:center;
+  overflow: hidden; position: relative;
+  min-height: 128px;
+  display: flex; align-items: center; justify-content: center;
 }
 .pab-dropzone:hover, .pab-dropzone.drag-over { border-color: var(--ac-lt); background: rgba(6,182,212,.05); }
 .pab-dropzone-inner {
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:.4rem; padding:1.5rem; text-align:center; pointer-events:none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: .4rem; padding: 1.5rem; text-align: center; pointer-events: none;
 }
 .pab-dropzone-icon {
-  width:40px; height:40px; border-radius: var(--r-sm);
+  width: 40px; height: 40px; border-radius: var(--r-sm);
   background: rgba(14,116,144,.09);
-  display:flex; align-items:center; justify-content:center;
-  color: var(--ac); margin-bottom:.2rem;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ac); margin-bottom: .2rem;
   transition: background .2s;
 }
 .pab-dropzone:hover .pab-dropzone-icon { background: rgba(14,116,144,.16); }
-.pab-dropzone-label { font-size:.83rem; font-weight:700; color:var(--tx-primary); }
-.pab-dropzone-sub { font-size:.66rem; color:var(--tx-muted); letter-spacing:.02em; }
-#pab-preview { width:100%; height:140px; object-fit:cover; display:none; }
-#pab-preview.show { display:block; }
+.pab-dropzone-label { font-size: .83rem; font-weight: 700; color: var(--tx-primary); }
+.pab-dropzone-sub { font-size: .66rem; color: var(--tx-muted); letter-spacing: .02em; }
+#pab-preview { width: 100%; height: 150px; object-fit: cover; display: none; }
+#pab-preview.show { display: block; }
 .pab-preview-reset {
-  position:absolute; top:8px; right:8px;
-  width:28px; height:28px; border-radius:50%;
+  position: absolute; top: 8px; right: 8px;
+  width: 28px; height: 28px; border-radius: 50%;
   background: rgba(15,23,42,.55);
-  border:1px solid rgba(255,255,255,.25);
-  display:none; align-items:center; justify-content:center;
-  cursor:pointer; color:#fff; z-index:2;
+  border: 1px solid rgba(255,255,255,.25);
+  display: none; align-items: center; justify-content: center;
+  cursor: pointer; color: #fff; z-index: 2;
   transition: background .2s;
 }
 .pab-preview-reset:hover { background: rgba(185,28,28,.7); }
-.pab-preview-reset.show { display:flex; }
+.pab-preview-reset.show { display: flex; }
 .pab-file-error {
-  display:none;
-  align-items:center; gap:6px;
-  font-size:.72rem; color: var(--red);
-  margin-top:.2rem;
+  display: none;
+  align-items: center; gap: 6px;
+  font-size: .72rem; color: var(--red);
+  margin-top: .2rem;
   font-weight: 500;
 }
-.pab-file-error.show { display:flex; }
+.pab-file-error.show { display: flex; }
 
-/* ── Submit button (§5.3) ── */
+/* ── Submit button ── */
 .pab-submit {
-  width:100%; padding:13px;
-  background: var(--ac); color:#fff;
-  font-weight:800; font-size:.9rem;
-  border:none; border-radius: var(--r-sm); cursor:pointer;
-  display:flex; align-items:center; justify-content:center; gap:8px;
+  width: 100%; padding: 13px;
+  background: var(--ac); color: #fff;
+  font-weight: 800; font-size: .9rem;
+  border: none; border-radius: var(--r-sm); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
   transition: background .18s, transform .12s, box-shadow .18s;
   box-shadow: 0 8px 22px rgba(14,116,144,.25);
-  letter-spacing:-.01em; margin-top:.3rem;
+  letter-spacing: -.01em; margin-top: .3rem;
   font-family: inherit;
 }
 .pab-submit:hover { background: var(--ac-lt); transform: translateY(-2px); box-shadow: 0 12px 28px rgba(6,182,212,.3); }
 .pab-submit:active { transform: translateY(0); }
-.pab-submit:disabled { opacity:.55; cursor:not-allowed; transform:none; }
+.pab-submit:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 
 .pab-privacy-note {
-  font-size:.68rem; color:var(--tx-muted); text-align:center; line-height:1.6;
-  margin-top:.4rem;
+  font-size: .68rem; color: var(--tx-muted); text-align: center; line-height: 1.6;
+  margin-top: .4rem;
 }
-
-/* ── Footer link ── */
-.pab-back { text-align:center; margin-top:1.5rem; }
-.pab-back a {
-  font-size:.82rem; color:var(--tx-secondary); text-decoration:none;
-  transition: color .2s;
-  display:inline-flex; align-items:center; gap:5px;
-  font-weight: 600;
-}
-.pab-back a:hover { color: var(--ac); }
-
-/* Step indicator */
-.pab-steps { display:flex; align-items:center; gap:0; margin-bottom:1.6rem; }
-.pab-step { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; position:relative; }
-.pab-step::after { content:''; position:absolute; top:14px; left:50%; width:100%; height:1px; background:var(--bd-subtle); }
-.pab-step:last-child::after { display:none; }
-.pab-step-dot {
-  width:28px; height:28px; border-radius:50%;
-  background: #fbfcfe; border:1px solid var(--bd-subtle);
-  display:flex; align-items:center; justify-content:center;
-  font-size:.68rem; font-weight: 700; color:var(--tx-muted);
-  position:relative; z-index:1; transition: all .3s;
-}
-.pab-step.active .pab-step-dot { background: var(--ac); border-color: var(--ac); color:#fff; box-shadow: 0 0 0 4px rgba(14,116,144,.15); }
-.pab-step.done .pab-step-dot { background: var(--green-bg); border-color: var(--green-bd); color: var(--green); }
-.pab-step-label { font-size:.62rem; color:var(--tx-muted); font-weight: 700; letter-spacing:.05em; text-transform:uppercase; white-space:nowrap; }
-.pab-step.active .pab-step-label { color: var(--ac); }
-.pab-step.done  .pab-step-label  { color: var(--green); }
 
 /* ── Responsive ── */
+@media (max-width: 900px) {
+  .pab-shell { grid-template-columns: 1fr; max-width: 560px; gap: 2.25rem; }
+  .pab-side { position: static; text-align: center; align-items: center; }
+  .pab-logo-wrap { flex-direction: column; gap: .5rem; }
+  .pab-benefits { text-align: left; width: 100%; }
+  .pab-badge, .pab-deadline { margin-inline: auto; }
+}
+
 @media (max-width: 480px) {
-  .pab-wrap { padding: 3rem .85rem 4rem; }
+  .pab-wrap { padding: 2.5rem 1rem 3.5rem; }
   .pab-card-body { padding: 1.4rem; }
   .pab-card-head { padding: 1.1rem 1.4rem; }
   .pab-grid-2 { grid-template-columns: 1fr; }
   .pab-steps { display: none; }
-  .pab-title { font-size: 1.6rem; }
-  .pab-logo { height: 68px; }
+  .pab-title { font-size: 1.55rem; }
+  .pab-logo { height: 46px; }
   .pab-req { padding: 1rem 1.1rem; }
 }
 
@@ -368,19 +407,23 @@ $extra_head .= '
 </style>
 
 <div class="pab-wrap">
-  <div class="pab-container">
+  <div class="pab-shell">
 
-    <!-- ── Header ── -->
-    <header class="pab-header">
+    <!-- ── Side panel: branding & info ── -->
+    <aside class="pab-side">
 
       <div class="pab-logo-wrap">
         <img
           src="<?= BASE_URL ?>/assets/img/logo-com.png"
           alt="Logo <?= htmlspecialchars($settings['org_name']['value'] ?? APP_NAME) ?>"
           class="pab-logo"
-          width="88" height="88"
+          width="52" height="52"
           loading="eager"
           onerror="this.style.display='none'">
+        <div>
+          <div class="pab-logo-org"><?= htmlspecialchars($settings['org_name']['value'] ?? APP_NAME) ?></div>
+          <div class="pab-logo-sub">SMK Negeri 2 Pinrang</div>
+        </div>
       </div>
 
       <div class="pab-badge">
@@ -400,8 +443,7 @@ $extra_head .= '
       </h1>
 
       <p class="pab-tagline">
-        Bergabunglah bersama <strong>Komunitas Programmer SMKN 2 Pinrang</strong>.<br>
-        Jadilah bagian dari generasi teknologi berikutnya!
+        Bergabunglah bersama <strong>Komunitas Programmer SMKN 2 Pinrang</strong>. Jadilah bagian dari generasi teknologi berikutnya!
       </p>
 
       <?php if (!empty($settings['pab_info']['value'])): ?>
@@ -409,212 +451,239 @@ $extra_head .= '
       <?php endif; ?>
 
       <?php if (!empty($settings['pab_deadline']['value'])): ?>
-        <div style="display:flex;justify-content:center">
-          <span class="pab-deadline">
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Batas: <?= htmlspecialchars($settings['pab_deadline']['value']) ?>
-          </span>
+        <span class="pab-deadline">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Batas: <?= htmlspecialchars($settings['pab_deadline']['value']) ?>
+        </span>
+      <?php endif; ?>
+
+      <!-- Kenapa gabung -->
+      <div class="pab-benefits">
+        <div class="pab-benefit">
+          <div class="pab-benefit-icon">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <div class="pab-benefit-text"><strong>Belajar coding bareng</strong> — dari dasar sampai proyek nyata, dibimbing kakak kelas dan mentor.</div>
+        </div>
+        <div class="pab-benefit">
+          <div class="pab-benefit-icon">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="pab-benefit-text"><strong>Komunitas suportif</strong> — tempat berbagi ide, berkolaborasi, dan tumbuh bersama.</div>
+        </div>
+        <div class="pab-benefit">
+          <div class="pab-benefit-icon">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+          </div>
+          <div class="pab-benefit-text"><strong>Portofolio nyata</strong> — kesempatan mengerjakan proyek yang bisa kamu tunjukkan ke dunia luar.</div>
+        </div>
+      </div>
+
+      <?php if ($isOpen): ?>
+      <!-- ── Persyaratan pendaftaran ── -->
+      <section class="pab-req" aria-labelledby="pab-req-title">
+        <div class="pab-req-title" id="pab-req-title">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Yang Perlu Disiapkan
+        </div>
+        <div class="pab-req-list">
+          <div class="pab-req-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Nama lengkap, kelas, dan nomor HP aktif yang bisa dihubungi.</span>
+          </div>
+          <div class="pab-req-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Password akun portal (minimal 6 karakter) untuk login setelah mendaftar.</span>
+          </div>
+          <div class="pab-req-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Pas foto terbaru format JPG/PNG/WEBP, ukuran maksimal 2 MB.</span>
+          </div>
+        </div>
+      </section>
+      <?php endif; ?>
+
+      <div class="pab-back">
+        <a href="<?= BASE_URL ?>/">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          Kembali ke beranda
+        </a>
+      </div>
+
+    </aside>
+
+    <!-- ── Main column: alert + card ── -->
+    <div class="pab-main">
+
+      <!-- ── Flash alert ── -->
+      <?php if (!empty($flash)): ?>
+        <?php
+          $alertType = $flash['type'] === 'success' ? 'success' : ($flash['type'] === 'info' ? 'info' : 'error');
+          $alertIcon = $alertType === 'success'
+            ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'
+            : '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+        ?>
+        <div class="pab-alert <?= $alertType ?>" role="alert">
+          <svg class="pab-alert-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><?= $alertIcon ?></svg>
+          <?= $flash['msg'] ?>
         </div>
       <?php endif; ?>
-    </header>
 
-    <!-- ── Flash alert ── -->
-    <?php if (!empty($flash)): ?>
-      <?php
-        $alertType = $flash['type'] === 'success' ? 'success' : ($flash['type'] === 'info' ? 'info' : 'error');
-        $alertIcon = $alertType === 'success'
-          ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'
-          : '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
-      ?>
-      <div class="pab-alert <?= $alertType ?>" role="alert">
-        <svg class="pab-alert-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><?= $alertIcon ?></svg>
-        <?= $flash['msg'] ?>
-      </div>
-    <?php endif; ?>
+      <!-- ── Card ── -->
+      <div class="pab-card">
 
-    <?php if ($isOpen): ?>
-    <!-- ── Persyaratan pendaftaran (agar siswa lebih paham sebelum mengisi form) ── -->
-    <section class="pab-req" aria-labelledby="pab-req-title">
-      <div class="pab-req-title" id="pab-req-title">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        Yang Perlu Disiapkan
-      </div>
-      <div class="pab-req-list">
-        <div class="pab-req-item">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>Nama lengkap, kelas, dan nomor HP aktif yang bisa dihubungi.</span>
-        </div>
-        <div class="pab-req-item">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>Password akun portal (minimal 6 karakter) untuk login setelah mendaftar.</span>
-        </div>
-        <div class="pab-req-item">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>Pas foto terbaru format JPG/PNG/WEBP, ukuran maksimal 2 MB.</span>
-        </div>
-      </div>
-    </section>
-    <?php endif; ?>
-
-    <!-- ── Card ── -->
-    <div class="pab-card">
-
-      <?php if (!$isOpen): ?>
-        <!-- Closed state -->
-        <div class="pab-closed">
-          <div class="pab-closed-icon">
-            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </div>
-          <h2>Pendaftaran Ditutup</h2>
-          <p>Saat ini pendaftaran PAB sedang tidak dibuka.<br>Pantau terus informasi selanjutnya melalui media sosial kami.</p>
-        </div>
-
-      <?php else: ?>
-        <!-- Card header -->
-        <div class="pab-card-head">
-          <div class="pab-card-head-icon">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="21" y1="8" x2="21" y2="14"/><line x1="18" y1="11" x2="24" y2="11"/></svg>
-          </div>
-          <div>
-            <h2>Formulir Pendaftaran</h2>
-            <span>Isi data diri dengan lengkap dan benar</span>
-          </div>
-        </div>
-
-        <!-- Card body -->
-        <div class="pab-card-body">
-
-          <!-- Step indicator -->
-          <div class="pab-steps" aria-label="Langkah pendaftaran">
-            <div class="pab-step active">
-              <div class="pab-step-dot">1</div>
-              <span class="pab-step-label">Data Diri</span>
+        <?php if (!$isOpen): ?>
+          <!-- Closed state -->
+          <div class="pab-closed">
+            <div class="pab-closed-icon">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </div>
-            <div class="pab-step">
-              <div class="pab-step-dot">2</div>
-              <span class="pab-step-label">Akun</span>
-            </div>
-            <div class="pab-step">
-              <div class="pab-step-dot">3</div>
-              <span class="pab-step-label">Foto</span>
+            <h2>Pendaftaran Ditutup</h2>
+            <p>Saat ini pendaftaran PAB sedang tidak dibuka. Pantau terus informasi selanjutnya melalui media sosial kami.</p>
+          </div>
+
+        <?php else: ?>
+          <!-- Card header -->
+          <div class="pab-card-head">
+            <div class="pab-card-head-left">
+              <div class="pab-card-head-icon">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="21" y1="8" x2="21" y2="14"/><line x1="18" y1="11" x2="24" y2="11"/></svg>
+              </div>
+              <div>
+                <h2>Formulir Pendaftaran</h2>
+                <span>Isi data diri dengan lengkap dan benar</span>
+              </div>
             </div>
           </div>
 
-          <form method="POST" action="<?= BASE_URL ?>/pab/register"
-                enctype="multipart/form-data" class="pab-form" id="pab-form" novalidate>
-            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
+          <!-- Card body -->
+          <div class="pab-card-body">
 
-            <!-- Nama -->
-            <div class="pab-field">
-              <label class="pab-label" for="pab-nama">Nama Lengkap <span>*</span></label>
-              <input id="pab-nama" type="text" name="nama_lengkap" required
-                     class="pab-input" placeholder="Nama sesuai rapor"
-                     autocomplete="name">
+            <!-- Step indicator -->
+            <div class="pab-steps" aria-label="Langkah pendaftaran">
+              <div class="pab-step active">
+                <div class="pab-step-dot">1</div>
+                <span class="pab-step-label">Data Diri</span>
+              </div>
+              <div class="pab-step">
+                <div class="pab-step-dot">2</div>
+                <span class="pab-step-label">Akun</span>
+              </div>
+              <div class="pab-step">
+                <div class="pab-step-dot">3</div>
+                <span class="pab-step-label">Foto</span>
+              </div>
             </div>
 
-            <!-- Kelas + No HP -->
-            <div class="pab-grid-2">
+            <form method="POST" action="<?= BASE_URL ?>/pab/register"
+                  enctype="multipart/form-data" class="pab-form" id="pab-form" novalidate>
+              <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
+
+              <!-- Nama -->
               <div class="pab-field">
-                <label class="pab-label" for="pab-kelas">Kelas <span>*</span></label>
-                <input id="pab-kelas" type="text" name="kelas" required
-                       class="pab-input" placeholder="Contoh: XI RPL 1">
+                <label class="pab-label" for="pab-nama">Nama Lengkap <span>*</span></label>
+                <input id="pab-nama" type="text" name="nama_lengkap" required
+                       class="pab-input" placeholder="Nama sesuai rapor"
+                       autocomplete="name">
               </div>
-              <div class="pab-field">
-                <label class="pab-label" for="pab-hp">Nomor HP <span>*</span></label>
-                <input id="pab-hp" type="tel" name="no_hp" required
-                       class="pab-input" placeholder="08xxxxxxxxxx"
-                       autocomplete="tel" pattern="[0-9]{10,15}"
-                       inputmode="numeric">
-              </div>
-            </div>
-            <span class="pab-hint">Pastikan nomor HP aktif — panitia akan menghubungi lewat WhatsApp.</span>
 
-            <!-- Divider -->
-            <div class="pab-divider">Akun Portal</div>
-
-            <!-- Password -->
-            <div class="pab-field">
-              <label class="pab-label" for="pab-pass">Password <span>*</span></label>
-              <div style="position:relative">
-                <input id="pab-pass" type="password" name="password" required
-                       minlength="6" class="pab-input" placeholder="Minimal 6 karakter"
-                       autocomplete="new-password" style="padding-right:2.8rem">
-                <button type="button" id="toggle-pass"
-                        style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--tx-muted);padding:0;display:flex;align-items:center;"
-                        aria-label="Tampilkan password">
-                  <svg id="eye-icon" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </button>
-              </div>
-              <span class="pab-pass-hint">Password ini digunakan untuk login ke portal komunitas — jangan lupa dicatat.</span>
-            </div>
-
-            <!-- Konfirmasi Password -->
-            <div class="pab-field">
-              <label class="pab-label" for="pab-pass2">Konfirmasi Password <span>*</span></label>
-              <div style="position:relative">
-                <input id="pab-pass2" type="password" name="password_confirmation" required
-                       class="pab-input" placeholder="Ulangi password yang sama"
-                       autocomplete="new-password" style="padding-right:2.8rem">
-                <span id="pass-match-icon"
-                      style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);display:none;"></span>
-              </div>
-              <span class="pab-hint" id="pass-match-text"></span>
-            </div>
-
-            <!-- Divider -->
-            <div class="pab-divider">Pas Foto</div>
-
-            <!-- Dropzone foto -->
-            <div class="pab-field">
-              <label class="pab-label">Pas Foto <span>*</span></label>
-              <div class="pab-dropzone" id="pab-dropzone" role="button" tabindex="0"
-                   aria-label="Unggah pas foto">
-                <img id="pab-preview" alt="Preview foto">
-                <button type="button" class="pab-preview-reset" id="pab-reset-photo"
-                        aria-label="Hapus foto">
-                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-                <div class="pab-dropzone-inner" id="pab-dz-inner">
-                  <div class="pab-dropzone-icon">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                  </div>
-                  <span class="pab-dropzone-label">Klik atau seret foto ke sini</span>
-                  <span class="pab-dropzone-sub">JPG · PNG · WEBP — Maks. 2 MB</span>
+              <!-- Kelas + No HP -->
+              <div class="pab-grid-2">
+                <div class="pab-field">
+                  <label class="pab-label" for="pab-kelas">Kelas <span>*</span></label>
+                  <input id="pab-kelas" type="text" name="kelas" required
+                         class="pab-input" placeholder="Contoh: XI RPL 1">
                 </div>
-                <input type="file" name="foto" id="pab-foto"
-                       accept="image/jpeg,image/png,image/webp"
-                       class="hidden" required style="display:none">
+                <div class="pab-field">
+                  <label class="pab-label" for="pab-hp">Nomor HP <span>*</span></label>
+                  <input id="pab-hp" type="tel" name="no_hp" required
+                         class="pab-input" placeholder="08xxxxxxxxxx"
+                         autocomplete="tel" pattern="[0-9]{10,15}"
+                         inputmode="numeric">
+                </div>
               </div>
-              <span class="pab-file-error" id="pab-file-error">
-                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <span id="pab-file-error-text">Ukuran foto maksimal 2 MB.</span>
-              </span>
-            </div>
+              <span class="pab-hint">Pastikan nomor HP aktif — panitia akan menghubungi lewat WhatsApp.</span>
 
-            <!-- Submit -->
-            <button type="submit" class="pab-submit" id="pab-submit">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-              Kirim Pendaftaran
-            </button>
+              <!-- Divider -->
+              <div class="pab-divider">Akun Portal</div>
 
-            <p class="pab-privacy-note">
-              Dengan mengirim formulir ini, kamu menyetujui data digunakan hanya untuk keperluan seleksi anggota.
-            </p>
+              <!-- Password -->
+              <div class="pab-field">
+                <label class="pab-label" for="pab-pass">Password <span>*</span></label>
+                <div style="position:relative">
+                  <input id="pab-pass" type="password" name="password" required
+                         minlength="6" class="pab-input" placeholder="Minimal 6 karakter"
+                         autocomplete="new-password" style="padding-right:2.8rem">
+                  <button type="button" id="toggle-pass"
+                          style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--tx-muted);padding:0;display:flex;align-items:center;"
+                          aria-label="Tampilkan password">
+                    <svg id="eye-icon" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <span class="pab-pass-hint">Password ini digunakan untuk login ke portal komunitas — jangan lupa dicatat.</span>
+              </div>
 
-          </form>
-        </div><!-- .pab-card-body -->
-      <?php endif; ?>
-    </div><!-- .pab-card -->
+              <!-- Konfirmasi Password -->
+              <div class="pab-field">
+                <label class="pab-label" for="pab-pass2">Konfirmasi Password <span>*</span></label>
+                <div style="position:relative">
+                  <input id="pab-pass2" type="password" name="password_confirmation" required
+                         class="pab-input" placeholder="Ulangi password yang sama"
+                         autocomplete="new-password" style="padding-right:2.8rem">
+                  <span id="pass-match-icon"
+                        style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);display:none;"></span>
+                </div>
+                <span class="pab-hint" id="pass-match-text"></span>
+              </div>
 
-    <!-- Satu-satunya link kembali ke beranda -->
-    <div class="pab-back">
-      <a href="<?= BASE_URL ?>/">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        Kembali ke beranda
-      </a>
-    </div>
+              <!-- Divider -->
+              <div class="pab-divider">Pas Foto</div>
 
-  </div><!-- .pab-container -->
+              <!-- Dropzone foto -->
+              <div class="pab-field">
+                <label class="pab-label">Pas Foto <span>*</span></label>
+                <div class="pab-dropzone" id="pab-dropzone" role="button" tabindex="0"
+                     aria-label="Unggah pas foto">
+                  <img id="pab-preview" alt="Preview foto">
+                  <button type="button" class="pab-preview-reset" id="pab-reset-photo"
+                          aria-label="Hapus foto">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                  <div class="pab-dropzone-inner" id="pab-dz-inner">
+                    <div class="pab-dropzone-icon">
+                      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    </div>
+                    <span class="pab-dropzone-label">Klik atau seret foto ke sini</span>
+                    <span class="pab-dropzone-sub">JPG · PNG · WEBP — Maks. 2 MB</span>
+                  </div>
+                  <input type="file" name="foto" id="pab-foto"
+                         accept="image/jpeg,image/png,image/webp"
+                         class="hidden" required style="display:none">
+                </div>
+                <span class="pab-file-error" id="pab-file-error">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span id="pab-file-error-text">Ukuran foto maksimal 2 MB.</span>
+                </span>
+              </div>
+
+              <!-- Submit -->
+              <button type="submit" class="pab-submit" id="pab-submit">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Kirim Pendaftaran
+              </button>
+
+              <p class="pab-privacy-note">
+                Dengan mengirim formulir ini, kamu menyetujui data digunakan hanya untuk keperluan seleksi anggota.
+              </p>
+
+            </form>
+          </div><!-- .pab-card-body -->
+        <?php endif; ?>
+      </div><!-- .pab-card -->
+
+    </div><!-- .pab-main -->
+
+  </div><!-- .pab-shell -->
 </div><!-- .pab-wrap -->
 
 <script>
