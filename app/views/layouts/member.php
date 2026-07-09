@@ -773,23 +773,6 @@
         'label' => 'Absensi Saya',
         'icon'  => 'clipboard-check',
       ],
-      [
-        'href'  => '/member/kegiatan',
-        'label' => 'Program & Kegiatan',
-        'icon'  => 'calendar-event',
-      ],
-    ],
-    'Informasi' => [
-      [
-        'href'  => '/member/berita',
-        'label' => 'Berita & Artikel',
-        'icon'  => 'news',
-      ],
-      [
-        'href'  => '/member/galeri',
-        'label' => 'Galeri Foto',
-        'icon'  => 'photo',
-      ],
     ],
     'Akun' => [
       [
