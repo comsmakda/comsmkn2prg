@@ -146,7 +146,7 @@ class FingerprintModel
     public function pushUser(int $userId): bool
     {
         $stmt = $this->db->prepare(
-            'SELECT id, nia, nama_lengkap, status FROM users WHERE id = ? LIMIT 1'
+            'SELECT id, nia, nama_lengkap, role, status FROM users WHERE id = ? LIMIT 1'
         );
         $stmt->execute([$userId]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -155,8 +155,18 @@ class FingerprintModel
             return false;
         }
 
+        if ($user['role'] !== 'anggota') {
+            $this->updateFpStatus($userId, 'gagal', 'Hanya akun anggota yang bisa didaftarkan ke mesin fingerprint.');
+            return false;
+        }
+
         if ($user['status'] !== 'aktif') {
             $this->updateFpStatus($userId, 'gagal', 'Anggota tidak berstatus aktif.');
+            return false;
+        }
+
+        if (empty($user['nia'])) {
+            $this->updateFpStatus($userId, 'gagal', 'Anggota belum memiliki NIA.');
             return false;
         }
 
@@ -374,7 +384,7 @@ class FingerprintModel
         $stmtUsers = $this->db->prepare(
             "SELECT id, nia, nama_lengkap, kelas
              FROM users
-             WHERE status = 'aktif' {$kelasSql}
+             WHERE role = 'anggota' AND status = 'aktif' {$kelasSql}
              ORDER BY kelas, nama_lengkap"
         );
         $stmtUsers->execute($this->onlyKeys($params, ['kelas']));
@@ -475,7 +485,7 @@ class FingerprintModel
         $stmt = $this->db->query(
             "SELECT id, nia, nama_lengkap, kelas, fp_status, fp_synced_at, fp_last_error
              FROM users
-             WHERE status = 'aktif'
+             WHERE role = 'anggota' AND status = 'aktif'
              ORDER BY kelas, nama_lengkap"
         );
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -485,7 +495,7 @@ class FingerprintModel
     {
         $stmt = $this->db->query(
             "SELECT id FROM users
-             WHERE status = 'aktif' AND fp_status IN ('belum_sync', 'gagal')"
+             WHERE role = 'anggota' AND status = 'aktif' AND fp_status IN ('belum_sync', 'gagal')"
         );
         return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
     }
