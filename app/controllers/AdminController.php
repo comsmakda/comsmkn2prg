@@ -540,6 +540,40 @@ public function fingerprint(): void
         $this->view('admin/fingerprint_rekap_print', compact('rekap', 'tanggalMulai', 'tanggalAkhir', 'kelas', 'settings'), 'print');
     }
 
+    public function fingerprintRekapExport(): void
+    {
+        $this->requireAdmin();
+        $tanggalMulai = $_GET['tanggal_mulai'] ?? date('Y-m-d');
+        $tanggalAkhir = $_GET['tanggal_akhir'] ?? date('Y-m-d');
+        $kelas        = $_GET['kelas'] ?? '';
+        $filter       = ['kelas' => $kelas];
+        $rekap = (new FingerprintModel())->getRekapHarian($tanggalMulai, $tanggalAkhir, $filter);
+        // Sesuaikan nama kolom di sini dengan field yang benar-benar dikembalikan
+        // oleh getRekapHarian() di FingerprintModel.php kamu.
+        $headers = ['Nama', 'NIA', 'Kelas', 'Tanggal', 'Jam Masuk', 'Jam Pulang', 'Status'];
+        $data = [];
+        foreach ($rekap as $r) {
+            $data[] = [
+                $r['nama_lengkap'] ?? '',
+                $r['nia']          ?? '',
+                $r['kelas']        ?? '',
+                $r['tanggal']      ?? '',
+                $r['jam_masuk']    ?? '',
+                $r['jam_pulang']   ?? '',
+                $r['status']       ?? '',
+            ];
+        }
+        $filename = 'rekap_absensi_' . $tanggalMulai . '_sd_' . $tanggalAkhir;
+        // Xlsx sudah di-autoload otomatis dari folder core/, tidak perlu require_once manual
+        $content = Xlsx::write($headers, $data);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '.xlsx"');
+        header('Content-Length: ' . strlen($content));
+        header('Cache-Control: max-age=0');
+        echo $content;
+        exit;
+    }
+
     // ================================================================
     //  PROFIL ADMIN
     // ================================================================

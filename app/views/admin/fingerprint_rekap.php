@@ -3,120 +3,387 @@
  * app/views/admin/fingerprint_rekap.php
  *
  * Variabel yang tersedia:
- * $title, $rekap (array baris hasil FingerprintModel::getRekapHarian),
- * $tanggalMulai, $tanggalAkhir, $kelasTerpilih, $kelasList, $csrfToken, $flash
+ * $rekap (array baris hasil FingerprintModel::getRekapHarian),
+ * $tanggalMulai, $tanggalAkhir, $kelas, $kelasList, $flash
  */
 ?>
 
-<div class="page-header">
-    <h1 class="page-title"><?= htmlspecialchars($title) ?></h1>
-</div>
-
-<?php if (!empty($flash)): ?>
-    <div class="alert alert-<?= htmlspecialchars($flash['type']) ?>">
-        <?= htmlspecialchars($flash['message']) ?>
-    </div>
-<?php endif; ?>
-
-<div class="card mb-3">
-    <div class="card-body">
-        <form method="get" action="/admin/fingerprint/rekap" class="row g-2 align-items-end">
-            <div class="col-auto">
-                <label class="form-label">Tanggal Mulai</label>
-                <input type="date" name="tanggal_mulai" class="form-control"
-                       value="<?= htmlspecialchars($tanggalMulai) ?>">
-            </div>
-            <div class="col-auto">
-                <label class="form-label">Tanggal Akhir</label>
-                <input type="date" name="tanggal_akhir" class="form-control"
-                       value="<?= htmlspecialchars($tanggalAkhir) ?>">
-            </div>
-            <div class="col-auto">
-                <label class="form-label">Kelas</label>
-                <select name="kelas" class="form-select">
-                    <option value="">Semua Kelas</option>
-                    <?php foreach ($kelasList as $kelas): ?>
-                        <option value="<?= htmlspecialchars($kelas) ?>"
-                            <?= $kelasTerpilih === $kelas ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($kelas) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary">
-                    <i class="ti ti-filter"></i> Tampilkan
-                </button>
-            </div>
-            <div class="col-auto ms-auto">
-                <a class="btn btn-outline-secondary"
-                   target="_blank"
-                   href="/admin/fingerprint/rekap/print?tanggal_mulai=<?= urlencode($tanggalMulai) ?>&tanggal_akhir=<?= urlencode($tanggalAkhir) ?>&kelas=<?= urlencode($kelasTerpilih) ?>">
-                    <i class="ti ti-printer"></i> Cetak / Export
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama</th>
-                        <th>NIA</th>
-                        <th>Kelas</th>
-                        <th>Tanggal</th>
-                        <th>Jam Masuk</th>
-                        <th>Jam Pulang</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php if (empty($rekap)): ?>
-                    <tr>
-                        <td colspan="8" class="text-center text-muted py-4">
-                            Tidak ada data untuk rentang tanggal ini.
-                        </td>
-                    </tr>
-                <?php else: ?>
-                    <?php $no = 1; ?>
-                    <?php foreach ($rekap as $row): ?>
-                        <?php
-                            $badgeClass = match ($row['status']) {
-                                'hadir'     => 'badge-green',
-                                'terlambat' => 'badge-amber',
-                                default     => 'badge-red',
-                            };
-                            $badgeLabel = match ($row['status']) {
-                                'hadir'     => 'Hadir',
-                                'terlambat' => 'Terlambat',
-                                default     => 'Alpa',
-                            };
-                        ?>
-                        <tr>
-                            <td><?= $no++ ?></td>
-                            <td><?= htmlspecialchars($row['nama_lengkap']) ?></td>
-                            <td><?= htmlspecialchars($row['nia']) ?></td>
-                            <td><?= htmlspecialchars($row['kelas']) ?></td>
-                            <td><?= htmlspecialchars(date('d/m/Y', strtotime($row['tanggal']))) ?></td>
-                            <td><?= $row['jam_masuk'] ? htmlspecialchars(substr($row['jam_masuk'], 0, 5)) : '-' ?></td>
-                            <td><?= $row['jam_pulang'] ? htmlspecialchars(substr($row['jam_pulang'], 0, 5)) : '-' ?></td>
-                            <td><span class="badge <?= $badgeClass ?>"><?= $badgeLabel ?></span></td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
 <style>
-.badge-green { background: var(--c-green-100, #dcfce7); color: var(--c-green-700, #15803d); }
-.badge-red { background: var(--c-red-100, #fee2e2); color: var(--c-red-700, #b91c1c); }
-.badge-amber { background: var(--c-amber-100, #fef3c7); color: var(--c-amber-700, #b45309); }
+/* ═══════════════════════════════════════
+   SCOPE ROOT — alias ke Design System
+   (disamakan dengan app/views/admin/fingerprint.php)
+═══════════════════════════════════════ */
+.fpr-root {
+  --tx-primary:   var(--c-ink,    #0f172a);
+  --tx-secondary: var(--c-muted,  #64748b);
+  --tx-muted:     var(--c-muted2, #94a3b8);
+
+  --bg-surface:  var(--c-white, #ffffff);
+  --bg-elevated: #f8fafc;
+
+  --bd-subtle:  var(--c-border, #e6ebf1);
+  --bd-accent:  var(--c-primary-25, rgba(14,116,144,.25));
+
+  --ac:      var(--c-primary,    #0e7490);
+  --ac-dk:   var(--c-primary-dk, #0b5a70);
+  --ac-lt:   var(--c-primary-lt, #06b6d4);
+  --ac-dim:  var(--c-primary-08, rgba(14,116,144,.08));
+
+  --green:   var(--c-green-text, #15803d);
+  --green-d: var(--c-green-bg,   #f0fdf4);
+  --red:     var(--c-red-text,   #b91c1c);
+  --red-d:   var(--c-red-bg,     #fef2f2);
+  --amber:   var(--c-amber-icon, #d9910c);
+  --amber-d: var(--c-amber-bg,   #fef6e2);
+
+  --r-xs: 6px;
+  --r-sm: var(--radius-sm, 9px);
+  --r-md: var(--radius-md, 13px);
+  --r-lg: var(--radius-lg, 22px);
+
+  --font-ui: var(--ff, 'Plus Jakarta Sans', sans-serif);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast: 120ms;
+}
+
+.fpr-root * { box-sizing: border-box; }
+.fpr-root {
+  font-family: var(--font-ui);
+  color: var(--tx-primary);
+  font-size: 13.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+.fpr-header { margin-bottom: 20px; }
+.fpr-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ac);
+  margin-bottom: 6px;
+}
+.fpr-eyebrow::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ac);
+  box-shadow: 0 0 6px var(--ac);
+}
+.fpr-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  color: var(--ac-dk);
+}
+
+/* ── Alert (flash) ── */
+.fpr-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  border: 1px solid;
+}
+.fpr-alert i { font-size: 17px; flex-shrink: 0; }
+.fpr-alert--success { background: var(--green-d); border-color: rgba(21,128,61,.25); color: var(--green); }
+.fpr-alert--error,
+.fpr-alert--danger   { background: var(--red-d);   border-color: rgba(185,28,28,.25); color: var(--red); }
+.fpr-alert--warning  { background: var(--amber-d); border-color: rgba(217,145,12,.3); color: var(--amber); }
+.fpr-alert--info      { background: var(--ac-dim);  border-color: var(--bd-accent);   color: var(--ac-dk); }
+
+/* ── Panel base ── */
+.fpr-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--bd-subtle);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.fpr-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--bd-subtle);
+  gap: 8px;
+}
+.fpr-panel__title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--tx-primary);
+  letter-spacing: -.01em;
+}
+.fpr-panel__body { padding: 18px 20px; }
+
+/* ── Filter form ── */
+.fpr-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+.fpr-field { display: flex; flex-direction: column; gap: 5px; }
+.fpr-field label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--tx-muted);
+}
+.fpr-field input,
+.fpr-field select {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--tx-primary);
+  padding: 9px 12px;
+  border: 1.5px solid var(--bd-subtle);
+  border-radius: var(--r-sm);
+  background: var(--bg-surface);
+  min-width: 150px;
+  transition: border-color var(--t-fast) var(--ease);
+}
+.fpr-field input:focus,
+.fpr-field select:focus {
+  outline: none;
+  border-color: var(--ac);
+  box-shadow: 0 0 0 3px var(--ac-dim);
+}
+.fpr-filter__actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+/* ── Buttons ── */
+.fpr-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 15px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: var(--r-sm);
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: all var(--t-fast) var(--ease);
+}
+.fpr-btn i { font-size: 15px; }
+
+.fpr-btn--sec {
+  background: var(--bg-surface);
+  color: var(--ac);
+  border: 1.5px solid var(--bd-accent);
+}
+.fpr-btn--sec:hover { background: var(--ac-dim); }
+
+.fpr-btn--pri {
+  background: var(--ac);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(14,116,144,.22);
+}
+.fpr-btn--pri:hover { background: var(--ac-lt); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(6,182,212,.28); }
+
+/* ── Table ── */
+.fpr-tbl-wrap { overflow-x: auto; }
+.fpr-tbl { width: 100%; border-collapse: collapse; min-width: 760px; }
+.fpr-tbl th {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--tx-muted);
+  text-align: left;
+  padding: 0 10px 10px 0;
+  border-bottom: 1px solid var(--bd-subtle);
+  white-space: nowrap;
+}
+.fpr-tbl td {
+  padding: 12px 10px 12px 0;
+  border-bottom: 1px solid var(--bd-subtle);
+  font-size: 12.5px;
+  color: var(--tx-secondary);
+  vertical-align: middle;
+}
+.fpr-tbl tr:last-child td { border-bottom: none; }
+.fpr-tbl tr:hover td { background: rgba(14,116,144,.03); }
+.fpr-tbl__name { color: var(--tx-primary); font-weight: 700; }
+.fpr-tbl__no { color: var(--tx-muted); font-weight: 600; }
+
+.fpr-empty {
+  text-align: center;
+  padding: 34px 20px;
+  color: var(--tx-muted);
+  font-size: 12.5px;
+}
+
+/* ── Badge status ── */
+.fpr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--r-xs);
+  white-space: nowrap;
+}
+.fpr-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.fpr-badge--green { background: var(--green-d); color: var(--green); }
+.fpr-badge--red   { background: var(--red-d);   color: var(--red); }
+.fpr-badge--amber { background: var(--amber-d); color: var(--amber); }
+
+@media (max-width: 640px) {
+  .fpr-filter { flex-direction: column; align-items: stretch; }
+  .fpr-filter__actions { margin-left: 0; justify-content: stretch; }
+  .fpr-filter__actions .fpr-btn { flex: 1; justify-content: center; }
+  .fpr-field select, .fpr-field input { min-width: 0; width: 100%; }
+}
 </style>
+
+<div class="fpr-root">
+
+  <div class="fpr-header">
+    <div class="fpr-eyebrow">Laporan</div>
+    <h1 class="fpr-title">Rekap Absensi Fingerprint</h1>
+  </div>
+
+  <?php if (!empty($flash)): ?>
+      <?php
+        $flashType = htmlspecialchars($flash['type']);
+        $flashIcon = match ($flash['type']) {
+            'success' => 'ti-circle-check',
+            'error', 'danger' => 'ti-alert-circle',
+            'warning' => 'ti-alert-triangle',
+            default   => 'ti-info-circle',
+        };
+      ?>
+      <div class="fpr-alert fpr-alert--<?= $flashType ?>">
+          <i class="ti <?= $flashIcon ?>" aria-hidden="true"></i>
+          <span><?= htmlspecialchars($flash['msg']) ?></span>
+      </div>
+  <?php endif; ?>
+
+  <!-- ── Filter ── -->
+  <div class="fpr-panel">
+    <div class="fpr-panel__body">
+      <form method="get" action="/admin/fingerprint/rekap" class="fpr-filter">
+        <div class="fpr-field">
+          <label for="fpr-tgl-mulai">Tanggal Mulai</label>
+          <input type="date" id="fpr-tgl-mulai" name="tanggal_mulai"
+                 value="<?= htmlspecialchars($tanggalMulai) ?>">
+        </div>
+        <div class="fpr-field">
+          <label for="fpr-tgl-akhir">Tanggal Akhir</label>
+          <input type="date" id="fpr-tgl-akhir" name="tanggal_akhir"
+                 value="<?= htmlspecialchars($tanggalAkhir) ?>">
+        </div>
+        <div class="fpr-field">
+          <label for="fpr-kelas">Kelas</label>
+          <select id="fpr-kelas" name="kelas">
+              <option value="">Semua Kelas</option>
+              <?php foreach ($kelasList as $k): ?>
+                  <option value="<?= htmlspecialchars($k) ?>"
+                      <?= $kelas === $k ? 'selected' : '' ?>>
+                      <?= htmlspecialchars($k) ?>
+                  </option>
+              <?php endforeach; ?>
+          </select>
+        </div>
+
+        <div class="fpr-filter__actions">
+          <button type="submit" class="fpr-btn fpr-btn--pri">
+            <i class="ti ti-filter" aria-hidden="true"></i>
+            Tampilkan
+          </button>
+          <a class="fpr-btn fpr-btn--sec"
+             target="_blank"
+             href="/admin/fingerprint/rekap/print?tanggal_mulai=<?= urlencode($tanggalMulai) ?>&tanggal_akhir=<?= urlencode($tanggalAkhir) ?>&kelas=<?= urlencode($kelas) ?>">
+            <i class="ti ti-printer" aria-hidden="true"></i>
+            Cetak
+          </a>
+          <a class="fpr-btn fpr-btn--sec"
+             href="/admin/fingerprint/rekap/export?tanggal_mulai=<?= urlencode($tanggalMulai) ?>&tanggal_akhir=<?= urlencode($tanggalAkhir) ?>&kelas=<?= urlencode($kelas) ?>">
+            <i class="ti ti-file-spreadsheet" aria-hidden="true"></i>
+            Export Excel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Tabel Rekap ── -->
+  <div class="fpr-panel">
+    <div class="fpr-panel__head">
+      <span class="fpr-panel__title">Data Rekap Absensi</span>
+    </div>
+    <div class="fpr-panel__body">
+      <div class="fpr-tbl-wrap">
+        <table class="fpr-tbl">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama</th>
+              <th>NIA</th>
+              <th>Kelas</th>
+              <th>Tanggal</th>
+              <th>Jam Masuk</th>
+              <th>Jam Pulang</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+          <?php if (empty($rekap)): ?>
+              <tr>
+                  <td colspan="8" class="fpr-empty">
+                      Tidak ada data untuk rentang tanggal ini.
+                  </td>
+              </tr>
+          <?php else: ?>
+              <?php $no = 1; ?>
+              <?php foreach ($rekap as $row): ?>
+                  <?php
+                      $badgeClass = match ($row['status']) {
+                          'hadir'     => 'fpr-badge--green',
+                          'terlambat' => 'fpr-badge--amber',
+                          default     => 'fpr-badge--red',
+                      };
+                      $badgeLabel = match ($row['status']) {
+                          'hadir'     => 'Hadir',
+                          'terlambat' => 'Terlambat',
+                          default     => 'Alpa',
+                      };
+                  ?>
+                  <tr>
+                      <td class="fpr-tbl__no"><?= $no++ ?></td>
+                      <td class="fpr-tbl__name"><?= htmlspecialchars($row['nama_lengkap']) ?></td>
+                      <td><?= htmlspecialchars($row['nia']) ?></td>
+                      <td><?= htmlspecialchars($row['kelas']) ?></td>
+                      <td><?= htmlspecialchars(date('d/m/Y', strtotime($row['tanggal']))) ?></td>
+                      <td><?= $row['jam_masuk'] ? htmlspecialchars(substr($row['jam_masuk'], 0, 5)) : '-' ?></td>
+                      <td><?= $row['jam_pulang'] ? htmlspecialchars(substr($row['jam_pulang'], 0, 5)) : '-' ?></td>
+                      <td><span class="fpr-badge <?= $badgeClass ?>"><?= $badgeLabel ?></span></td>
+                  </tr>
+              <?php endforeach; ?>
+          <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
