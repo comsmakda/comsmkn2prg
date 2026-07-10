@@ -114,8 +114,17 @@
 .btn-template:hover { background: var(--ac-dim); }
 .btn-template i { font-size: 14px; }
 
-/* ── Kolom kanan: dropzone ── */
+/* ── Kolom kanan: dropzone ──
+   PENTING: .imp-drop adalah tag <label>, yang default-nya display:inline.
+   Karena isinya berupa <div> (block), border dashed jadi pecah mengikuti
+   baris teks kalau tidak dipaksa jadi block/flex. Makanya di sini WAJIB
+   diberi display:flex (bukan cuma text-align:center) supaya border-nya
+   menyatu jadi satu kotak utuh, bukan terpecah jadi beberapa kotak kecil. */
 .imp-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   border: 2px dashed var(--bd-subtle);
   border-radius: var(--r-lg);
   padding: 34px 20px;
