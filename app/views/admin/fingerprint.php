@@ -316,7 +316,7 @@ form.fp-inline { display: inline-flex; margin: 0; }
         <span class="fp-status-dot <?= $health['success'] ? 'fp-status-dot--ok' : 'fp-status-dot--err' ?>" aria-hidden="true"></span>
         <div class="fp-status__text">
           <div class="fp-status__label">Status Mesin GEISA X107</div>
-          <div class="fp-status__msg"><?= htmlspecialchars($health['msg']) ?></div>
+          <div class="fp-status__msg"><?= htmlspecialchars($health['message']) ?></div>
         </div>
       </div>
 
