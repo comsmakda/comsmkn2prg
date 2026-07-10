@@ -1,9 +1,10 @@
 FROM php:8.2-apache
 
 # curl diperlukan untuk komunikasi PHP -> Sync Agent (push user, pull log fingerprint)
+# libzip-dev + zip ext diperlukan untuk baca/tulis file .xlsx (fitur export/import anggota)
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libcurl4-openssl-dev \
-    && docker-php-ext-install mysqli pdo pdo_mysql curl \
+    && apt-get install -y --no-install-recommends libcurl4-openssl-dev libzip-dev zip unzip \
+    && docker-php-ext-install mysqli pdo pdo_mysql curl zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Timezone WITA (Pinrang, Sulawesi Selatan) - penting untuk akurasi jam masuk/pulang di rekap fingerprint
