@@ -40,7 +40,7 @@ app = FastAPI(title="FP Sync Agent - GEISA X107")
 
 def get_connection():
     """Buka koneksi ke mesin. Selalu pakai context manager / disconnect manual."""
-    zk = ZK(DEVICE_IP, port=DEVICE_PORT, timeout=10, password=0, force_udp=False, ommit_ping=False)
+    zk = ZK(DEVICE_IP, port=DEVICE_PORT, timeout=10, password=0, force_udp=False, ommit_ping=True)
     try:
         conn = zk.connect()
         return conn
