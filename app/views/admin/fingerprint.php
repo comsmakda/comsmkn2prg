@@ -321,6 +321,11 @@ form.fp-inline { display: inline-flex; margin: 0; }
       </div>
 
       <div class="fp-status__actions">
+        <a href="/admin/fingerprint/rekap" class="fp-btn fp-btn--sec">
+          <i class="ti ti-report" aria-hidden="true"></i>
+          Rekap Absensi
+        </a>
+
         <form method="post" action="/admin/fingerprint/sync-logs" class="fp-inline">
           <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
           <button type="submit" class="fp-btn fp-btn--sec">

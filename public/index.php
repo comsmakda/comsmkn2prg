@@ -82,6 +82,7 @@ $router->post('/admin/fingerprint/:id/delete',          [AdminController::class,
 $router->post('/admin/fingerprint/sync-logs',           [AdminController::class, 'fingerprintSyncLogs']);
 $router->get('/admin/fingerprint/rekap',                [AdminController::class, 'fingerprintRekap']);
 $router->get('/admin/fingerprint/rekap/print',          [AdminController::class, 'fingerprintRekapPrint']);
+$router->get('/admin/fingerprint/rekap/export', [AdminController::class, 'fingerprintRekapExport']);
 
 // Profil Admin
 $router->get('/admin/profil',               [AdminController::class, 'profil']);
