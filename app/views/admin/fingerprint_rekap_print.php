@@ -7,11 +7,11 @@
  * tabel bersih, tombol cetak yang otomatis memanggil window.print().
  *
  * Variabel yang tersedia:
- * $title, $rekap, $tanggalMulai, $tanggalAkhir, $kelasTerpilih, $settings (array key=>value)
+ * $rekap, $tanggalMulai, $tanggalAkhir, $kelas, $settings (array key=>value)
  */
 
-$namaSekolah = $settings['nama_sekolah'] ?? 'SMK Negeri 2 Pinrang';
-$alamatSekolah = $settings['alamat_sekolah'] ?? '';
+$namaSekolah   = $settings['org_name']       ?? 'SMK Negeri 2 Pinrang';
+$alamatSekolah = $settings['contact_address'] ?? '';
 ?>
 
 <div class="print-wrapper">
@@ -27,8 +27,8 @@ $alamatSekolah = $settings['alamat_sekolah'] ?? '';
     <p class="text-center mb-1">
         Periode: <?= htmlspecialchars(date('d/m/Y', strtotime($tanggalMulai))) ?>
         s/d <?= htmlspecialchars(date('d/m/Y', strtotime($tanggalAkhir))) ?>
-        <?php if ($kelasTerpilih !== ''): ?>
-            &mdash; Kelas: <?= htmlspecialchars($kelasTerpilih) ?>
+        <?php if ($kelas !== ''): ?>
+            &mdash; Kelas: <?= htmlspecialchars($kelas) ?>
         <?php endif; ?>
     </p>
 
