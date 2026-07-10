@@ -214,10 +214,12 @@ class UserModel extends Model
             $db->beginTransaction();
 
             foreach ($relatedTables as $table) {
-                $db->query("DELETE FROM {$table} WHERE user_id = ?", [$id]);
+                $stmt = $db->prepare("DELETE FROM {$table} WHERE user_id = ?");
+                $stmt->execute([$id]);
             }
 
-            $db->query("DELETE FROM users WHERE id = ?", [$id]);
+            $stmt = $db->prepare("DELETE FROM users WHERE id = ?");
+            $stmt->execute([$id]);
 
             $db->commit();
             return true;
