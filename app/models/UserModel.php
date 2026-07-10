@@ -178,8 +178,53 @@ class UserModel extends Model
         );
     }
 
+    /**
+     * @deprecated Tidak lagi dipanggil dari AdminController — diganti hardDelete().
+     * Dibiarkan ada untuk kompatibilitas jika masih dipakai di tempat lain.
+     */
     public function softDelete(int $id): void
     {
         $this->execute("UPDATE users SET status = 'nonaktif' WHERE id = ?", [$id]);
+    }
+
+    /**
+     * Hapus anggota secara permanen dari database beserta seluruh data terkait.
+     * Tidak ada FK constraint di skema ini (dikonfirmasi lewat information_schema),
+     * jadi pembersihan tabel terkait dilakukan manual sebelum menghapus row user.
+     *
+     * Tabel yang punya kolom user_id (dikonfirmasi via information_schema.COLUMNS):
+     * attendance_records, fp_rekap_harian, fp_scan_logs, pab_registrations, user_sessions.
+     *
+     * Dibungkus transaksi PDO supaya atomik — kalau salah satu DELETE gagal,
+     * semua di-rollback dan row user tidak ikut terhapus.
+     */
+    public function hardDelete(int $id): bool
+    {
+        $db = Database::getInstance();
+
+        $relatedTables = [
+            'attendance_records',
+            'fp_rekap_harian',
+            'fp_scan_logs',
+            'pab_registrations',
+            'user_sessions',
+        ];
+
+        try {
+            $db->beginTransaction();
+
+            foreach ($relatedTables as $table) {
+                $db->query("DELETE FROM {$table} WHERE user_id = ?", [$id]);
+            }
+
+            $db->query("DELETE FROM users WHERE id = ?", [$id]);
+
+            $db->commit();
+            return true;
+        } catch (\Throwable $e) {
+            $db->rollBack();
+            error_log('UserModel::hardDelete gagal: ' . $e->getMessage());
+            return false;
+        }
     }
 }

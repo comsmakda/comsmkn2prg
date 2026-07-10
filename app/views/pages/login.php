@@ -376,7 +376,7 @@
             <label class="field-label" for="nia">Nomor Induk Anggota (NIA)</label>
             <div class="field-wrap">
               <input type="text" id="nia" name="nia" class="field-input"
-                     placeholder="Contoh: 2024001" autocomplete="username"
+                     placeholder="Contoh: 202424001" autocomplete="username"
                      inputmode="numeric" maxlength="12"
                      value="<?= htmlspecialchars($_POST['nia'] ?? '') ?>" required />
               <i class="ti ti-id field-icon"></i>

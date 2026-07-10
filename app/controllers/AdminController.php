@@ -147,12 +147,41 @@ class AdminController extends Controller
     }
 
     public function anggotaDelete(string $id): void
-    {
-        $this->requireAdmin();
-        (new UserModel())->softDelete((int)$id);
-        $this->flash('success', 'Anggota dinonaktifkan.');
+{
+    $this->requireAdmin();
+    $this->verifyCsrf();
+
+    $um   = new UserModel();
+    $user = $um->find((int)$id);
+
+    if (!$user) {
+        $this->flash('error', 'Anggota tidak ditemukan.');
         $this->redirect('/admin/anggota');
     }
+
+    // Best-effort: hapus dari mesin fingerprint dulu (kalau anggota punya NIA)
+    if (!empty($user['nia'])) {
+        try {
+            (new FingerprintModel())->deleteUser($user['nia']);
+        } catch (\Throwable $e) {
+            error_log('Gagal hapus dari fingerprint saat hardDelete: ' . $e->getMessage());
+        }
+    }
+
+    // Hapus foto fisik anggota
+    if (!empty($user['foto'])) {
+        $fotoPath = ROOT . '/public/uploads/' . $user['foto'];
+        if (file_exists($fotoPath)) @unlink($fotoPath);
+    }
+
+    if ($um->hardDelete((int)$id)) {
+        $this->flash('success', 'Anggota berhasil dihapus permanen dari database.');
+    } else {
+        $this->flash('error', 'Gagal menghapus anggota. Cek log server.');
+    }
+
+    $this->redirect('/admin/anggota');
+}
 
     public function anggotaResetPassword(string $id): void
     {
