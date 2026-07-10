@@ -164,6 +164,63 @@ class UserModel extends Model
         return $this->fetchAll($sql, $params);
     }
 
+    /**
+     * Ambil SEMUA anggota aktif sesuai filter TANPA pagination — dipakai
+     * untuk export (CSV/Excel), supaya export tidak cuma ngambil 1 halaman
+     * tabel saja seperti yang ditampilkan di UI. Sama pola-nya dengan
+     * getAnggotaAktif(), tapi tambah filter 'sumber' (pab/manual) karena
+     * itu juga ada di filter bar halaman anggota.
+     */
+    public function getAnggotaForExport(array $filter = []): array
+    {
+        $where  = ["role = 'anggota'", "status = 'aktif'"];
+        $params = [];
+
+        if (!empty($filter['kelas'])) {
+            $where[]  = "kelas = ?";
+            $params[] = $filter['kelas'];
+        }
+        if (!empty($filter['sumber'])) {
+            $where[]  = "sumber = ?";
+            $params[] = $filter['sumber'];
+        }
+        if (!empty($filter['search'])) {
+            $where[]  = "(nama_lengkap LIKE ? OR nia LIKE ? OR no_hp LIKE ?)";
+            $params[] = '%' . $filter['search'] . '%';
+            $params[] = '%' . $filter['search'] . '%';
+            $params[] = '%' . $filter['search'] . '%';
+        }
+
+        $sql = "SELECT nia, nama_lengkap, kelas, no_hp, email, sumber, status, tahun_daftar
+                FROM users WHERE " . implode(' AND ', $where) . " ORDER BY nama_lengkap ASC";
+
+        return $this->fetchAll($sql, $params);
+    }
+
+    /**
+     * Cek apakah email sudah dipakai user lain — dipakai saat IMPORT anggota
+     * supaya baris duplikat (email sudah terdaftar) otomatis dilewati.
+     */
+    public function existsByEmail(string $email): bool
+    {
+        return (bool) $this->fetch(
+            "SELECT id FROM users WHERE email = ? LIMIT 1",
+            [$email]
+        );
+    }
+
+    /**
+     * Cek apakah no HP sudah dipakai user lain — dipakai saat IMPORT anggota
+     * supaya baris duplikat (No HP sudah terdaftar) otomatis dilewati.
+     */
+    public function existsByPhone(string $noHp): bool
+    {
+        return (bool) $this->fetch(
+            "SELECT id FROM users WHERE no_hp = ? LIMIT 1",
+            [$noHp]
+        );
+    }
+
     public function getKelasList(): array
     {
         return $this->fetchAll(

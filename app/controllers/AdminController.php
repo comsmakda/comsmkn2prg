@@ -1197,4 +1197,216 @@ public function fingerprint(): void
         $this->flash('success', 'Foto berhasil dihapus.');
         $this->redirect('/admin/galeri/' . $albumId . '/foto');
     }
+    // ================================================================
+//  ANGGOTA — EXPORT
+// ================================================================
+public function anggotaExport(): void
+{
+    $this->requireAdmin();
+ 
+    $format = ($_GET['format'] ?? 'csv') === 'xlsx' ? 'xlsx' : 'csv';
+    $filter = [
+        'kelas'  => $_GET['kelas']  ?? '',
+        'search' => $_GET['search'] ?? '',
+        'sumber' => $_GET['sumber'] ?? '',
+    ];
+ 
+    $um   = new UserModel();
+    $rows = $um->getAnggotaForExport($filter);
+ 
+    $headers = ['NIA', 'Nama Lengkap', 'Kelas', 'No HP', 'Email', 'Sumber', 'Status', 'Tahun Daftar'];
+    $data = [];
+    foreach ($rows as $r) {
+        $data[] = [
+            $r['nia']          ?? '',
+            $r['nama_lengkap'] ?? '',
+            $r['kelas']        ?? '',
+            $r['no_hp']        ?? '',
+            $r['email']        ?? '',
+            $r['sumber']       ?? '',
+            $r['status']       ?? '',
+            $r['tahun_daftar'] ?? '',
+        ];
+    }
+ 
+    $filename = 'anggota_' . date('Ymd_His');
+ 
+    if ($format === 'xlsx') {
+        require_once APP_PATH . '/core/Xlsx.php';
+        $content = Xlsx::write($headers, $data);
+ 
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '.xlsx"');
+        header('Content-Length: ' . strlen($content));
+        header('Cache-Control: max-age=0');
+        echo $content;
+        exit;
+    }
+ 
+    // default: CSV
+    header('Content-Type: text/csv; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+    header('Cache-Control: max-age=0');
+ 
+    $out = fopen('php://output', 'w');
+    fputs($out, "\xEF\xBB\xBF"); // BOM supaya Excel baca UTF-8 (é, ñ, dll) dgn benar
+    fputcsv($out, $headers);
+    foreach ($data as $row) {
+        fputcsv($out, $row);
+    }
+    fclose($out);
+    exit;
+}
+ 
+// ================================================================
+//  ANGGOTA — IMPORT
+// ================================================================
+public function anggotaImport(): void
+{
+    $this->requireAdmin();
+    $flash = $this->getFlash();
+    $csrf  = $this->csrfToken();
+ 
+    // ambil detail baris yang dilewati (kalau ada, dari proses sebelumnya)
+    $importErrors = $_SESSION['import_errors'] ?? [];
+    unset($_SESSION['import_errors']);
+ 
+    $this->view('admin/anggota_import', compact('flash', 'csrf', 'importErrors'), 'admin');
+}
+ 
+public function anggotaImportTemplate(): void
+{
+    $this->requireAdmin();
+ 
+    $headers = ['Nama Lengkap', 'Kelas', 'No HP', 'Email'];
+    $example = ['Contoh Nama Siswa', 'XII RPL 1', '081234567890', 'contoh@email.com'];
+ 
+    header('Content-Type: text/csv; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="template_import_anggota.csv"');
+ 
+    $out = fopen('php://output', 'w');
+    fputs($out, "\xEF\xBB\xBF");
+    fputcsv($out, $headers);
+    fputcsv($out, $example);
+    fclose($out);
+    exit;
+}
+ 
+public function anggotaImportProcess(): void
+{
+    $this->requireAdmin();
+    $this->verifyCsrf();
+ 
+    if (empty($_FILES['file']['name']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+        $this->flash('error', 'File tidak ditemukan atau gagal diupload.');
+        $this->redirect('/admin/anggota/import');
+    }
+ 
+    $ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, ['csv', 'xlsx'], true)) {
+        $this->flash('error', 'Format file harus .csv atau .xlsx.');
+        $this->redirect('/admin/anggota/import');
+    }
+ 
+    // ── Baca file jadi array baris ──────────────────────────────
+    $rows = [];
+ 
+    if ($ext === 'csv') {
+        $handle = fopen($_FILES['file']['tmp_name'], 'r');
+        if ($handle === false) {
+            $this->flash('error', 'Gagal membaca file CSV.');
+            $this->redirect('/admin/anggota/import');
+        }
+        // buang BOM UTF-8 kalau ada, biar kolom pertama header ga aneh
+        $first = fread($handle, 3);
+        if ($first !== "\xEF\xBB\xBF") {
+            rewind($handle);
+        }
+        while (($r = fgetcsv($handle)) !== false) {
+            $rows[] = $r;
+        }
+        fclose($handle);
+    } else {
+        require_once APP_PATH . '/core/Xlsx.php';
+        try {
+            $rows = Xlsx::read($_FILES['file']['tmp_name']);
+        } catch (RuntimeException $e) {
+            $this->flash('error', $e->getMessage());
+            $this->redirect('/admin/anggota/import');
+        }
+    }
+ 
+    if (empty($rows)) {
+        $this->flash('error', 'File kosong atau tidak berisi data.');
+        $this->redirect('/admin/anggota/import');
+    }
+ 
+    // baris pertama dianggap header, dibuang
+    array_shift($rows);
+ 
+    // ── Proses tiap baris ────────────────────────────────────────
+    // Urutan kolom yang diharapkan: Nama Lengkap | Kelas | No HP | Email
+    $um = new UserModel();
+    $defaultPasswordHash = password_hash('comsmakda', PASSWORD_BCRYPT, ['cost' => 12]);
+ 
+    $sukses   = 0;
+    $dilewati = 0;
+    $errors   = [];
+ 
+    foreach ($rows as $i => $row) {
+        $lineNum = $i + 2; // +1 utk index 0-based, +1 lagi utk baris header
+ 
+        $nama  = trim((string)($row[0] ?? ''));
+        $kelas = trim((string)($row[1] ?? ''));
+        $noHp  = preg_replace('/\D/', '', (string)($row[2] ?? ''));
+        $email = trim((string)($row[3] ?? ''));
+        $email = filter_var($email, FILTER_VALIDATE_EMAIL) ?: null;
+ 
+        // baris kosong (misal baris terakhir file) dilewati diam-diam
+        if ($nama === '' && $kelas === '' && $noHp === '' && !$email) {
+            continue;
+        }
+ 
+        if ($nama === '' || $kelas === '') {
+            $errors[] = "Baris {$lineNum}: nama/kelas kosong — dilewati.";
+            $dilewati++;
+            continue;
+        }
+ 
+        // Skip duplikat: cek by email ATAU no HP (bukan nama, krn nama boleh sama)
+        if (($email && $um->existsByEmail($email)) || ($noHp && $um->existsByPhone($noHp))) {
+            $errors[] = "Baris {$lineNum}: {$nama} — email/No HP sudah terdaftar, dilewati.";
+            $dilewati++;
+            continue;
+        }
+ 
+        $userId = $um->createAnggota([
+            'nama_lengkap'  => htmlspecialchars($nama, ENT_QUOTES),
+            'kelas'         => htmlspecialchars($kelas, ENT_QUOTES),
+            'no_hp'         => $noHp,
+            'email'         => $email,
+            'password_hash' => $defaultPasswordHash, // password TIDAK diimpor, pakai default
+            'foto'          => null,
+            'sumber'        => 'manual',
+            'tahun_daftar'  => date('Y'),
+        ]);
+ 
+        // NIA belum ada di file import -> generate otomatis lewat aktivasi()
+        $um->aktivasi($userId);
+        $sukses++;
+    }
+ 
+    $msg = "{$sukses} anggota berhasil diimpor";
+    $msg .= $dilewati > 0 ? ", {$dilewati} baris dilewati (kosong/duplikat)." : '.';
+    $msg .= ' Password default: <strong>comsmakda</strong> (wajib diganti anggota setelah login).';
+ 
+    $this->flash($dilewati > 0 && $sukses === 0 ? 'error' : ($dilewati > 0 ? 'warning' : 'success'), $msg);
+ 
+    if (!empty($errors)) {
+        $_SESSION['import_errors'] = array_slice($errors, 0, 50);
+    }
+ 
+    $this->redirect($sukses > 0 || $dilewati > 0 ? '/admin/anggota' : '/admin/anggota/import');
+}
+    
 }

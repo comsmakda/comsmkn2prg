@@ -162,6 +162,37 @@
 }
 .btn-sec i { font-size: 13px; }
 
+/* ── Export dropdown ── */
+.export-dropdown { position: relative; }
+.export-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  background: var(--bg-surface);
+  border: 1px solid var(--bd-subtle);
+  border-radius: var(--r-lg);
+  box-shadow: 0 16px 40px -12px rgba(15,23,42,.18), 0 4px 14px rgba(15,23,42,.06);
+  padding: 6px;
+  z-index: 40;
+}
+.export-menu.is-open { display: block; }
+.export-menu a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 11px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--tx-secondary);
+  border-radius: var(--r-sm);
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.export-menu a:hover { background: var(--ac-dim); color: var(--ac); }
+.export-menu a i { font-size: 15px; color: var(--tx-muted); }
+.export-menu a:hover i { color: var(--ac); }
+
 /* ═══════════════════════════════════════
    SECTION LABEL
 ═══════════════════════════════════════ */
@@ -817,10 +848,35 @@
     <p class="ph__sub">Kelola seluruh data anggota — aktif, pending, dan riwayat.</p>
   </div>
   <div class="ph__actions">
-    <a href="<?= BASE_URL ?>/admin/laporan/anggota" class="btn-sec">
-      <i class="ti ti-download" aria-hidden="true"></i>
-      Ekspor
+
+    <?php
+      $exportQuery = http_build_query(array_filter([
+        'search' => $filter['search'] ?? '',
+        'kelas'  => $filter['kelas']  ?? '',
+        'sumber' => $filter['sumber'] ?? '',
+      ]));
+    ?>
+    <div class="export-dropdown" id="export-dropdown">
+      <button type="button" class="btn-sec" id="export-toggle">
+        <i class="ti ti-download" aria-hidden="true"></i>
+        Ekspor
+        <i class="ti ti-chevron-down" aria-hidden="true" style="font-size:11px;"></i>
+      </button>
+      <div class="export-menu" id="export-menu">
+        <a href="<?= BASE_URL ?>/admin/anggota/export?format=csv<?= $exportQuery ? '&' . $exportQuery : '' ?>">
+          <i class="ti ti-file-type-csv" aria-hidden="true"></i> Export CSV
+        </a>
+        <a href="<?= BASE_URL ?>/admin/anggota/export?format=xlsx<?= $exportQuery ? '&' . $exportQuery : '' ?>">
+          <i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Export Excel
+        </a>
+      </div>
+    </div>
+
+    <a href="<?= BASE_URL ?>/admin/anggota/import" class="btn-sec">
+      <i class="ti ti-file-upload" aria-hidden="true"></i>
+      Impor
     </a>
+
     <a href="<?= BASE_URL ?>/admin/anggota/tambah" class="btn-pri">
       <i class="ti ti-plus" aria-hidden="true"></i>
       Tambah Anggota
@@ -1252,6 +1308,26 @@
     if (overlay.classList.contains('is-open'))      closeConfirm();
     if (resetOverlay.classList.contains('is-open')) closeReset();
   });
+
+  /* ════════════════════════════════════
+     EXPORT DROPDOWN
+  ════════════════════════════════════ */
+  var exportToggle = document.getElementById('export-toggle');
+  var exportMenu   = document.getElementById('export-menu');
+  var exportWrap   = document.getElementById('export-dropdown');
+
+  if (exportToggle) {
+    exportToggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      exportMenu.classList.toggle('is-open');
+    });
+    document.addEventListener('click', function (e) {
+      if (!exportWrap.contains(e.target)) exportMenu.classList.remove('is-open');
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') exportMenu.classList.remove('is-open');
+    });
+  }
 
   /* ════════════════════════════════════
      AUTO-SUBMIT FILTER

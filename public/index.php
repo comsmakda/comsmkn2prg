@@ -118,6 +118,11 @@ $router->post('/admin/galeri/:id/delete',               [AdminController::class,
 $router->get('/admin/galeri/:id/foto',                  [AdminController::class, 'galeriFoto']);
 $router->post('/admin/galeri/:id/upload',        [AdminController::class, 'galeriUploadFoto']);
 
+$router->get('/admin/anggota/export',              [AdminController::class, 'anggotaExport']);
+$router->get('/admin/anggota/import',               [AdminController::class, 'anggotaImport']);
+$router->post('/admin/anggota/import',              [AdminController::class, 'anggotaImportProcess']);
+$router->get('/admin/anggota/import/template',      [AdminController::class, 'anggotaImportTemplate']);
+
 // ── Member routes ─────────────────────────────────────────────
 $router->get('/member/dashboard',                       [MemberController::class, 'dashboard']);
 $router->get('/member/profile',                         [MemberController::class, 'profile']);
