@@ -10,8 +10,21 @@
  * $rekap, $tanggalMulai, $tanggalAkhir, $kelas, $settings (array key=>value)
  */
 
-$namaSekolah   = $settings['org_name']       ?? 'SMK Negeri 2 Pinrang';
-$alamatSekolah = $settings['contact_address'] ?? '';
+// Helper defensif: paksa jadi string aman untuk htmlspecialchars().
+// Kalau value dari $settings ternyata bukan string/scalar (mis. array),
+// jangan sampai bikin fatal error — pakai default saja.
+$fprStr = function ($value, string $default = ''): string {
+    if (is_array($value)) {
+        return $default;
+    }
+    if ($value === null || $value === '') {
+        return $default;
+    }
+    return (string) $value;
+};
+
+$namaSekolah   = $fprStr($settings['org_name']       ?? null, 'SMK Negeri 2 Pinrang');
+$alamatSekolah = $fprStr($settings['contact_address'] ?? null, '');
 ?>
 
 <div class="print-wrapper">
