@@ -250,4 +250,14 @@ class BeritaModel {
         $q->execute([$beritaId]);
         return (int)$q->fetchColumn();
     }
+    public function getLatestPublished(int $limit = 3): array
+    {
+        $db   = Database::getInstance();
+        $stmt = $db->prepare(
+            "SELECT * FROM berita WHERE status = 'published' ORDER BY created_at DESC LIMIT :limit"
+        );
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

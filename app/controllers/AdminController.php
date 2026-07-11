@@ -268,7 +268,7 @@ class AdminController extends Controller
         $allowed = [
             'org_name', 'org_tagline', 'org_description', 'org_vision', 'org_mission',
             'org_nilai',
-            'contact_email', 'contact_phone', 'contact_address',
+            'contact_email', 'contact_phone', 'contact_address', 'contact_instagram',
             'footer_text',
             'hero_badge_text', 'ticker_items',
             'stat_members', 'stat_years', 'stat_events', 'stat_awards',
@@ -323,29 +323,34 @@ class AdminController extends Controller
             }
         }
 
-        $sm              = new SettingModel();
-        $heroImageDelete = ($_POST['hero_image_delete'] ?? '0') === '1';
-        $heroHasNewFile  = !empty($_FILES['hero_image']['name']);
+        // ── Hero Carousel (3 slot gambar) ──────────────────────────────
+        $sm = new SettingModel();
+        for ($hi = 1; $hi <= 3; $hi++) {
+            $slotKey    = "hero_image_{$hi}";
+            $fieldName  = "hero_image_{$hi}";
+            $deleteFlag = ($_POST["{$slotKey}_delete"] ?? '0') === '1';
+            $hasNewFile = !empty($_FILES[$fieldName]['name']);
 
-        if ($heroHasNewFile) {
-            $existingHero = $sm->get('hero_image');
-            if ($existingHero) {
-                $oldPath = ROOT . '/public/uploads/' . $existingHero;
-                if (file_exists($oldPath)) @unlink($oldPath);
+            if ($hasNewFile) {
+                $existing = $sm->get($slotKey);
+                if ($existing) {
+                    $oldPath = ROOT . '/public/uploads/' . $existing;
+                    if (file_exists($oldPath)) @unlink($oldPath);
+                }
+                try {
+                    $data[$slotKey] = FileUploader::uploadFoto($_FILES[$fieldName], $slotKey);
+                } catch (RuntimeException $e) {
+                    $this->flash('error', "Upload gambar hero slide {$hi} gagal: " . $e->getMessage());
+                    $this->redirect('/admin/settings#hero');
+                }
+            } elseif ($deleteFlag) {
+                $existing = $sm->get($slotKey);
+                if ($existing) {
+                    $oldPath = ROOT . '/public/uploads/' . $existing;
+                    if (file_exists($oldPath)) @unlink($oldPath);
+                }
+                $data[$slotKey] = '';
             }
-            try {
-                $data['hero_image'] = FileUploader::uploadFoto($_FILES['hero_image'], 'hero_image');
-            } catch (RuntimeException $e) {
-                $this->flash('error', 'Upload gambar hero gagal: ' . $e->getMessage());
-                $this->redirect('/admin/settings#hero');
-            }
-        } elseif ($heroImageDelete) {
-            $existingHero = $sm->get('hero_image');
-            if ($existingHero) {
-                $oldPath = ROOT . '/public/uploads/' . $existingHero;
-                if (file_exists($oldPath)) @unlink($oldPath);
-            }
-            $data['hero_image'] = '';
         }
 
         $sm->setMany($data);

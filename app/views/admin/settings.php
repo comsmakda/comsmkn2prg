@@ -517,13 +517,10 @@ input[type="file"].fhidden {
 <form method="POST" action="<?= BASE_URL ?>/admin/settings/save"
       enctype="multipart/form-data" id="cms-form">
   <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
-  <!-- Flag hapus hero image — diisi JS saat tombol ditekan -->
-  <input type="hidden" name="hero_image_delete" id="hero-image-delete-flag" value="0">
 
   <?php
   // Helper
   $v = fn(string $k, string $d='') => htmlspecialchars($settings[$k]['value'] ?? $d);
-  $hasHeroImage = !empty($settings['hero_image']['value']);
   ?>
 
   <!-- ══════════════════════════════════════════════
@@ -562,9 +559,15 @@ input[type="file"].fhidden {
             <input id="f-phone" name="contact_phone" type="tel" class="fi" placeholder="08xx-xxxx-xxxx" value="<?= $v('contact_phone') ?>">
           </div>
         </div>
-        <div class="fg">
-          <label class="lbl" for="f-address">Alamat</label>
-          <input id="f-address" name="contact_address" type="text" class="fi" placeholder="Jl. ..." value="<?= $v('contact_address') ?>">
+        <div class="fg--2">
+          <div class="fg">
+            <label class="lbl" for="f-address">Alamat</label>
+            <input id="f-address" name="contact_address" type="text" class="fi" placeholder="Jl. ..." value="<?= $v('contact_address') ?>">
+          </div>
+          <div class="fg">
+            <label class="lbl" for="f-instagram">Instagram <span class="lbl__hint">username atau URL lengkap</span></label>
+            <input id="f-instagram" name="contact_instagram" type="text" class="fi" placeholder="com_smakdapinrang" value="<?= $v('contact_instagram') ?>">
+          </div>
         </div>
         <div class="fdiv"></div>
         <div class="fg">
@@ -669,117 +672,112 @@ input[type="file"].fhidden {
       </div>
     </div>
 
-    <!-- Card 2: Gambar Hero (dengan fitur hapus) -->
+    <!-- Card 2: Gambar Hero — 3 SLOT (Carousel) -->
     <div class="cms-card">
       <div class="cms-card__head">
-        <div class="cms-card__ico cms-card__ico--<?= $hasHeroImage ? 'green' : 'amber' ?>">
+        <div class="cms-card__ico cms-card__ico--<?= (!empty($settings['hero_image_1']['value']) || !empty($settings['hero_image_2']['value']) || !empty($settings['hero_image_3']['value'])) ? 'green' : 'amber' ?>">
           <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="12" height="12" rx="1.5"/><circle cx="4.5" cy="4.5" r="1.2"/><path d="M1 9.5l3-3 3 3 2-2.5 4 4"/></svg>
         </div>
         <div>
-          <div class="cms-card__title">Gambar Hero / Background</div>
-          <div class="cms-card__desc">Gambar yang ditampilkan sebagai background atau ilustrasi utama seksi hero.</div>
+          <div class="cms-card__title">Slider Hero (3 Foto)</div>
+          <div class="cms-card__desc">Upload hingga 3 foto untuk slider background hero. Foto akan berganti otomatis setiap 5 detik di halaman utama.</div>
         </div>
       </div>
       <div class="cms-card__body">
 
-        <!-- Info status saat ini -->
-        <div class="info-box" id="hero-status-box"
-             style="<?= $hasHeroImage ? '' : 'display:none' ?>">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5.5"/><path d="M7 6.5v3"/><circle cx="7" cy="5" r=".5" fill="currentColor"/></svg>
-          Gambar hero sedang aktif. Anda bisa mengganti dengan upload baru, atau hapus agar hero tampil tanpa background.
-        </div>
-        <div class="info-box" id="hero-empty-box"
-             style="<?= $hasHeroImage ? 'display:none' : '' ?>">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5.5"/><path d="M7 6.5v3"/><circle cx="7" cy="5" r=".5" fill="currentColor"/></svg>
-          Belum ada gambar hero. Upload gambar agar tampil sebagai background utama.
-        </div>
+        <?php for ($hi = 1; $hi <= 3; $hi++):
+          $slotKey      = "hero_image_{$hi}";
+          $hasThisImage = !empty($settings[$slotKey]['value']);
+        ?>
+        <div class="hero-slide-block" data-slide-index="<?= $hi ?>">
+          <div class="sec-lbl" style="margin-bottom:10px">
+            <span class="sec-lbl__text">Slide <?= $hi ?></span>
+            <div class="sec-lbl__line"></div>
+          </div>
 
-        <!-- Pratinjau gambar -->
-        <div class="fg">
-          <label class="lbl">Pratinjau Gambar Hero</label>
+          <div class="info-box hero-status-box-<?= $hi ?>" style="<?= $hasThisImage ? '' : 'display:none' ?>">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5.5"/><path d="M7 6.5v3"/><circle cx="7" cy="5" r=".5" fill="currentColor"/></svg>
+            Gambar slide <?= $hi ?> sedang aktif. Anda bisa mengganti atau menghapusnya.
+          </div>
+          <div class="info-box hero-empty-box-<?= $hi ?>" style="<?= $hasThisImage ? 'display:none' : '' ?>">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5.5"/><path d="M7 6.5v3"/><circle cx="7" cy="5" r=".5" fill="currentColor"/></svg>
+            Belum ada gambar untuk slide <?= $hi ?>.
+          </div>
 
-          <!-- Kondisi: ada gambar tersimpan di DB -->
-          <div id="hero-preview-existing" style="<?= $hasHeroImage ? '' : 'display:none' ?>">
-            <div class="hero-img-preview" id="hero-existing-wrap">
-              <img src="<?= $hasHeroImage ? UPLOAD_URL . '/' . $v('hero_image') : '' ?>"
-                   id="img-hero-existing" alt="Gambar Hero"
-                   style="<?= $hasHeroImage ? '' : 'display:none' ?>">
-              <span class="hero-img-badge" id="hero-badge-existing">Terpasang</span>
+          <div class="fg">
+            <label class="lbl">Pratinjau Slide <?= $hi ?></label>
+
+            <div id="hero-preview-existing-<?= $hi ?>" style="<?= $hasThisImage ? '' : 'display:none' ?>">
+              <div class="hero-img-preview" id="hero-existing-wrap-<?= $hi ?>">
+                <img src="<?= $hasThisImage ? UPLOAD_URL . '/' . htmlspecialchars($settings[$slotKey]['value']) : '' ?>"
+                     id="img-hero-existing-<?= $hi ?>" alt="Gambar Hero Slide <?= $hi ?>"
+                     style="<?= $hasThisImage ? '' : 'display:none' ?>">
+                <span class="hero-img-badge" id="hero-badge-existing-<?= $hi ?>">Terpasang</span>
+              </div>
+              <div style="margin-top:8px">
+                <span class="img-upload__name" id="fname-hero-existing-<?= $hi ?>">
+                  <?= $hasThisImage ? htmlspecialchars(basename($settings[$slotKey]['value'])) : '' ?>
+                </span>
+              </div>
+              <div class="img-deleted-notice" id="hero-delete-notice-<?= $hi ?>" style="display:none;margin-top:8px">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h10M5 4V3a1 1 0 011-1h2a1 1 0 011 1v1M6 7v3M8 7v3M3 4l.8 7.2A1 1 0 004.8 12h4.4a1 1 0 001-.8L11 4"/></svg>
+                Gambar slide <?= $hi ?> akan dihapus saat kamu menyimpan perubahan.
+                <button type="button" class="hero-undo-delete" data-slide="<?= $hi ?>"
+                  style="margin-left:auto;font-size:11px;color:var(--tx2);background:none;border:none;cursor:pointer;text-decoration:underline;padding:0">
+                  Batalkan
+                </button>
+              </div>
             </div>
-            <div style="margin-top:8px">
-              <span class="img-upload__name" id="fname-hero-existing">
-                <?= $hasHeroImage ? htmlspecialchars(basename($settings['hero_image']['value'])) : '' ?>
-              </span>
+
+            <div id="hero-preview-new-<?= $hi ?>" style="display:none">
+              <div class="hero-img-preview">
+                <img id="img-hero-new-<?= $hi ?>" src="" alt="Preview Slide <?= $hi ?> Baru">
+                <span class="hero-img-badge" style="background:var(--pur-d);color:var(--pur);border-color:rgba(11,90,112,.3)">Baru — Belum Disimpan</span>
+              </div>
+              <div style="margin-top:8px">
+                <span class="img-upload__name" id="fname-hero-new-<?= $hi ?>">–</span>
+              </div>
             </div>
-            <!-- Notifikasi akan dihapus (muncul saat tombol hapus diklik) -->
-            <div class="img-deleted-notice" id="hero-delete-notice" style="display:none;margin-top:8px">
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h10M5 4V3a1 1 0 011-1h2a1 1 0 011 1v1M6 7v3M8 7v3M3 4l.8 7.2A1 1 0 004.8 12h4.4a1 1 0 001-.8L11 4"/></svg>
-              Gambar akan dihapus saat kamu menyimpan perubahan.
-              <button type="button" id="hero-undo-delete"
-                style="margin-left:auto;font-size:11px;color:var(--tx2);background:none;border:none;cursor:pointer;text-decoration:underline;padding:0">
-                Batalkan
+
+            <div id="hero-preview-empty-<?= $hi ?>" style="<?= $hasThisImage ? 'display:none' : '' ?>">
+              <div class="hero-img-preview hero-img-preview__empty" style="display:flex">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="30" height="30" rx="4"/><circle cx="12" cy="12" r="3.5"/><path d="M3 24l8-8 7 7 5-6 12 10"/></svg>
+                <span>Belum ada gambar slide <?= $hi ?></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="fdiv"></div>
+
+          <div class="fg">
+            <label class="lbl">Kelola Slide <?= $hi ?></label>
+            <div class="hero-img-controls">
+              <label for="f-hero-img-<?= $hi ?>" class="img-upload__btn hero-upload-btn" data-slide="<?= $hi ?>">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 9V1M4 4l3-3 3 3M1 11v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg>
+                <?= $hasThisImage ? 'Ganti Gambar' : 'Upload Gambar' ?>
+              </label>
+              <input type="file" id="f-hero-img-<?= $hi ?>" name="hero_image_<?= $hi ?>" accept="image/*" class="fhidden hero-file-input" data-slide="<?= $hi ?>">
+
+              <button type="button" class="btn-danger hero-delete-btn" data-slide="<?= $hi ?>" <?= $hasThisImage ? '' : 'disabled' ?>>
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h10M5 4V3a1 1 0 011-1h2a1 1 0 011 1v1M6 7v3M8 7v3M3 4l.8 7.2A1 1 0 004.8 12h4.4a1 1 0 001-.8L11 4"/></svg>
+                Hapus Slide <?= $hi ?>
               </button>
             </div>
+            <span class="img-upload__name" style="margin-top:2px">Format: JPG, PNG, WebP · Rasio 16:9 atau 21:9 · Maks. 5 MB</span>
           </div>
 
-          <!-- Preview gambar baru yang baru dipilih (belum ada di DB) -->
-          <div id="hero-preview-new" style="display:none">
-            <div class="hero-img-preview">
-              <img id="img-hero-new" src="" alt="Preview Gambar Baru">
-              <span class="hero-img-badge" style="background:var(--pur-d);color:var(--pur);border-color:rgba(11,90,112,.3)">Baru — Belum Disimpan</span>
-            </div>
-            <div style="margin-top:8px">
-              <span class="img-upload__name" id="fname-hero-new">–</span>
-            </div>
-          </div>
-
-          <!-- Placeholder saat kosong -->
-          <div id="hero-preview-empty" style="<?= $hasHeroImage ? 'display:none' : '' ?>">
-            <div class="hero-img-preview hero-img-preview__empty" style="display:flex">
-              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="30" height="30" rx="4"/><circle cx="12" cy="12" r="3.5"/><path d="M3 24l8-8 7 7 5-6 12 10"/></svg>
-              <span>Belum ada gambar hero</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="fdiv"></div>
-
-        <!-- Kontrol: Upload + Hapus -->
-        <div class="fg">
-          <label class="lbl">Kelola Gambar Hero</label>
-          <div class="hero-img-controls">
-            <!-- Tombol Upload -->
-            <label for="f-hero-img" class="img-upload__btn" id="hero-upload-btn">
-              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 9V1M4 4l3-3 3 3M1 11v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg>
-              <?= $hasHeroImage ? 'Ganti Gambar' : 'Upload Gambar' ?>
-            </label>
-            <input type="file" id="f-hero-img" name="hero_image" accept="image/*" class="fhidden">
-
-            <!-- Tombol Hapus (hanya tampil jika ada gambar) -->
-            <?php if ($hasHeroImage): ?>
-            <button type="button" class="btn-danger" id="hero-delete-btn">
-              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h10M5 4V3a1 1 0 011-1h2a1 1 0 011 1v1M6 7v3M8 7v3M3 4l.8 7.2A1 1 0 004.8 12h4.4a1 1 0 001-.8L11 4"/></svg>
-              Hapus Foto Hero
+          <div class="hero-cancel-new-wrap" data-slide="<?= $hi ?>" style="display:none">
+            <button type="button" class="btn-outline hero-cancel-new" data-slide="<?= $hi ?>" style="font-size:11px;padding:6px 12px">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4L4 10M4 4l6 6"/></svg>
+              Batalkan Pilihan Gambar Baru
             </button>
-            <?php else: ?>
-            <button type="button" class="btn-danger" id="hero-delete-btn" disabled>
-              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h10M5 4V3a1 1 0 011-1h2a1 1 0 011 1v1M6 7v3M8 7v3M3 4l.8 7.2A1 1 0 004.8 12h4.4a1 1 0 001-.8L11 4"/></svg>
-              Hapus Foto Hero
-            </button>
-            <?php endif; ?>
           </div>
-          <span class="img-upload__name" style="margin-top:2px">
-            Format: JPG, PNG, WebP · Disarankan rasio 16:9 atau 21:9 · Maks. 5 MB
-          </span>
-        </div>
 
-        <!-- Batalkan pilihan file baru -->
-        <div id="hero-cancel-new-wrap" style="display:none">
-          <button type="button" class="btn-outline" id="hero-cancel-new" style="font-size:11px;padding:6px 12px">
-            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4L4 10M4 4l6 6"/></svg>
-            Batalkan Pilihan Gambar Baru
-          </button>
+          <input type="hidden" name="hero_image_<?= $hi ?>_delete" id="hero-image-delete-flag-<?= $hi ?>" value="0">
+
+          <?php if ($hi < 3): ?><div class="fdiv" style="margin:14px 0 4px"></div><?php endif; ?>
         </div>
+        <?php endfor; ?>
 
       </div>
     </div><!-- /card hero image -->
@@ -1382,7 +1380,7 @@ if (hash) {
 }
 
 /* ── Image file preview (universal — non-hero) ── */
-document.querySelectorAll('input[type="file"].fhidden:not(#f-hero-img)').forEach(inp => {
+document.querySelectorAll('input[type="file"].fhidden:not(.hero-file-input)').forEach(inp => {
   inp.addEventListener('change', () => {
     const file = inp.files[0];
     if (!file) return;
@@ -1405,140 +1403,135 @@ document.querySelectorAll('input[type="file"].fhidden:not(#f-hero-img)').forEach
 });
 
 /* ════════════════════════════════════════════════
-   HERO IMAGE — Logika hapus & preview
+   HERO IMAGE (3 SLIDE) — Logika hapus & preview per-slide
 ════════════════════════════════════════════════ */
-const heroFileInput       = document.getElementById('f-hero-img');
-const heroDeleteFlag      = document.getElementById('hero-image-delete-flag');
-const heroDeleteBtn       = document.getElementById('hero-delete-btn');
-const heroUndoDelete      = document.getElementById('hero-undo-delete');
-const heroDeleteNotice    = document.getElementById('hero-delete-notice');
-const heroExistingWrap    = document.getElementById('hero-existing-wrap');
-const heroPreviewExisting = document.getElementById('hero-preview-existing');
-const heroPreviewNew      = document.getElementById('hero-preview-new');
-const heroPreviewEmpty    = document.getElementById('hero-preview-empty');
-const heroImgNew          = document.getElementById('img-hero-new');
-const fnameHeroNew        = document.getElementById('fname-hero-new');
-const heroStatusBox       = document.getElementById('hero-status-box');
-const heroEmptyBox        = document.getElementById('hero-empty-box');
-const heroUploadBtn       = document.getElementById('hero-upload-btn');
-const heroCancelNewWrap   = document.getElementById('hero-cancel-new-wrap');
-const heroBadgeExisting   = document.getElementById('hero-badge-existing');
+function setupHeroSlide(i, hasExistingInitial) {
+  const fileInput      = document.getElementById(`f-hero-img-${i}`);
+  const deleteFlag      = document.getElementById(`hero-image-delete-flag-${i}`);
+  const deleteBtn       = document.querySelector(`.hero-delete-btn[data-slide="${i}"]`);
+  const undoDelete      = document.querySelector(`.hero-undo-delete[data-slide="${i}"]`);
+  const deleteNotice    = document.getElementById(`hero-delete-notice-${i}`);
+  const existingWrap    = document.getElementById(`hero-existing-wrap-${i}`);
+  const previewExisting = document.getElementById(`hero-preview-existing-${i}`);
+  const previewNew      = document.getElementById(`hero-preview-new-${i}`);
+  const previewEmpty    = document.getElementById(`hero-preview-empty-${i}`);
+  const imgNew          = document.getElementById(`img-hero-new-${i}`);
+  const fnameNew        = document.getElementById(`fname-hero-new-${i}`);
+  const statusBox       = document.querySelector(`.hero-status-box-${i}`);
+  const emptyBox        = document.querySelector(`.hero-empty-box-${i}`);
+  const uploadBtn       = document.querySelector(`.hero-upload-btn[data-slide="${i}"]`);
+  const cancelNewWrap   = document.querySelector(`.hero-cancel-new-wrap[data-slide="${i}"]`);
+  const cancelNewBtn    = document.querySelector(`.hero-cancel-new[data-slide="${i}"]`);
+  const badgeExisting   = document.getElementById(`hero-badge-existing-${i}`);
 
-let heroHasExisting = <?= $hasHeroImage ? 'true' : 'false' ?>;
-let heroNewSelected  = false;
-let heroMarkedDelete = false;
+  let hasExisting  = hasExistingInitial;
+  let newSelected  = false;
+  let markedDelete = false;
 
-function updateHeroUI() {
-  if (heroNewSelected) {
-    // Tampilkan preview baru
-    if (heroPreviewNew)      heroPreviewNew.style.display      = '';
-    if (heroPreviewExisting) heroPreviewExisting.style.display = 'none';
-    if (heroPreviewEmpty)    heroPreviewEmpty.style.display    = 'none';
-    if (heroCancelNewWrap)   heroCancelNewWrap.style.display   = '';
-    if (heroDeleteBtn)       heroDeleteBtn.disabled            = true;
-    if (heroStatusBox)       heroStatusBox.style.display       = 'none';
-    if (heroEmptyBox)        heroEmptyBox.style.display        = 'none';
-    if (heroDeleteNotice)    heroDeleteNotice.style.display    = 'none';
-    heroDeleteFlag.value = '0';
-    return;
-  }
-
-  if (heroHasExisting) {
-    if (heroPreviewExisting) heroPreviewExisting.style.display = '';
-    if (heroPreviewNew)      heroPreviewNew.style.display      = 'none';
-    if (heroPreviewEmpty)    heroPreviewEmpty.style.display    = 'none';
-    if (heroCancelNewWrap)   heroCancelNewWrap.style.display   = 'none';
-    if (heroDeleteBtn)       heroDeleteBtn.disabled            = false;
-    if (heroUploadBtn)       heroUploadBtn.textContent         = 'Ganti Gambar';
-
-    if (heroMarkedDelete) {
-      if (heroDeleteNotice)  heroDeleteNotice.style.display = '';
-      if (heroExistingWrap)  heroExistingWrap.style.opacity = '0.4';
-      if (heroStatusBox)     heroStatusBox.style.display    = 'none';
-      if (heroEmptyBox)      heroEmptyBox.style.display     = 'none';
-      /* PERBAIKAN BUG: badge "Terpasang" sebelumnya tidak pernah berubah
-         walau gambar sudah ditandai akan dihapus — sekarang ikut berubah
-         jadi "Akan Dihapus" supaya statusnya jelas & tidak menyesatkan. */
-      if (heroBadgeExisting) {
-        heroBadgeExisting.textContent = 'Akan Dihapus';
-        heroBadgeExisting.classList.add('hero-img-badge--pending');
-      }
-      heroDeleteFlag.value = '1';
-    } else {
-      if (heroDeleteNotice) heroDeleteNotice.style.display = 'none';
-      if (heroExistingWrap) heroExistingWrap.style.opacity = '1';
-      if (heroStatusBox)    heroStatusBox.style.display    = '';
-      if (heroEmptyBox)     heroEmptyBox.style.display     = 'none';
-      if (heroBadgeExisting) {
-        heroBadgeExisting.textContent = 'Terpasang';
-        heroBadgeExisting.classList.remove('hero-img-badge--pending');
-      }
-      heroDeleteFlag.value = '0';
+  function updateUI() {
+    if (newSelected) {
+      if (previewNew)      previewNew.style.display      = '';
+      if (previewExisting) previewExisting.style.display = 'none';
+      if (previewEmpty)    previewEmpty.style.display    = 'none';
+      if (cancelNewWrap)   cancelNewWrap.style.display   = '';
+      if (deleteBtn)       deleteBtn.disabled            = true;
+      if (statusBox)       statusBox.style.display       = 'none';
+      if (emptyBox)        emptyBox.style.display        = 'none';
+      if (deleteNotice)    deleteNotice.style.display    = 'none';
+      deleteFlag.value = '0';
+      return;
     }
-  } else {
-    // Tidak ada gambar
-    if (heroPreviewExisting) heroPreviewExisting.style.display = 'none';
-    if (heroPreviewNew)      heroPreviewNew.style.display      = 'none';
-    if (heroPreviewEmpty)    heroPreviewEmpty.style.display    = '';
-    if (heroCancelNewWrap)   heroCancelNewWrap.style.display   = 'none';
-    if (heroDeleteBtn)       heroDeleteBtn.disabled            = true;
-    if (heroUploadBtn)       heroUploadBtn.textContent         = 'Upload Gambar';
-    if (heroStatusBox)       heroStatusBox.style.display       = 'none';
-    if (heroEmptyBox)        heroEmptyBox.style.display        = '';
-    heroDeleteFlag.value = '0';
+
+    if (hasExisting) {
+      if (previewExisting) previewExisting.style.display = '';
+      if (previewNew)      previewNew.style.display      = 'none';
+      if (previewEmpty)    previewEmpty.style.display    = 'none';
+      if (cancelNewWrap)   cancelNewWrap.style.display   = 'none';
+      if (deleteBtn)       deleteBtn.disabled            = false;
+      if (uploadBtn)       uploadBtn.textContent         = 'Ganti Gambar';
+
+      if (markedDelete) {
+        if (deleteNotice)  deleteNotice.style.display = '';
+        if (existingWrap)  existingWrap.style.opacity  = '0.4';
+        if (statusBox)     statusBox.style.display     = 'none';
+        if (emptyBox)      emptyBox.style.display      = 'none';
+        if (badgeExisting) {
+          badgeExisting.textContent = 'Akan Dihapus';
+          badgeExisting.classList.add('hero-img-badge--pending');
+        }
+        deleteFlag.value = '1';
+      } else {
+        if (deleteNotice) deleteNotice.style.display = 'none';
+        if (existingWrap) existingWrap.style.opacity  = '1';
+        if (statusBox)    statusBox.style.display     = '';
+        if (emptyBox)     emptyBox.style.display      = 'none';
+        if (badgeExisting) {
+          badgeExisting.textContent = 'Terpasang';
+          badgeExisting.classList.remove('hero-img-badge--pending');
+        }
+        deleteFlag.value = '0';
+      }
+    } else {
+      if (previewExisting) previewExisting.style.display = 'none';
+      if (previewNew)      previewNew.style.display      = 'none';
+      if (previewEmpty)    previewEmpty.style.display    = '';
+      if (cancelNewWrap)   cancelNewWrap.style.display   = 'none';
+      if (deleteBtn)       deleteBtn.disabled            = true;
+      if (uploadBtn)       uploadBtn.textContent         = 'Upload Gambar';
+      if (statusBox)       statusBox.style.display       = 'none';
+      if (emptyBox)        emptyBox.style.display        = '';
+      deleteFlag.value = '0';
+    }
   }
+
+  if (fileInput) {
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      newSelected  = true;
+      markedDelete = false;
+      const reader = new FileReader();
+      reader.onload = e => {
+        if (imgNew)   imgNew.src           = e.target.result;
+        if (fnameNew) fnameNew.textContent = file.name;
+      };
+      reader.readAsDataURL(file);
+      updateUI();
+    });
+  }
+
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', () => {
+      if (!hasExisting) return;
+      if (!confirm(`Hapus gambar slide ${i}? Perubahan berlaku setelah kamu klik "Simpan Perubahan".`)) return;
+      markedDelete = true;
+      newSelected  = false;
+      if (fileInput) fileInput.value = '';
+      updateUI();
+    });
+  }
+
+  if (undoDelete) {
+    undoDelete.addEventListener('click', () => {
+      markedDelete = false;
+      updateUI();
+    });
+  }
+
+  if (cancelNewBtn) {
+    cancelNewBtn.addEventListener('click', () => {
+      newSelected = false;
+      if (fileInput) fileInput.value = '';
+      updateUI();
+    });
+  }
+
+  updateUI();
 }
 
-// File baru dipilih
-if (heroFileInput) {
-  heroFileInput.addEventListener('change', () => {
-    const file = heroFileInput.files[0];
-    if (!file) return;
-    heroNewSelected  = true;
-    heroMarkedDelete = false;
-    const reader = new FileReader();
-    reader.onload = e => {
-      if (heroImgNew)    heroImgNew.src          = e.target.result;
-      if (fnameHeroNew)  fnameHeroNew.textContent = file.name;
-    };
-    reader.readAsDataURL(file);
-    updateHeroUI();
-  });
-}
-
-// Tombol hapus
-if (heroDeleteBtn) {
-  heroDeleteBtn.addEventListener('click', () => {
-    if (!heroHasExisting) return;
-    if (!confirm('Hapus gambar hero? Perubahan baru berlaku setelah kamu klik "Simpan Perubahan".')) return;
-    heroMarkedDelete = true;
-    heroNewSelected  = false;
-    // Reset file input agar tidak ikut ter-upload
-    if (heroFileInput) heroFileInput.value = '';
-    updateHeroUI();
-  });
-}
-
-// Batalkan hapus
-if (heroUndoDelete) {
-  heroUndoDelete.addEventListener('click', () => {
-    heroMarkedDelete = false;
-    updateHeroUI();
-  });
-}
-
-// Batalkan pilihan gambar baru
-const heroCancelBtn = document.getElementById('hero-cancel-new');
-if (heroCancelBtn) {
-  heroCancelBtn.addEventListener('click', () => {
-    heroNewSelected = false;
-    if (heroFileInput) heroFileInput.value = '';
-    updateHeroUI();
-  });
-}
-
-// Init
-updateHeroUI();
+setupHeroSlide(1, <?= !empty($settings['hero_image_1']['value']) ? 'true' : 'false' ?>);
+setupHeroSlide(2, <?= !empty($settings['hero_image_2']['value']) ? 'true' : 'false' ?>);
+setupHeroSlide(3, <?= !empty($settings['hero_image_3']['value']) ? 'true' : 'false' ?>);
 
 /* ── Ctrl+S / Cmd+S shortcut ── */
 document.addEventListener('keydown', e => {

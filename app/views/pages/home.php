@@ -24,10 +24,14 @@ $og_sitename = $og_title;
 /* ══════════════════════════════════════════════════════════════
    FALLBACK GAMBAR CDN (tema pendidikan) — HANYA dipakai jika admin
    belum upload gambar sendiri. Semua gambar utama tetap ambil dari
-   UPLOAD_URL + kolom DB (org_logo, org_photo, hero_image, gallery_img_N,
+   UPLOAD_URL + kolom DB (org_logo, org_photo, hero_image_1..3, gallery_img_N,
    pembina_foto, foto riwayat pengurus, dst).
    ══════════════════════════════════════════════════════════════ */
-$heroFallbackImg     = 'https://images.unsplash.com/photo-1743090660977-babf07732432?auto=format&fit=crop&w=1600&q=60';
+$heroFallbackImgs = [
+    'https://images.unsplash.com/photo-1743090660977-babf07732432?auto=format&fit=crop&w=1600&q=60',
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=60',
+    'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1600&q=60',
+];
 $aboutFallbackImg    = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1000&q=60';
 $sambutanFallbackImg = 'https://images.unsplash.com/photo-1544717297-fa95b6ee9643?auto=format&fit=crop&w=600&q=60';
 $galleryFallbackImgs = [
@@ -39,7 +43,18 @@ $galleryFallbackImgs = [
     'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=60',
 ];
 
-$heroImgSrc = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $heroFallbackImg;
+/* ── Hero carousel: kumpulkan hingga 3 gambar dari admin, fallback ke stok ── */
+$heroImages = [];
+for ($hi = 1; $hi <= 3; $hi++) {
+    $img = $sr("hero_image_{$hi}");
+    if ($img) $heroImages[] = UPLOAD_URL . '/' . htmlspecialchars($img);
+}
+if (empty($heroImages)) {
+    $heroImages = $heroFallbackImgs;
+}
+
+/* ── Berita terbaru (dikirim dari HomeController, aman jika kosong) ── */
+$beritaList = isset($beritaList) && is_array($beritaList) ? $beritaList : [];
 ?>
 
 <!-- ══ SEO: PRIMARY META ══ -->
@@ -167,9 +182,24 @@ $heroImgSrc = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $heroF
   display: flex; align-items: center; overflow: hidden;
   background: linear-gradient(165deg, var(--c-primary-dk) 0%, #082c3a 100%);
 }
-.hero-bg-img { position: absolute; inset: 0; z-index: 0; }
-.hero-bg-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .6s ease; }
-.hero-bg-img img.is-loaded { opacity: .55; }
+/* ── HERO BACKGROUND CAROUSEL (3 foto, auto-slide crossfade) ── */
+.hero-bg-carousel { position: absolute; inset: 0; z-index: 0; }
+.hero-bg-slide {
+  position: absolute; inset: 0; opacity: 0;
+  transition: opacity 1.1s ease-in-out;
+}
+.hero-bg-slide.is-active { opacity: 1; }
+.hero-bg-slide img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .6s ease; }
+.hero-bg-slide img.is-loaded { opacity: .55; }
+.hero-carousel-dots {
+  position: absolute; z-index: 2; bottom: 1.9rem; right: 2rem;
+  display: flex; gap: 6px;
+}
+.hero-carousel-dot {
+  width: 6px; height: 6px; border-radius: 99px; background: rgba(255,255,255,.35);
+  border: none; cursor: pointer; transition: all .3s; padding: 0;
+}
+.hero-carousel-dot.active { width: 20px; background: var(--c-primary-lt); }
 .hero-bg-overlay {
   position: absolute; inset: 0; z-index: 0;
   background: linear-gradient(175deg, rgba(8,20,32,.55) 0%, rgba(9,45,64,.72) 45%, rgba(6,30,44,.94) 100%);
@@ -274,6 +304,10 @@ $heroImgSrc = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $heroF
 .scroll-cue-track { width: 1px; height: 36px; background: rgba(255,255,255,.2); border-radius: 2px; overflow: hidden; position: relative; }
 .scroll-cue-track::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%; border-radius: 2px; background: linear-gradient(to bottom, var(--c-primary-lt), transparent); animation: track-drop 2s ease-in-out infinite; }
 @keyframes track-drop { 0% { transform: translateY(-100%); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(200%); opacity: 0; } }
+
+@media (max-width: 768px) {
+  .hero-carousel-dots { right: 50%; transform: translateX(50%); bottom: 4.6rem; }
+}
 
 /* ─── TICKER ─────────────────────────────────────────────────── */
 .ticker-section { background: var(--c-white); border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border); padding: 11px 0; overflow: hidden; }
@@ -404,6 +438,7 @@ $heroImgSrc = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $heroF
 .gallery-dots { display: flex; gap: 5px; }
 .gallery-dot { width: 6px; height: 6px; border-radius: 99px; background: var(--c-border); transition: all .3s; cursor: pointer; border: none; }
 .gallery-dot.active { width: 18px; background: var(--c-primary); }
+.gallery-more-wrap { display: flex; justify-content: center; margin-top: 1.7rem; }
 
 /* ─── LIGHTBOX ───────────────────────────────────────────────── */
 .lightbox-overlay { position: fixed; inset: 0; z-index: 999; background: rgba(6,14,22,.9); display: none; align-items: center; justify-content: center; padding: 2rem; backdrop-filter: blur(2px); }
@@ -412,6 +447,31 @@ $heroImgSrc = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $heroF
 .lightbox-img-wrap img { max-width: 90vw; max-height: 85vh; border-radius: var(--radius-md); display: block; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
 .lightbox-caption { text-align: center; color: rgba(255,255,255,.8); font-size: .8rem; margin-top: .8rem; }
 .lightbox-close { position: absolute; top: -18px; right: -18px; width: 36px; height: 36px; border-radius: 50%; background: #fff; color: var(--c-ink); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 22px rgba(0,0,0,.35); font-size: 16px; }
+
+/* ─── BERITA ─────────────────────────────────────────────────── */
+.berita-section { background: var(--c-white); }
+.berita-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9rem; margin-top: 2.2rem; }
+.berita-card {
+  background: var(--c-page); border: 1px solid var(--c-border); border-radius: var(--radius-md);
+  overflow: hidden; text-decoration: none; display: flex; flex-direction: column;
+  transition: all .22s var(--ease-out);
+}
+.berita-card:hover { border-color: rgba(14,116,144,.28); transform: translateY(-3px); box-shadow: 0 14px 30px -14px rgba(15,23,42,.2); }
+.berita-card-img { aspect-ratio: 16/9; background: var(--c-border); overflow: hidden; }
+.berita-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.berita-card-body { padding: 1.1rem 1.2rem 1.3rem; display: flex; flex-direction: column; gap: .5rem; }
+.berita-card-tag {
+  display: inline-flex; align-items: center; width: fit-content; font-size: .62rem; font-weight: 700;
+  padding: 2px 10px; border-radius: 99px; background: rgba(14,116,144,.09); border: 1px solid rgba(14,116,144,.22);
+  color: var(--c-primary); letter-spacing: .02em; text-transform: uppercase;
+}
+.berita-card-body h3 { font-family: var(--font-display); font-size: .92rem; font-weight: 700; color: var(--c-ink); line-height: 1.35; }
+.berita-card-body p { font-size: .79rem; color: var(--c-muted); line-height: 1.65; }
+.berita-card-date { font-size: .68rem; color: var(--c-muted2); display: inline-flex; align-items: center; gap: 4px; margin-top: 2px; }
+.empty-berita { text-align: center; padding: 2.4rem 1rem; color: var(--c-muted); font-size: .86rem; background: var(--c-page); border: 1px dashed var(--c-border); border-radius: var(--radius-md); margin-top: 2rem; }
+.berita-more-wrap { display: flex; justify-content: center; margin-top: 2rem; }
+@media (max-width: 900px) { .berita-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .berita-grid { grid-template-columns: 1fr; } }
 
 /* ─── TESTIMONIALS CAROUSEL ──────────────────────────────────── */
 .carousel-section { background: var(--c-white); overflow: hidden; }
@@ -527,10 +587,22 @@ $heroImgSrc = $sr('hero_image') ? (UPLOAD_URL . '/' . $s('hero_image')) : $heroF
 
 <!-- ══ HERO ══ -->
 <section class="hero">
-  <div class="hero-bg-img">
-    <img src="<?= htmlspecialchars($heroImgSrc) ?>" alt="" loading="eager" decoding="async" onload="this.classList.add('is-loaded')">
+  <div class="hero-bg-carousel" id="hero-bg-carousel">
+    <?php foreach ($heroImages as $hIdx => $hSrc): ?>
+    <div class="hero-bg-slide<?= $hIdx === 0 ? ' is-active' : '' ?>" data-hero-slide="<?= $hIdx ?>">
+      <img src="<?= htmlspecialchars($hSrc) ?>" alt="" loading="<?= $hIdx === 0 ? 'eager' : 'lazy' ?>" decoding="async" onload="this.classList.add('is-loaded')">
+    </div>
+    <?php endforeach; ?>
   </div>
   <div class="hero-bg-overlay"></div>
+
+  <?php if (count($heroImages) > 1): ?>
+  <div class="hero-carousel-dots" id="hero-carousel-dots" aria-hidden="true">
+    <?php foreach ($heroImages as $hIdx => $hSrc): ?>
+    <button type="button" class="hero-carousel-dot<?= $hIdx === 0 ? ' active' : '' ?>" data-hero-dot="<?= $hIdx ?>" aria-label="Slide <?= $hIdx + 1 ?>"></button>
+    <?php endforeach; ?>
+  </div>
+  <?php endif; ?>
 
   <div class="hero-inner">
     <div class="hero-left">
@@ -905,7 +977,7 @@ $featIcons = ['ti-users', 'ti-calendar-event', 'ti-file-text', 'ti-user-circle',
   <div class="section-wrap">
     <div class="eyebrow" data-reveal><span class="eyebrow-bar"></span>Galeri</div>
     <h2 class="section-title" data-reveal data-delay="1">Momen Kegiatan</h2>
-    <p class="section-desc" data-reveal data-delay="2">Dokumentasi kegiatan dan prestasi organisasi kami. Klik foto untuk memperbesar.</p>
+    <p class="section-desc" data-reveal data-delay="2">Dokumentasi kegiatan dan prestasi organisasi kami. Klik foto untuk memperbesar, atau jelajahi seluruh galeri kami.</p>
 
     <div data-reveal data-delay="2">
       <div class="gallery-carousel-viewport">
@@ -933,6 +1005,12 @@ $featIcons = ['ti-users', 'ti-calendar-event', 'ti-file-text', 'ti-user-circle',
         <button class="gallery-btn" id="gal-next" aria-label="Berikutnya"><i class="ti ti-chevron-right"></i></button>
         <div class="gallery-dots" id="gal-dots" role="tablist"></div>
       </div>
+
+      <div class="gallery-more-wrap">
+        <a href="<?= BASE_URL ?>/galeri" class="btn-primary">
+          <i class="ti ti-photo"></i> Lihat Semua Galeri
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -944,6 +1022,53 @@ $featIcons = ['ti-users', 'ti-calendar-event', 'ti-file-text', 'ti-user-circle',
     <div class="lightbox-caption" id="lightbox-caption"></div>
   </div>
 </div>
+
+<div class="section-divider"></div>
+
+<!-- ══ BERITA ══ -->
+<section class="berita-section section-pad" id="berita">
+  <div class="section-wrap">
+    <div class="eyebrow" data-reveal><span class="eyebrow-bar"></span>Informasi</div>
+    <h2 class="section-title" data-reveal data-delay="1">Berita &amp; Kegiatan Terbaru</h2>
+    <p class="section-desc" data-reveal data-delay="2">Ikuti perkembangan dan kabar terkini seputar organisasi kami.</p>
+
+    <?php if (!empty($beritaList)): ?>
+    <div class="berita-grid">
+      <?php foreach ($beritaList as $bIdx => $b): ?>
+      <a href="<?= BASE_URL ?>/berita/<?= htmlspecialchars($b['slug'] ?? $b['id']) ?>" class="berita-card" data-reveal data-delay="<?= ($bIdx % 3) + 1 ?>">
+        <div class="berita-card-img">
+          <?php if (!empty($b['thumbnail'])): ?>
+            <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($b['thumbnail']) ?>" alt="<?= htmlspecialchars($b['judul']) ?>" loading="lazy">
+          <?php else: ?>
+            <img src="<?= htmlspecialchars($aboutFallbackImg) ?>" alt="<?= htmlspecialchars($b['judul']) ?>" loading="lazy">
+          <?php endif; ?>
+        </div>
+        <div class="berita-card-body">
+          <?php if (!empty($b['kategori_nama'])): ?>
+          <span class="berita-card-tag"><?= htmlspecialchars($b['kategori_nama']) ?></span>
+          <?php endif; ?>
+          <h3><?= htmlspecialchars($b['judul']) ?></h3>
+          <p><?= htmlspecialchars(mb_strimwidth(strip_tags($b['ringkasan'] ?? $b['konten'] ?? ''), 0, 110, '…')) ?></p>
+          <?php if (!empty($b['created_at'])): ?>
+          <span class="berita-card-date"><i class="ti ti-calendar"></i> <?= date('d M Y', strtotime($b['created_at'])) ?></span>
+          <?php endif; ?>
+        </div>
+      </a>
+      <?php endforeach; ?>
+    </div>
+    <?php else: ?>
+    <div class="empty-berita" data-reveal data-delay="2">
+      Belum ada berita yang dipublikasikan saat ini. Nantikan kabar terbaru dari kami!
+    </div>
+    <?php endif; ?>
+
+    <div class="berita-more-wrap" data-reveal data-delay="3">
+      <a href="<?= BASE_URL ?>/berita" class="btn-primary">
+        <i class="ti ti-news"></i> Lihat Semua Berita
+      </a>
+    </div>
+  </div>
+</section>
 
 <div class="section-divider"></div>
 
@@ -1023,6 +1148,16 @@ $featIcons = ['ti-users', 'ti-calendar-event', 'ti-file-text', 'ti-user-circle',
       $mapsQuery = $sr('maps_query') ?: ($sr('contact_address') ?: 'SMK Negeri 2 Pinrang');
       $mapsEmbed = 'https://www.google.com/maps?q=' . urlencode($mapsQuery) . '&output=embed';
       $mapsLink  = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($mapsQuery);
+
+      // Instagram: field admin bisa diisi username saja atau URL lengkap
+      $igHandleRaw   = $sr('contact_instagram') ?: 'com_smakdapinrang';
+      $igHandleClean = ltrim(trim($igHandleRaw), '@');
+      $igUrl         = (stripos($igHandleClean, 'http') === 0) ? $igHandleClean : ('https://instagram.com/' . $igHandleClean);
+      // Ambil username saja untuk ditampilkan (buang domain kalau admin isi URL penuh)
+      $igDisplay = $igHandleClean;
+      if (stripos($igHandleClean, 'instagram.com') !== false) {
+          $igDisplay = trim(parse_url($igHandleClean, PHP_URL_PATH) ?? '', '/');
+      }
     ?>
     <div class="contact-layout">
 
@@ -1048,13 +1183,13 @@ $featIcons = ['ti-users', 'ti-calendar-event', 'ti-file-text', 'ti-user-circle',
         </a>
         <?php endif; ?>
 
-        <div class="contact-card" data-reveal data-delay="3">
-          <div class="contact-icon"><i class="bi bi-instagram"></i></i></div>
+        <a href="<?= htmlspecialchars($igUrl) ?>" class="contact-card" data-reveal data-delay="3" target="_blank" rel="noopener noreferrer">
+          <div class="contact-icon"><i class="ti ti-brand-instagram"></i></div>
           <div>
             <div class="contact-label">Instagram</div>
-            <div class="contact-val">com_smakdapinrang</div>
+            <div class="contact-val">@<?= htmlspecialchars($igDisplay) ?></div>
           </div>
-        </div>
+        </a>
 
         <?php if ($sr('contact_address')): ?>
         <div class="contact-card" data-reveal data-delay="3">
@@ -1115,6 +1250,29 @@ $featIcons = ['ti-users', 'ti-calendar-event', 'ti-file-text', 'ti-user-circle',
       el.style.transform  = 'none';
     }, item.delay);
   });
+
+  /* ── Hero background carousel (auto-slide, 3 foto) ── */
+  (function () {
+    var slides = document.querySelectorAll('#hero-bg-carousel .hero-bg-slide');
+    var dots   = document.querySelectorAll('#hero-carousel-dots .hero-carousel-dot');
+    if (slides.length <= 1) return;
+
+    var cur = 0, timer = null;
+
+    function goTo(idx) {
+      cur = ((idx % slides.length) + slides.length) % slides.length;
+      slides.forEach(function (sl, i) { sl.classList.toggle('is-active', i === cur); });
+      dots.forEach(function (d, i) { d.classList.toggle('active', i === cur); });
+    }
+    function start() { timer = setInterval(function () { goTo(cur + 1); }, 5000); }
+    function stop()  { clearInterval(timer); }
+
+    dots.forEach(function (d, i) {
+      d.addEventListener('click', function () { goTo(i); stop(); start(); });
+    });
+
+    start();
+  })();
 
   /* ── Scroll reveal ── */
   var revealEls = document.querySelectorAll('[data-reveal]');
