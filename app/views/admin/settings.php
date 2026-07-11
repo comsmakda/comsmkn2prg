@@ -208,9 +208,24 @@ textarea.fi { resize:vertical; min-height:68px; line-height:1.65; }
 .img-upload__btn:hover { border-color:var(--bd-ac); color:var(--ac); background:var(--ac-d); }
 .img-upload__btn svg { width:12px; height:12px; }
 .img-upload__name { font-family:var(--font-mono); font-size:10.5px; color:var(--tx3); }
+
+/* ── Hidden file input ──
+   FIX BUG: sebelumnya position:absolute tanpa parent relative membuat
+   browser salah menghitung posisi elemen ini. Akibatnya, setiap kali
+   dialog "Open File" ditutup (baik pilih file MAUPUN klik Cancel),
+   browser mengembalikan focus ke input ini lalu mencoba scrollIntoView
+   pada container scroll (.pg di layout admin) — dan karena posisinya
+   salah dihitung, halaman melompat scroll ke bawah sampai terlihat
+   blank. position:fixed membuat browser selalu menganggap elemen ini
+   berada di viewport, sehingga tidak pernah memicu auto-scroll saat
+   menerima focus. */
 input[type="file"].fhidden {
-  position:absolute; width:1px; height:1px;
-  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  padding: 0; margin: 0;
 }
 
 /* ── Hero image preview area ── */
@@ -1379,11 +1394,16 @@ if (hash) {
   if (t) activateTab(t, false);
 }
 
-/* ── Image file preview (universal — non-hero) ── */
+/* ── Image file preview (universal — non-hero) ──
+   FIX BUG: tambahkan inp.blur() setelah proses selesai (baik ada file
+   maupun dibatalkan) supaya focus dilepas dari input file. Tanpa ini,
+   elemen yang di-hide via clip-rect tetap menerima focus dan memicu
+   browser auto-scroll ke posisinya (yang salah dihitung), membuat
+   halaman melompat dan terlihat blank. */
 document.querySelectorAll('input[type="file"].fhidden:not(.hero-file-input)').forEach(inp => {
   inp.addEventListener('change', () => {
     const file = inp.files[0];
-    if (!file) return;
+    if (!file) { inp.blur(); return; }
     const previewId = inp.dataset.preview;
     const emptyId   = inp.dataset.empty;
     const nameId    = inp.dataset.name;
@@ -1399,6 +1419,7 @@ document.querySelectorAll('input[type="file"].fhidden:not(.hero-file-input)').fo
       if (empty) empty.style.display = 'none';
     };
     reader.readAsDataURL(file);
+    inp.blur(); // FIX BUG: lepas focus supaya tidak memicu auto-scroll
   });
 });
 
@@ -1487,7 +1508,7 @@ function setupHeroSlide(i, hasExistingInitial) {
   if (fileInput) {
     fileInput.addEventListener('change', () => {
       const file = fileInput.files[0];
-      if (!file) return;
+      if (!file) { fileInput.blur(); return; }
       newSelected  = true;
       markedDelete = false;
       const reader = new FileReader();
@@ -1497,6 +1518,7 @@ function setupHeroSlide(i, hasExistingInitial) {
       };
       reader.readAsDataURL(file);
       updateUI();
+      fileInput.blur(); // FIX BUG: lepas focus supaya tidak memicu auto-scroll
     });
   }
 
