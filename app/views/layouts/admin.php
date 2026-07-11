@@ -19,22 +19,28 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* ==========================================================================
-   FLUID ROOT — semua ukuran turunan (rem) mengikuti ini.
-   Skala dari layar kecil (14px) sampai layar besar/4K (20px).
-   Ini kunci utama supaya UI ikut membesar mengikuti resolusi layar.
+   FLUID ROOT
+   FIX: sebelumnya pakai clamp(14px, 0.5vw + 10px, 20px) yang terlalu agresif
+   — di lebar laptop umum (1280–1440px) sudah nyaris mentok 20px sehingga
+   seluruh UI (sidebar, ikon, teks) tampak raksasa. Sekarang pakai
+   breakpoint tetap yang lebih terkontrol & balance di semua ukuran layar.
    ========================================================================== */
-html {
-  font-size: clamp(14px, 0.5vw + 10px, 20px);
-}
+html { font-size: 15px; }
+@media (min-width: 400px)  { html { font-size: 14.5px; } }
+@media (min-width: 768px)  { html { font-size: 15px; } }
+@media (min-width: 1200px) { html { font-size: 15.5px; } }
+@media (min-width: 1600px) { html { font-size: 16px; } }
+@media (min-width: 2200px) { html { font-size: 17px; } }
+@media (min-width: 2800px) { html { font-size: 18px; } }
 
 /* ==========================================================================
    TOKENS — Design System: Community Programmer SMKN 2 Pinrang
    ========================================================================== */
 :root {
-  /* Sidebar & topbar: pakai clamp+vw/vh sendiri (independen dari rem)
-     supaya proporsinya bisa dikontrol terpisah dari skala font. */
-  --sw: clamp(15rem, 16vw, 21.5rem);
-  --th: clamp(3.7rem, 7vh, 4.6rem);
+  /* Sidebar & topbar: fixed di rem, tidak lagi pakai vw supaya tidak
+     dobel-membesar bersamaan dengan root font-size. */
+  --sw: 16rem;
+  --th: 4rem;
 
   /* Base surface */
   --c-page:   #eef2f6;
@@ -58,9 +64,9 @@ html {
   --c-green-bg: #f0fdf4; --c-green-border: #bbf7d0; --c-green-text: #15803d;
 
   /* Radius (rem, ikut skala font root) */
-  --radius-sm: 0.65rem;
-  --radius-md: 0.95rem;
-  --radius-lg: 1.55rem;
+  --radius-sm: 0.6rem;
+  --radius-md: 0.9rem;
+  --radius-lg: 1.4rem;
 
   /* Font */
   --ff: 'Plus Jakarta Sans', sans-serif;
@@ -70,12 +76,15 @@ html {
   --tf: 150ms; --tm: 200ms; --ts: 260ms;
 }
 
+@media (min-width: 1600px) { :root { --sw: 17rem; } }
+@media (max-width: 480px)  { :root { --th: 3.5rem; } }
+
 /* ==========================================================================
    BASE
    ========================================================================== */
 html, body {
   height: 100%;
-  overflow: hidden; /* FIX: cegah body/window ikut scroll — scroll hanya di .pg */
+  overflow: hidden; /* cegah body/window ikut scroll — scroll hanya di .pg */
 }
 body {
   font-family: var(--ff);
@@ -96,10 +105,14 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ==========================================================================
    SHELL
+   FIX: pakai 100dvh dengan fallback 100vh supaya aman di browser mobile
+   yang toolbar-nya dinamis (mencegah munculnya "sisa" ruang yang memicu
+   scroll tak terduga).
    ========================================================================== */
 .shell {
   display: flex;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -144,14 +157,14 @@ button { font-family: inherit; cursor: pointer; }
 .sb-brand {
   display: flex;
   align-items: center;
-  gap: 0.86rem;
+  gap: 0.75rem;
   height: var(--th);
-  padding: 0 1.43rem;
+  padding: 0 1.25rem;
   border-bottom: 1px solid var(--c-border);
   flex-shrink: 0;
 }
 .sb-logo-wrap {
-  width: 2.57rem; height: 2.57rem;
+  width: 2.35rem; height: 2.35rem;
   border-radius: var(--radius-sm);
   background: var(--c-primary-08);
   display: flex; align-items: center; justify-content: center;
@@ -159,17 +172,17 @@ button { font-family: inherit; cursor: pointer; }
   overflow: hidden;
 }
 .sb-logo { width: 100%; height: 100%; object-fit: contain; }
-.sb-logo-fallback { font-size: 1.21rem; color: var(--c-primary); }
+.sb-logo-fallback { font-size: 1.1rem; color: var(--c-primary); }
 .sb-name {
   flex: 1;
-  font-size: 1.04rem;
+  font-size: 0.98rem;
   font-weight: 800;
   letter-spacing: -.02em;
   color: var(--c-primary-dk);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .sb-badge {
-  font-size: 0.71rem;
+  font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -177,7 +190,7 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--c-primary-08);
   border: 1px solid var(--c-primary-25);
   border-radius: var(--radius-sm);
-  padding: 0.21rem 0.57rem;
+  padding: 0.2rem 0.5rem;
   flex-shrink: 0;
 }
 
@@ -185,26 +198,26 @@ button { font-family: inherit; cursor: pointer; }
 .sb-nav {
   flex: 1;
   overflow-y: auto;
-  padding: 1.14rem 1rem;
+  padding: 1rem 0.85rem;
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
 /* Section */
-.nav-sec { margin-bottom: 0.29rem; }
+.nav-sec { margin-bottom: 0.25rem; }
 .nav-sec + .nav-sec {
-  margin-top: 0.71rem;
-  padding-top: 0.71rem;
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
   border-top: 1px solid var(--c-border);
 }
 .nav-sec-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--c-muted2);
-  padding: 0.43rem 0.86rem 0.57rem;
+  padding: 0.4rem 0.8rem 0.5rem;
   display: block;
 }
 
@@ -213,10 +226,10 @@ button { font-family: inherit; cursor: pointer; }
   position: relative;
   display: flex;
   align-items: center;
-  gap: 0.79rem;
-  padding: 0.71rem 0.86rem;
+  gap: 0.7rem;
+  padding: 0.6rem 0.8rem;
   border-radius: var(--radius-sm);
-  font-size: 0.96rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--c-muted);
   transition: color var(--tf) var(--ease), background var(--tf) var(--ease);
@@ -230,8 +243,8 @@ button { font-family: inherit; cursor: pointer; }
   box-shadow: 0 6px 16px rgba(14,116,144,.25);
 }
 .ni-icon {
-  font-size: 1.21rem;
-  width: 1.21rem; height: 1.21rem;
+  font-size: 1.1rem;
+  width: 1.1rem; height: 1.1rem;
   flex-shrink: 0;
   color: var(--c-muted2);
   display: flex; align-items: center; justify-content: center;
@@ -239,9 +252,9 @@ button { font-family: inherit; cursor: pointer; }
 }
 .ni:hover .ni-icon { color: var(--c-primary); }
 .ni.act .ni-icon { color: #fff; }
-.ni-label { flex: 1; line-height: 1.2; }
+.ni-label { flex: 1; line-height: 1.25; }
 .ni-badge {
-  font-size: 0.64rem;
+  font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: .05em;
   text-transform: uppercase;
@@ -249,41 +262,41 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--c-amber-bg);
   border: 1px solid var(--c-amber-border);
   border-radius: var(--radius-sm);
-  padding: 0.14rem 0.43rem;
+  padding: 0.14rem 0.4rem;
   flex-shrink: 0;
 }
 .ni-new {
-  font-size: 0.64rem;
+  font-size: 0.6rem;
   font-weight: 700;
   color: var(--c-green-text);
   background: var(--c-green-bg);
   border: 1px solid var(--c-green-border);
   border-radius: var(--radius-sm);
-  padding: 0.14rem 0.43rem;
+  padding: 0.14rem 0.4rem;
   flex-shrink: 0;
 }
-.ni-ext-icon { font-size: 0.86rem; color: var(--c-muted2); flex-shrink: 0; }
+.ni-ext-icon { font-size: 0.8rem; color: var(--c-muted2); flex-shrink: 0; }
 .ni.act .ni-ext-icon { color: rgba(255,255,255,.8); }
 
 /* Footer */
 .sb-footer {
-  padding: 1rem;
+  padding: 0.9rem;
   border-top: 1px solid var(--c-border);
   flex-shrink: 0;
 }
 .sb-ver {
-  font-size: 0.71rem;
+  font-size: 0.66rem;
   color: var(--c-muted2);
   text-align: center;
-  margin-bottom: 0.71rem;
+  margin-bottom: 0.65rem;
   letter-spacing: .03em;
   font-weight: 500;
 }
 .ucard {
   display: flex;
   align-items: center;
-  gap: 0.71rem;
-  padding: 0.71rem 0.86rem;
+  gap: 0.65rem;
+  padding: 0.65rem 0.8rem;
   border-radius: var(--radius-md);
   background: #f8fafc;
   border: 1px solid var(--c-border);
@@ -291,11 +304,11 @@ button { font-family: inherit; cursor: pointer; }
 }
 .ucard:hover { border-color: var(--c-primary-25); background: #f4f8fa; }
 .ucard-av {
-  width: 2.43rem; height: 2.43rem;
+  width: 2.2rem; height: 2.2rem;
   border-radius: 50%;
   background: var(--c-primary);
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.86rem;
+  font-size: 0.8rem;
   font-weight: 800;
   color: #fff;
   flex-shrink: 0;
@@ -303,7 +316,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 .ucard-info { flex: 1; min-width: 0; }
 .ucard-name {
-  font-size: 0.89rem;
+  font-size: 0.83rem;
   font-weight: 700;
   color: var(--c-ink);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -311,19 +324,19 @@ button { font-family: inherit; cursor: pointer; }
   line-height: 1.3;
 }
 .ucard-role {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--c-muted);
   font-weight: 500;
   margin-top: 0.07rem;
 }
 .btn-logout {
   display: flex; align-items: center; justify-content: center;
-  width: 2.14rem; height: 2.14rem;
+  width: 1.95rem; height: 1.95rem;
   border-radius: var(--radius-sm);
   background: transparent;
   border: 1px solid transparent;
   color: var(--c-muted2);
-  font-size: 1.07rem;
+  font-size: 1rem;
   transition: background var(--tf) var(--ease), border-color var(--tf) var(--ease), color var(--tf) var(--ease);
   flex-shrink: 0;
 }
@@ -338,7 +351,7 @@ button { font-family: inherit; cursor: pointer; }
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
-  min-height: 0; /* FIX: kunci utama — cegah .main ikut membesar mengikuti konten .pg */
+  min-height: 0; /* cegah .main ikut membesar mengikuti konten .pg */
   margin-left: 0;
 }
 @media (min-width: 768px) { .main { margin-left: var(--sw); } }
@@ -350,8 +363,8 @@ button { font-family: inherit; cursor: pointer; }
   height: var(--th);
   display: flex;
   align-items: center;
-  gap: 0.86rem;
-  padding: 0 2rem;
+  gap: 0.8rem;
+  padding: 0 1.75rem;
   background: var(--c-white);
   border-bottom: 1px solid var(--c-border);
   flex-shrink: 0;
@@ -359,12 +372,12 @@ button { font-family: inherit; cursor: pointer; }
 }
 .btn-menu {
   display: flex; align-items: center; justify-content: center;
-  width: 2.57rem; height: 2.57rem;
+  width: 2.35rem; height: 2.35rem;
   border-radius: var(--radius-sm);
   background: transparent;
   border: 1px solid var(--c-border);
   color: var(--c-muted);
-  font-size: 1.14rem;
+  font-size: 1.05rem;
   transition: background var(--tf), border-color var(--tf), color var(--tf);
   flex-shrink: 0;
 }
@@ -375,29 +388,29 @@ button { font-family: inherit; cursor: pointer; }
 .bc {
   display: flex;
   align-items: center;
-  font-size: 0.93rem;
+  font-size: 0.87rem;
 }
 .bc-root { color: var(--c-muted2); font-weight: 600; }
-.bc-sep  { color: var(--c-muted2); font-size: 1.07rem; margin: 0 0.43rem; display: flex; }
-.bc-page { color: var(--c-primary-dk); font-weight: 800; font-size: 1rem; }
+.bc-sep  { color: var(--c-muted2); font-size: 1rem; margin: 0 0.4rem; display: flex; }
+.bc-page { color: var(--c-primary-dk); font-weight: 800; font-size: 0.93rem; }
 @media (max-width: 767px) { .bc { display: none; } }
 
 /* Search */
 .tb-search {
   flex: 1;
-  max-width: 21.43rem;
+  max-width: 19rem;
   margin-left: auto;
   position: relative;
 }
 .tb-search input {
   width: 100%;
-  height: 2.71rem;
+  height: 2.5rem;
   background: #fbfcfe;
   border: 1.5px solid var(--c-border);
   border-radius: var(--radius-sm);
-  padding: 0 3.14rem 0 2.71rem;
+  padding: 0 2.9rem 0 2.5rem;
   font-family: var(--ff);
-  font-size: 0.93rem;
+  font-size: 0.87rem;
   color: var(--c-ink);
   outline: none;
   transition: border var(--tf), background var(--tf), box-shadow var(--tf);
@@ -405,49 +418,49 @@ button { font-family: inherit; cursor: pointer; }
 .tb-search input::placeholder { color: var(--c-muted2); }
 .tb-search input:focus { border-color: var(--c-primary-lt); background: #fff; box-shadow: 0 0 0 3px rgba(6,182,212,.12); }
 .tb-si {
-  position: absolute; left: 0.86rem; top: 50%; transform: translateY(-50%);
-  font-size: 1.07rem; color: var(--c-muted2); pointer-events: none;
+  position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%);
+  font-size: 1rem; color: var(--c-muted2); pointer-events: none;
 }
 .tb-kbd {
-  position: absolute; right: 0.71rem; top: 50%; transform: translateY(-50%);
-  font-size: 0.71rem; font-weight: 600; color: var(--c-muted2);
+  position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%);
+  font-size: 0.66rem; font-weight: 600; color: var(--c-muted2);
   background: var(--c-page); border: 1px solid var(--c-border);
-  border-radius: 0.36rem; padding: 0.14rem 0.43rem; pointer-events: none;
+  border-radius: 0.34rem; padding: 0.14rem 0.4rem; pointer-events: none;
 }
 
 /* Actions */
 .tb-actions {
-  display: flex; align-items: center; gap: 0.57rem; flex-shrink: 0;
+  display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;
 }
 @media (max-width: 767px) { .tb-search { display: none; } .tb-actions { margin-left: auto; } }
 
 .btn-icon {
   position: relative;
   display: flex; align-items: center; justify-content: center;
-  width: 2.71rem; height: 2.71rem;
+  width: 2.5rem; height: 2.5rem;
   border-radius: var(--radius-sm);
   background: transparent;
   border: 1px solid var(--c-border);
   color: var(--c-muted);
-  font-size: 1.14rem;
+  font-size: 1.05rem;
   transition: background var(--tf), border-color var(--tf), color var(--tf);
 }
 .btn-icon:hover { background: #f4f7fa; border-color: var(--c-primary-25); color: var(--c-primary); }
 .ndot {
   position: absolute; top: 0.5rem; right: 0.5rem;
-  width: 0.43rem; height: 0.43rem;
+  width: 0.4rem; height: 0.4rem;
   border-radius: 50%; background: var(--c-red-text); border: 1.5px solid var(--c-white);
 }
 .chip-ok {
-  display: flex; align-items: center; gap: 0.5rem;
-  padding: 0.43rem 0.93rem;
+  display: flex; align-items: center; gap: 0.45rem;
+  padding: 0.4rem 0.85rem;
   border-radius: 99px;
   background: var(--c-green-bg); border: 1px solid var(--c-green-border);
-  font-size: 0.82rem; font-weight: 700; color: var(--c-green-text);
+  font-size: 0.78rem; font-weight: 700; color: var(--c-green-text);
   user-select: none;
 }
 .chip-dot {
-  width: 0.43rem; height: 0.43rem; border-radius: 50%; background: var(--c-green-text); flex-shrink: 0;
+  width: 0.4rem; height: 0.4rem; border-radius: 50%; background: var(--c-green-text); flex-shrink: 0;
   animation: pdot 2.4s ease infinite;
 }
 @keyframes pdot {
@@ -457,11 +470,11 @@ button { font-family: inherit; cursor: pointer; }
 @media (max-width: 560px) { .chip-ok span:last-child { display: none; } }
 
 .tb-av {
-  width: 2.71rem; height: 2.71rem;
+  width: 2.5rem; height: 2.5rem;
   border-radius: 50%;
   background: var(--c-primary);
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.89rem; font-weight: 800; color: #fff;
+  font-size: 0.84rem; font-weight: 800; color: #fff;
   cursor: pointer; flex-shrink: 0;
   transition: box-shadow var(--tf), transform var(--tf);
   letter-spacing: -.02em;
@@ -471,18 +484,18 @@ button { font-family: inherit; cursor: pointer; }
 /* ==========================================================================
    FLASH
    ========================================================================== */
-.flash-wrap { padding: 1.43rem 2rem 0; }
+.flash-wrap { padding: 1.25rem 1.75rem 0; }
 .alert {
-  display: flex; align-items: flex-start; gap: 0.79rem;
-  padding: 0.93rem 1.07rem;
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  padding: 0.85rem 1rem;
   border-radius: var(--radius-md);
-  font-size: 0.93rem; font-weight: 500;
+  font-size: 0.87rem; font-weight: 500;
   border: 1px solid; line-height: 1.5;
 }
-.alert i { font-size: 1.21rem; flex-shrink: 0; margin-top: 0.07rem; }
+.alert i { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.07rem; }
 .alert-msg { flex: 1; }
 .alert-x {
-  background: none; border: none; font-size: 1.29rem; line-height: 1;
+  background: none; border: none; font-size: 1.2rem; line-height: 1;
   color: inherit; opacity: .45; padding: 0; flex-shrink: 0;
   transition: opacity var(--tf);
 }
@@ -494,31 +507,38 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ==========================================================================
    PAGE
+   Satu-satunya container yang boleh scroll di area konten.
+   FIX: tambahkan scroll-margin-top ke semua elemen ber-id supaya kalau
+   ada hash link (#id) di URL, target tidak ketutup topbar sticky dan
+   scroll dilakukan dengan benar di dalam .pg (lihat script di bawah).
    ========================================================================== */
 .pg {
   flex: 1;
   overflow-y: auto;
-  padding: 2.29rem 2rem;
-  min-height: 0; /* FIX: paksa .pg untuk benar-benar shrink & scroll di dalam dirinya sendiri */
+  overflow-x: hidden;
+  padding: 2rem 1.75rem;
+  min-height: 0; /* paksa .pg untuk benar-benar shrink & scroll di dalam dirinya sendiri */
   width: 100%;
+  scroll-behavior: smooth;
 }
+.pg [id] { scroll-margin-top: calc(var(--th) + 1rem); }
 
 /* Layar kecil / mobile: rapatkan padding */
 @media (max-width: 480px) {
-  .tb        { padding: 0 1.14rem; }
-  .flash-wrap{ padding: 1rem 1.14rem 0; }
-  .pg        { padding: 1.29rem 1.14rem; }
+  .tb        { padding: 0 1rem; }
+  .flash-wrap{ padding: 0.9rem 1rem 0; }
+  .pg        { padding: 1.15rem 1rem; }
 }
 
 /* Layar besar (monitor PC / widescreen): beri ruang lebih & batasi lebar
    konten supaya tidak melebar tak terkendali di layar ultra-wide/4K. */
 @media (min-width: 1600px) {
-  .tb         { padding: 0 2.6rem; }
-  .flash-wrap { padding: 1.6rem 2.6rem 0; }
-  .pg         { padding: 2.6rem 2.6rem; max-width: 1920px; margin-inline: auto; }
+  .tb         { padding: 0 2.4rem; }
+  .flash-wrap { padding: 1.4rem 2.4rem 0; }
+  .pg         { padding: 2.4rem 2.4rem; max-width: 1600px; margin-inline: auto; }
 }
 @media (min-width: 2200px) {
-  .pg { max-width: 2200px; }
+  .pg { max-width: 1800px; }
 }
   </style>
 </head>
@@ -779,6 +799,7 @@ button { font-family: inherit; cursor: pointer; }
   var sb  = document.getElementById('js-sb');
   var bd  = document.getElementById('js-bd');
   var mb  = document.getElementById('js-mbtn');
+  var pg  = document.getElementById('main-content');
 
   function sbOpen(){
     sb.classList.add('on');
@@ -839,6 +860,27 @@ button { font-family: inherit; cursor: pointer; }
       });
     });
   }
+
+  /* ========================================================================
+     FIX BUG: hash anchor (#id) di URL.
+     Karena body/html overflow:hidden dan yang scroll sebenarnya adalah
+     .pg (#main-content), native browser anchor-scroll sering gagal/kadang
+     malah memicu lompatan scroll aneh. Solusi: tangani manual — cari
+     elemen target di dalam .pg lalu scrollIntoView ke situ saja.
+     ========================================================================== */
+  function goToHash(){
+    var hash = window.location.hash;
+    if(!hash || hash.length < 2) return;
+    var target;
+    try { target = document.getElementById(hash.slice(1)); } catch(e) { target = null; }
+    if(target && pg && pg.contains(target)){
+      requestAnimationFrame(function(){
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }
+  window.addEventListener('load', goToHash);
+  window.addEventListener('hashchange', goToHash);
 
 }());
 </script>

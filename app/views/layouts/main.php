@@ -161,11 +161,20 @@
       letter-spacing: .07em; text-transform: uppercase; display: block; margin-top: 0.19rem;
     }
     .nav-sep { width: 1px; height: 1.25rem; background: var(--c-border); flex-shrink: 0; }
-    .nav-links { display: flex; align-items: center; }
+    /* ─── NAV LINKS ───
+       FIX: link jadi flex container (icon + <span> teks) supaya ikon
+       otomatis center secara vertikal terhadap teks — tidak lagi
+       bergantung pada vertical-align inline yang gampang meleset. */
+    .nav-links { display: flex; align-items: center; gap: 0.125rem; }
     .nav-link {
-      position: relative; font-size: .82rem; font-weight: 600; color: var(--c-muted);
-      text-decoration: none; padding: 0.38rem 0.75rem; border-radius: var(--radius-sm);
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: .82rem; font-weight: 600; color: var(--c-muted);
+      text-decoration: none; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm);
       transition: color .18s, background .18s; letter-spacing: -.01em; white-space: nowrap;
+      line-height: 1;
     }
     .nav-link:hover { color: var(--c-ink); background: #f4f7fa; }
     .nav-link.active { color: var(--c-primary); }
@@ -173,7 +182,17 @@
       content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
       width: 0.875rem; height: 2px; border-radius: 2px; background: var(--c-primary);
     }
-    .nav-link svg { color: var(--c-muted2); }
+    .nav-link-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      line-height: 1;
+      color: var(--c-muted2);
+      flex-shrink: 0;
+    }
+    .nav-link:hover .nav-link-icon,
+    .nav-link.active .nav-link-icon { color: currentColor; }
     /* ─── DROPDOWN (hover-based) ─── */
     .nav-dd { position: relative; }
     .nav-dd::after {
@@ -183,11 +202,12 @@
       display: flex; align-items: center; gap: 0.25rem;
       font-size: .82rem; font-weight: 600; color: var(--c-muted);
       background: none; border: none; cursor: pointer;
-      padding: 0.38rem 0.75rem; border-radius: var(--radius-sm);
+      padding: 0.5rem 0.75rem; border-radius: var(--radius-sm);
       transition: color .18s, background .18s;
       font-family: var(--font-body);
       letter-spacing: -.01em;
       user-select: none;
+      line-height: 1;
     }
     .nav-dd-toggle:hover,
     .nav-dd:hover .nav-dd-toggle { color: var(--c-ink); background: #f4f7fa; }
@@ -257,21 +277,52 @@
       transition: color .15s, background .15s;
     }
     .mob-sub-item:hover { color: var(--c-ink); background: #f4f7fa; }
-    .nav-actions { display: flex; align-items: center; gap: 0.44rem; }
-    .nav-btn-ghost {
-      display: inline-flex; align-items: center; gap: 0.31rem; padding: 0.44rem 0.875rem;
-      font-size: .8rem; font-weight: 700; color: var(--c-ink);
-      border: 1.5px solid var(--c-border); border-radius: var(--radius-sm); text-decoration: none;
-      transition: all .18s; letter-spacing: -.01em; background: var(--c-white);
-    }
-    .nav-btn-ghost:hover { background: #f4f7fa; border-color: #d7dee7; }
+    /* ─── TOMBOL AKSI NAVBAR ───
+       Daftar PAB (ghost) & Masuk/Dashboard (CTA) disamakan tinggi, padding,
+       radius, dan ukuran ikon supaya terlihat sepasang tombol yang seimbang
+       dan profesional, bukan dua tombol berbeda bobot. */
+    .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
+    .nav-btn-ghost,
     .nav-btn-cta {
-      display: inline-flex; align-items: center; gap: 0.31rem; padding: 0.5rem 1rem;
-      font-size: .8rem; font-weight: 800; color: #fff; background: var(--c-primary);
-      border-radius: var(--radius-sm); text-decoration: none; transition: background .18s, transform .12s, box-shadow .18s;
-      letter-spacing: -.01em; box-shadow: 0 8px 22px rgba(14,116,144,.25);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      height: 2.5rem;
+      padding: 0 1.05rem;
+      font-size: .82rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      letter-spacing: -.01em;
+      line-height: 1;
+      white-space: nowrap;
+      transition: background .18s, border-color .18s, color .18s, transform .12s, box-shadow .18s;
     }
-    .nav-btn-cta:hover { background: var(--c-primary-lt); box-shadow: 0 12px 28px rgba(6,182,212,.3); transform: translateY(-2px); }
+    .nav-btn-ghost i,
+    .nav-btn-cta i { font-size: 0.95rem; line-height: 1; }
+    .nav-btn-ghost {
+      color: var(--c-ink);
+      background: var(--c-white);
+      border: 1.5px solid var(--c-border);
+    }
+    .nav-btn-ghost:hover {
+      background: #f4f7fa;
+      border-color: #d7dee7;
+      transform: translateY(-1px);
+    }
+    .nav-btn-cta {
+      color: #fff;
+      background: var(--c-primary);
+      border: 1.5px solid var(--c-primary);
+      box-shadow: 0 8px 20px rgba(14,116,144,.22);
+    }
+    .nav-btn-cta:hover {
+      background: var(--c-primary-lt);
+      border-color: var(--c-primary-lt);
+      box-shadow: 0 12px 26px rgba(6,182,212,.28);
+      transform: translateY(-2px);
+    }
     .hamburger {
       display: none; flex-direction: column; gap: 0.25rem; cursor: pointer;
       padding: 0.5rem; background: var(--c-white);
@@ -472,12 +523,12 @@
     <div class="nav-sep"></div>
     <div class="nav-links">
       <a href="<?= BASE_URL ?>/" class="nav-link" data-page="home">
-        <i class="ti ti-home" style="font-size:0.81em;margin-right:3px;vertical-align:-2px"></i>
-        Home
+        <i class="ti ti-home nav-link-icon"></i>
+        <span>Home</span>
       </a>
-      <a href="<?= BASE_URL ?>/#about"    class="nav-link">Tentang</a>
-      <a href="<?= BASE_URL ?>/#features" class="nav-link">Layanan</a>
-      <a href="<?= BASE_URL ?>/#programs" class="nav-link">Program</a>
+      <a href="<?= BASE_URL ?>/#about"    class="nav-link"><span>Tentang</span></a>
+      <a href="<?= BASE_URL ?>/#features" class="nav-link"><span>Layanan</span></a>
+      <a href="<?= BASE_URL ?>/#programs" class="nav-link"><span>Program</span></a>
       <!-- Dropdown: Konten — hover only, no JS click needed -->
       <div class="nav-dd" id="dd-konten">
         <button class="nav-dd-toggle" type="button" aria-haspopup="true" aria-expanded="false">
@@ -507,22 +558,22 @@
           </div>
         </div>
       </div>
-      <a href="<?= BASE_URL ?>/#contact" class="nav-link">Kontak</a>
+      <a href="<?= BASE_URL ?>/#contact" class="nav-link"><span>Kontak</span></a>
     </div>
     <div class="nav-actions">
       <?php if (empty($_SESSION['user_id'])): ?>
         <a href="<?= BASE_URL ?>/pab" class="nav-btn-ghost">
-          <i class="ti ti-users" style="font-size:0.875em"></i>
-          Daftar PAB
+          <i class="ti ti-user-plus"></i>
+          <span>Daftar PAB</span>
         </a>
         <a href="<?= BASE_URL ?>/login" class="nav-btn-cta">
-          <i class="ti ti-login-2" style="font-size:0.875em"></i>
-          Masuk
+          <i class="ti ti-login-2"></i>
+          <span>Masuk</span>
         </a>
       <?php else: ?>
         <a href="<?= BASE_URL ?>/<?= $_SESSION['user_role'] === 'admin' ? 'admin' : 'member' ?>/dashboard" class="nav-btn-cta">
-          <i class="ti ti-layout-dashboard" style="font-size:0.875em"></i>
-          Dashboard
+          <i class="ti ti-layout-dashboard"></i>
+          <span>Dashboard</span>
         </a>
       <?php endif; ?>
     </div>
