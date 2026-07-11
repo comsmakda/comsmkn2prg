@@ -523,7 +523,7 @@ public function fingerprint(): void
         $filter       = ['kelas' => $kelas];
 
         $rekap     = (new FingerprintModel())->getRekapHarian($tanggalMulai, $tanggalAkhir, $filter);
-        $kelasList = (new UserModel())->getKelasList();
+        $kelasList = array_column((new UserModel())->getKelasList(), 'kelas');
         $flash     = $this->getFlash();
         $csrf      = $this->csrfToken();
 
