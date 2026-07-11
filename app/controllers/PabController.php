@@ -24,7 +24,7 @@ class PabController extends Controller
 
         $sm = new SettingModel();
         if (!$sm->isPabOpen()) {
-            $this->flash('error', ['Pendaftaran PAB sedang ditutup.']);
+            $this->flashMessages('error', ['Pendaftaran PAB sedang ditutup.']);
             $this->redirect('/pab');
         }
 
@@ -52,7 +52,7 @@ class PabController extends Controller
 
         if ($errors) {
             $_SESSION['old_input'] = $oldInput;
-            $this->flash('error', $errors);
+            $this->flashMessages('error', $errors);
             $this->redirect('/pab');
         }
 
@@ -61,7 +61,7 @@ class PabController extends Controller
             $fotoName = FileUploader::uploadFoto($_FILES['foto'], 'pab');
         } catch (RuntimeException $e) {
             $_SESSION['old_input'] = $oldInput;
-            $this->flash('error', [$e->getMessage()]);
+            $this->flashMessages('error', [$e->getMessage()]);
             $this->redirect('/pab');
         }
 
@@ -74,7 +74,17 @@ class PabController extends Controller
             'foto'          => $fotoName,
         ]);
 
-        $this->flash('success', ['Pendaftaran berhasil! Tunggu verifikasi Admin.']);
+        $this->flashMessages('success', ['Pendaftaran berhasil! Tunggu verifikasi Admin.']);
         $this->redirect('/pab');
+    }
+
+    /**
+     * Helper: kirim beberapa pesan sekaligus ke flash() milik Controller dasar,
+     * yang hanya menerima string. Di-encode jadi JSON supaya bisa dibaca
+     * kembali sebagai array di view (lihat $flashMsgs di pab.php).
+     */
+    private function flashMessages(string $type, array $messages): void
+    {
+        $this->flash($type, json_encode($messages, JSON_UNESCAPED_UNICODE));
     }
 }

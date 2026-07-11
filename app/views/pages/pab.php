@@ -29,10 +29,16 @@ $extra_head .= '
 
 /* ── Normalisasi flash jadi bentuk {type, messages[]} agar aman dipakai di JS ── */
 $flashType = $flash['type'] ?? 'error';
-$flashMsgs = $flash['msg'] ?? [];
-if (!is_array($flashMsgs)) {
-    $flashMsgs = array_filter([trim(strip_tags((string) $flashMsgs))]);
+$rawMsg    = $flash['msg'] ?? [];
+
+if (is_array($rawMsg)) {
+    $flashMsgs = $rawMsg;
+} else {
+    // Coba decode JSON (format baru dari flashMessages()); kalau gagal, anggap string biasa
+    $decoded = json_decode((string) $rawMsg, true);
+    $flashMsgs = is_array($decoded) ? $decoded : array_filter([trim(strip_tags((string) $rawMsg))]);
 }
+
 $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 ?>
 
