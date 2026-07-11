@@ -223,6 +223,7 @@
           <span class="imp-col-chip">2. Kelas</span>
           <span class="imp-col-chip">3. No HP</span>
           <span class="imp-col-chip imp-col-chip--opt">4. Email (opsional)</span>
+          <span class="imp-col-chip imp-col-chip--opt">5. Tahun Daftar (opsional)</span>
         </div>
       </div>
 
@@ -230,8 +231,10 @@
         <i class="ti ti-shield-lock" aria-hidden="true"></i>
         <div>
           <strong>Password tidak diimpor.</strong> Semua anggota baru dari import akan
-          diberi password default <strong>comsmakda</strong> dan NIA akan digenerate otomatis.
-          Baris dengan email/No HP yang sudah terdaftar akan otomatis dilewati.
+          diberi password default <strong>comsmakda</strong>. NIA digenerate otomatis
+          mengikuti kolom <strong>Tahun Daftar</strong> di tiap baris — kosongkan kolom itu
+          kalau mau pakai tahun berjalan. Baris dengan email/No HP yang sudah terdaftar
+          akan otomatis dilewati.
         </div>
       </div>
 

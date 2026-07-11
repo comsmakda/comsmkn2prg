@@ -124,6 +124,11 @@ $router->get('/admin/anggota/import',               [AdminController::class, 'an
 $router->post('/admin/anggota/import',              [AdminController::class, 'anggotaImportProcess']);
 $router->get('/admin/anggota/import/template',      [AdminController::class, 'anggotaImportTemplate']);
 
+// Reset Sequence NIA
+$router->get('/admin/nia-sequence',                 [AdminController::class, 'niaSequence']);
+$router->post('/admin/nia-sequence/:tahun/sync',    [AdminController::class, 'niaSequenceSync']);
+$router->post('/admin/nia-sequence/:tahun/manual',  [AdminController::class, 'niaSequenceManual']);
+
 // ── Member routes ─────────────────────────────────────────────
 $router->get('/member/dashboard',                       [MemberController::class, 'dashboard']);
 $router->get('/member/profile',                         [MemberController::class, 'profile']);

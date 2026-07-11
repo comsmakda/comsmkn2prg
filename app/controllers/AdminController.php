@@ -1317,8 +1317,8 @@ public function fingerprint(): void
     {
         $this->requireAdmin();
 
-        $headers = ['Nama Lengkap', 'Kelas', 'No HP', 'Email'];
-        $example = ['Contoh Nama Siswa', 'XII RPL 1', '081234567890', 'contoh@email.com'];
+        $headers = ['Nama Lengkap', 'Kelas', 'No HP', 'Email', 'Tahun Daftar'];
+        $example = ['Contoh Nama Siswa', 'XII RPL 1', '081234567890', 'contoh@email.com', date('Y')];
 
         header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="template_import_anggota.csv"');
@@ -1384,7 +1384,7 @@ public function fingerprint(): void
         array_shift($rows);
 
         // ── Proses tiap baris ────────────────────────────────────────
-        // Urutan kolom yang diharapkan: Nama Lengkap | Kelas | No HP | Email
+        // Urutan kolom yang diharapkan: Nama Lengkap | Kelas | No HP | Email | Tahun Daftar (opsional)
         $um = new UserModel();
         $defaultPasswordHash = password_hash('comsmakda', PASSWORD_BCRYPT, ['cost' => 12]);
 
@@ -1400,6 +1400,13 @@ public function fingerprint(): void
             $noHp  = preg_replace('/\D/', '', (string)($row[2] ?? ''));
             $email = trim((string)($row[3] ?? ''));
             $email = filter_var($email, FILTER_VALIDATE_EMAIL) ?: null;
+
+            // ── Tahun Daftar (opsional, kolom ke-5) ─────────────────────────
+            $tahunRaw = trim((string)($row[4] ?? ''));
+            $tahunMax = (int)date('Y') + 1; // toleransi input tahun depan
+            $tahun = (ctype_digit($tahunRaw) && (int)$tahunRaw >= 2000 && (int)$tahunRaw <= $tahunMax)
+                ? (int)$tahunRaw
+                : (int)date('Y'); // fallback tahun berjalan kalau kosong/invalid
 
             // baris kosong (misal baris terakhir file) dilewati diam-diam
             if ($nama === '' && $kelas === '' && $noHp === '' && !$email) {
@@ -1427,10 +1434,11 @@ public function fingerprint(): void
                 'password_hash' => $defaultPasswordHash, // password TIDAK diimpor, pakai default
                 'foto'          => null,
                 'sumber'        => 'manual',
-                'tahun_daftar'  => date('Y'),
+                'tahun_daftar'  => $tahun,
             ]);
 
             // NIA belum ada di file import -> generate otomatis lewat aktivasi()
+            // aktivasi() akan memakai tahun_daftar milik user ini saat memanggil NiaGenerator::generate()
             $um->aktivasi($userId);
             $sukses++;
         }
@@ -1446,6 +1454,40 @@ public function fingerprint(): void
         }
 
         $this->redirect($sukses > 0 || $dilewati > 0 ? '/admin/anggota' : '/admin/anggota/import');
+    }
+
+    // ================================================================
+    //  ANGGOTA — RESET SEQUENCE NIA
+    // ================================================================
+    public function niaSequence(): void
+    {
+        $this->requireAdmin();
+        $gen   = new NiaGenerator();
+        $rows  = $gen->getAllSequenceInfo();
+        $flash = $this->getFlash();
+        $csrf  = $this->csrfToken();
+        $this->view('admin/nia_sequence', compact('rows', 'flash', 'csrf'), 'admin');
+    }
+
+    public function niaSequenceSync(string $tahun): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $next = (new NiaGenerator())->resetToActual((int)$tahun);
+        $this->flash('success', "Sequence NIA tahun {$tahun} disinkronkan dengan data real. NIA berikutnya urut #{$next}.");
+        $this->redirect('/admin/nia-sequence');
+    }
+
+    public function niaSequenceManual(string $tahun): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $nextUrut = max(1, (int)($_POST['next_urut'] ?? 1));
+        (new NiaGenerator())->resetManual((int)$tahun, $nextUrut);
+        $this->flash('success', "Sequence NIA tahun {$tahun} diset manual. NIA berikutnya urut #{$nextUrut}.");
+        $this->redirect('/admin/nia-sequence');
     }
 
 }

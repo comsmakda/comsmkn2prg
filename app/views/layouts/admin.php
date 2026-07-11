@@ -629,17 +629,22 @@ button { font-family: inherit; cursor: pointer; }
           ],
 
           'Sistem' => [
-            [
-              'href'  => '/admin/settings',
-              'label' => 'Pengaturan & CMS',
-              'icon'  => 'ti-settings',
-            ],
-            [
-              'href'  => '/admin/profil',
-              'label' => 'Edit Profil Admin',
-              'icon'  => 'ti-user-edit',
-            ],
-          ],
+  [
+    'href'  => '/admin/settings',
+    'label' => 'Pengaturan & CMS',
+    'icon'  => 'ti-settings',
+  ],
+  [
+    'href'  => '/admin/nia-sequence',
+    'label' => 'Reset Sequence NIA',
+    'icon'  => 'ti-hash',
+  ],
+  [
+    'href'  => '/admin/profil',
+    'label' => 'Edit Profil Admin',
+    'icon'  => 'ti-user-edit',
+  ],
+],
 
         ];
 
