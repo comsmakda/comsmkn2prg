@@ -392,6 +392,21 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 
 /* ── Modal alert (gaya SweetAlert) ── */
 .pab-modal-overlay {
+  /* Variabel mandiri — modal ini berada di luar .pab-wrap secara DOM,
+     jadi ia tidak bisa mewarisi custom properties dari .pab-wrap.
+     Tanpa blok ini semua var(--xxx) di bawah akan gagal resolve,
+     ikon jadi transparan dan tombol jadi putih-di-atas-putih (invisible). */
+  --tx-primary:   var(--c-ink,        #0f172a);
+  --tx-secondary: var(--c-muted,      #64748b);
+  --tx-muted:     var(--c-muted2,     #94a3b8);
+  --ac:           var(--c-primary,    #0e7490);
+  --ac-lt:        var(--c-primary-lt, #06b6d4);
+  --green:        var(--c-green-text,   #15803d);
+  --green-bg:     var(--c-green-bg,     #f0fdf4);
+  --red:          var(--c-red-text,     #b91c1c);
+  --red-bg:       var(--c-red-bg,       #fef2f2);
+  --r-sm:         var(--radius-sm, 9px);
+
   position: fixed; inset: 0; z-index: 999;
   background: rgba(15,23,42,.52);
   backdrop-filter: blur(3px);
@@ -403,6 +418,7 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 }
 .pab-modal-overlay.show { display: flex; opacity: 1; }
 .pab-modal {
+  position: relative; /* penting: agar tombol close ✕ menempel benar di dalam kartu */
   background: #fff;
   border-radius: 20px;
   padding: 2rem 1.85rem 1.75rem;
@@ -414,6 +430,15 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
   transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
 }
 .pab-modal-overlay.show .pab-modal { transform: scale(1) translateY(0); opacity: 1; }
+.pab-modal-close {
+  position: absolute; top: 14px; right: 14px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #f1f5f9; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--tx-muted);
+  transition: background .18s, color .18s;
+}
+.pab-modal-close:hover { background: #e2e8f0; color: var(--tx-primary); }
 .pab-modal-icon {
   width: 62px; height: 62px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -736,10 +761,13 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 <!-- ── Modal alert (gaya SweetAlert), dipopulate lewat JS dari data flash ── -->
 <div class="pab-modal-overlay" id="pab-modal-overlay">
   <div class="pab-modal" role="alertdialog" aria-modal="true" aria-labelledby="pab-modal-title">
+    <button type="button" class="pab-modal-close" id="pab-modal-close" aria-label="Tutup">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
     <div class="pab-modal-icon" id="pab-modal-icon"></div>
     <h3 class="pab-modal-title" id="pab-modal-title"></h3>
     <div class="pab-modal-body" id="pab-modal-body"></div>
-    <button type="button" class="pab-modal-btn" id="pab-modal-btn">Mengerti</button>
+    <button type="button" class="pab-modal-btn" id="pab-modal-btn">Oke, Mengerti</button>
   </div>
 </div>
 
@@ -758,11 +786,12 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
     var data = window.__pabFlash;
     if (!data || !data.messages || !data.messages.length) return;
 
-    var overlay = document.getElementById('pab-modal-overlay');
-    var iconEl  = document.getElementById('pab-modal-icon');
-    var titleEl = document.getElementById('pab-modal-title');
-    var bodyEl  = document.getElementById('pab-modal-body');
-    var btnEl   = document.getElementById('pab-modal-btn');
+    var overlay  = document.getElementById('pab-modal-overlay');
+    var iconEl   = document.getElementById('pab-modal-icon');
+    var titleEl  = document.getElementById('pab-modal-title');
+    var bodyEl   = document.getElementById('pab-modal-body');
+    var btnEl    = document.getElementById('pab-modal-btn');
+    var closeBtn = document.getElementById('pab-modal-close');
     if (!overlay) return;
 
     var type = data.type === 'success' ? 'success' : (data.type === 'info' ? 'info' : 'error');
@@ -772,10 +801,19 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
       error:   '<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
       info:    '<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12.01"/><line x1="12" y1="16" x2="12" y2="16.01"/></svg>'
     };
-    var titles = { success: 'Berhasil!', error: 'Periksa Lagi', info: 'Informasi' };
+    var titles = {
+      success: 'Pendaftaran Berhasil!',
+      error:   'Data Belum Lengkap',
+      info:    'Informasi'
+    };
+    var btnTexts = {
+      success: 'Lanjut',
+      error:   'Oke, Saya Perbaiki',
+      info:    'Oke, Mengerti'
+    };
 
-    iconEl.className   = 'pab-modal-icon ' + type;
-    iconEl.innerHTML   = icons[type];
+    iconEl.className    = 'pab-modal-icon ' + type;
+    iconEl.innerHTML    = icons[type];
     titleEl.textContent = titles[type];
 
     bodyEl.innerHTML = '';
@@ -794,10 +832,11 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
     }
 
     btnEl.className   = 'pab-modal-btn' + (type === 'success' ? ' is-success' : '');
-    btnEl.textContent = type === 'success' ? 'Selesai' : 'Mengerti';
+    btnEl.textContent = btnTexts[type];
 
     function closeModal() { overlay.classList.remove('show'); }
     btnEl.addEventListener('click', closeModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
     overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
 
