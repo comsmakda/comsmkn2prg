@@ -10,7 +10,12 @@ class PabController extends Controller
         $settings = $sm->getAll();
         $flash    = $this->getFlash();
         $csrf     = $this->csrfToken();
-        $this->view('pages/pab', compact('isOpen', 'settings', 'flash', 'csrf'), 'main');
+
+        // Ambil input lama (jika ada dari percobaan submit sebelumnya), lalu bersihkan
+        $old = $_SESSION['old_input'] ?? [];
+        unset($_SESSION['old_input']);
+
+        $this->view('pages/pab', compact('isOpen', 'settings', 'flash', 'csrf', 'old'), 'main');
     }
 
     public function register(): void
@@ -19,27 +24,35 @@ class PabController extends Controller
 
         $sm = new SettingModel();
         if (!$sm->isPabOpen()) {
-            $this->flash('error', 'Pendaftaran PAB sedang ditutup.');
+            $this->flash('error', ['Pendaftaran PAB sedang ditutup.']);
             $this->redirect('/pab');
         }
 
         // Sanitize input
-        $nama = htmlspecialchars(trim($_POST['nama_lengkap'] ?? ''), ENT_QUOTES);
-        $kelas   = htmlspecialchars(trim($_POST['kelas'] ?? ''), ENT_QUOTES);
-        $no_hp   = preg_replace('/\D/', '', $_POST['no_hp'] ?? '');
+        $nama     = htmlspecialchars(trim($_POST['nama_lengkap'] ?? ''), ENT_QUOTES);
+        $kelas    = htmlspecialchars(trim($_POST['kelas'] ?? ''), ENT_QUOTES);
+        $no_hp    = preg_replace('/\D/', '', $_POST['no_hp'] ?? '');
         $password = $_POST['password'] ?? '';
         $passConf = $_POST['password_confirmation'] ?? '';
 
         $errors = [];
-        if (strlen($nama) < 3)            $errors[] = 'Nama lengkap minimal 3 karakter.';
-        if (empty($kelas))                 $errors[] = 'Kelas wajib diisi.';
-        if (strlen($no_hp) < 10)           $errors[] = 'Nomor HP tidak valid.';
-        if (strlen($password) < 6)         $errors[] = 'Password minimal 6 karakter.';
-        if ($password !== $passConf)       $errors[] = 'Konfirmasi password tidak cocok.';
+        if (strlen($nama) < 3)              $errors[] = 'Nama lengkap minimal 3 karakter.';
+        if (empty($kelas))                  $errors[] = 'Kelas wajib diisi.';
+        if (strlen($no_hp) < 10)            $errors[] = 'Nomor HP tidak valid (minimal 10 digit).';
+        if (strlen($password) < 6)          $errors[] = 'Password minimal 6 karakter.';
+        if ($password !== $passConf)        $errors[] = 'Konfirmasi password tidak cocok.';
         if (empty($_FILES['foto']['name'])) $errors[] = 'Pas foto wajib diunggah.';
 
+        // Data yang selalu disiapkan untuk dikembalikan ke form (password sengaja TIDAK disimpan)
+        $oldInput = [
+            'nama_lengkap' => $nama,
+            'kelas'        => $kelas,
+            'no_hp'        => $no_hp,
+        ];
+
         if ($errors) {
-            $this->flash('error', implode('<br>', $errors));
+            $_SESSION['old_input'] = $oldInput;
+            $this->flash('error', $errors);
             $this->redirect('/pab');
         }
 
@@ -47,7 +60,8 @@ class PabController extends Controller
         try {
             $fotoName = FileUploader::uploadFoto($_FILES['foto'], 'pab');
         } catch (RuntimeException $e) {
-            $this->flash('error', $e->getMessage());
+            $_SESSION['old_input'] = $oldInput;
+            $this->flash('error', [$e->getMessage()]);
             $this->redirect('/pab');
         }
 
@@ -60,7 +74,7 @@ class PabController extends Controller
             'foto'          => $fotoName,
         ]);
 
-        $this->flash('success', 'Pendaftaran berhasil! Tunggu verifikasi Admin.');
+        $this->flash('success', ['Pendaftaran berhasil! Tunggu verifikasi Admin.']);
         $this->redirect('/pab');
     }
 }

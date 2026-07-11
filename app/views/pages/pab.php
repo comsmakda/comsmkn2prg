@@ -1,6 +1,8 @@
 <?php // app/views/pages/pab.php ?>
 
 <?php
+$old = $old ?? [];
+
 /* ── Open Graph meta tags (inject ke <head> via layout) ── */
 $og_title       = "Daftar Sekarang! PAB " . ($settings['org_name']['value'] ?? APP_NAME) . " — Komunitas Programmer SMKN 2 Pinrang";
 $og_description = "Bergabunglah bersama komunitas programmer SMKN 2 Pinrang! Daftarkan diri kamu sekarang dan jadilah bagian dari generasi teknologi berikutnya. 💻🚀";
@@ -24,6 +26,14 @@ $extra_head .= '
 <meta name="twitter:image"       content="' . htmlspecialchars($og_image) . '">
 <meta name="description"         content="' . htmlspecialchars($og_description) . '">
 ';
+
+/* ── Normalisasi flash jadi bentuk {type, messages[]} agar aman dipakai di JS ── */
+$flashType = $flash['type'] ?? 'error';
+$flashMsgs = $flash['msg'] ?? [];
+if (!is_array($flashMsgs)) {
+    $flashMsgs = array_filter([trim(strip_tags((string) $flashMsgs))]);
+}
+$flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 ?>
 
 <style>
@@ -112,6 +122,9 @@ $extra_head .= '
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
+  max-height: calc(100svh - 5rem);
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 .pab-logo-wrap { display: flex; align-items: center; gap: .85rem; }
@@ -208,18 +221,6 @@ $extra_head .= '
 
 /* ── Main column ── */
 .pab-main { min-width: 0; }
-
-/* ── Flash alert ── */
-.pab-alert {
-  border-radius: var(--r-md); padding: .9rem 1.1rem; font-size: .84rem;
-  margin-bottom: 1.25rem; border: 1px solid;
-  display: flex; align-items: flex-start; gap: 9px;
-  font-weight: 500;
-}
-.pab-alert-icon { flex-shrink: 0; margin-top: 1px; }
-.pab-alert.success { background: var(--green-bg); border-color: var(--green-bd); color: var(--green); }
-.pab-alert.error   { background: var(--red-bg);   border-color: var(--red-bd);   color: var(--red); }
-.pab-alert.info    { background: rgba(14,116,144,.07); border-color: rgba(14,116,144,.22); color: var(--ac); }
 
 /* ── Card ── */
 .pab-card {
@@ -383,10 +384,57 @@ $extra_head .= '
   margin-top: .4rem;
 }
 
+/* ── Modal alert (gaya SweetAlert) ── */
+.pab-modal-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(15,23,42,.52);
+  backdrop-filter: blur(3px);
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  transition: opacity .22s ease;
+}
+.pab-modal-overlay.show { display: flex; opacity: 1; }
+.pab-modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2rem 1.85rem 1.75rem;
+  max-width: 380px; width: 100%;
+  text-align: center;
+  box-shadow: 0 30px 80px -18px rgba(15,23,42,.4);
+  transform: scale(.85) translateY(12px);
+  opacity: 0;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
+}
+.pab-modal-overlay.show .pab-modal { transform: scale(1) translateY(0); opacity: 1; }
+.pab-modal-icon {
+  width: 62px; height: 62px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.1rem;
+}
+.pab-modal-icon.error   { background: var(--red-bg);   color: var(--red); }
+.pab-modal-icon.success { background: var(--green-bg); color: var(--green); }
+.pab-modal-icon.info    { background: rgba(14,116,144,.09); color: var(--ac); }
+.pab-modal-title { font-size: 1.05rem; font-weight: 800; color: var(--tx-primary); margin-bottom: .55rem; }
+.pab-modal-body { font-size: .84rem; color: var(--tx-secondary); line-height: 1.7; }
+.pab-modal-body p { margin: 0; text-align: center; }
+.pab-modal-body ul { margin: 0; padding-left: 1.15rem; text-align: left; display: flex; flex-direction: column; gap: .4rem; }
+.pab-modal-btn {
+  margin-top: 1.4rem; width: 100%; padding: 11px;
+  background: var(--ac); color: #fff; font-weight: 800; font-size: .86rem;
+  border: none; border-radius: var(--r-sm); cursor: pointer;
+  font-family: inherit;
+  transition: background .18s, transform .12s;
+}
+.pab-modal-btn:hover { background: var(--ac-lt); transform: translateY(-1px); }
+.pab-modal-btn.is-success { background: var(--green); }
+.pab-modal-btn.is-success:hover { background: #16a34a; }
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .pab-shell { grid-template-columns: 1fr; max-width: 560px; gap: 2.25rem; }
-  .pab-side { position: static; text-align: center; align-items: center; }
+  .pab-side { position: static; text-align: center; align-items: center; max-height: none; overflow: visible; }
   .pab-logo-wrap { flex-direction: column; gap: .5rem; }
   .pab-benefits { text-align: left; width: 100%; }
   .pab-badge, .pab-deadline { margin-inline: auto; }
@@ -401,6 +449,7 @@ $extra_head .= '
   .pab-title { font-size: 1.55rem; }
   .pab-logo { height: 46px; }
   .pab-req { padding: 1rem 1.1rem; }
+  .pab-modal { padding: 1.6rem 1.4rem 1.4rem; }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -512,22 +561,8 @@ $extra_head .= '
 
     </aside>
 
-    <!-- ── Main column: alert + card ── -->
+    <!-- ── Main column: card ── -->
     <div class="pab-main">
-
-      <!-- ── Flash alert ── -->
-      <?php if (!empty($flash)): ?>
-        <?php
-          $alertType = $flash['type'] === 'success' ? 'success' : ($flash['type'] === 'info' ? 'info' : 'error');
-          $alertIcon = $alertType === 'success'
-            ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'
-            : '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
-        ?>
-        <div class="pab-alert <?= $alertType ?>" role="alert">
-          <svg class="pab-alert-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><?= $alertIcon ?></svg>
-          <?= $flash['msg'] ?>
-        </div>
-      <?php endif; ?>
 
       <!-- ── Card ── -->
       <div class="pab-card">
@@ -584,6 +619,7 @@ $extra_head .= '
                 <label class="pab-label" for="pab-nama">Nama Lengkap <span>*</span></label>
                 <input id="pab-nama" type="text" name="nama_lengkap" required
                        class="pab-input" placeholder="Nama sesuai rapor"
+                       value="<?= htmlspecialchars($old['nama_lengkap'] ?? '') ?>"
                        autocomplete="name">
               </div>
 
@@ -592,12 +628,14 @@ $extra_head .= '
                 <div class="pab-field">
                   <label class="pab-label" for="pab-kelas">Kelas <span>*</span></label>
                   <input id="pab-kelas" type="text" name="kelas" required
-                         class="pab-input" placeholder="Contoh: XI RPL 1">
+                         class="pab-input" placeholder="Contoh: XI RPL 1"
+                         value="<?= htmlspecialchars($old['kelas'] ?? '') ?>">
                 </div>
                 <div class="pab-field">
                   <label class="pab-label" for="pab-hp">Nomor HP <span>*</span></label>
                   <input id="pab-hp" type="tel" name="no_hp" required
                          class="pab-input" placeholder="08xxxxxxxxxx"
+                         value="<?= htmlspecialchars($old['no_hp'] ?? '') ?>"
                          autocomplete="tel" pattern="[0-9]{10,15}"
                          inputmode="numeric">
                 </div>
@@ -664,6 +702,9 @@ $extra_head .= '
                   <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                   <span id="pab-file-error-text">Ukuran foto maksimal 2 MB.</span>
                 </span>
+                <?php if (!empty($old)): ?>
+                  <span class="pab-hint">Foto perlu dipilih ulang — file tidak bisa disimpan otomatis karena alasan keamanan browser.</span>
+                <?php endif; ?>
               </div>
 
               <!-- Submit -->
@@ -686,9 +727,76 @@ $extra_head .= '
   </div><!-- .pab-shell -->
 </div><!-- .pab-wrap -->
 
+<!-- ── Modal alert (gaya SweetAlert), dipopulate lewat JS dari data flash ── -->
+<div class="pab-modal-overlay" id="pab-modal-overlay">
+  <div class="pab-modal" role="alertdialog" aria-modal="true" aria-labelledby="pab-modal-title">
+    <div class="pab-modal-icon" id="pab-modal-icon"></div>
+    <h3 class="pab-modal-title" id="pab-modal-title"></h3>
+    <div class="pab-modal-body" id="pab-modal-body"></div>
+    <button type="button" class="pab-modal-btn" id="pab-modal-btn">Mengerti</button>
+  </div>
+</div>
+
+<?php if (!empty($flashMsgs)): ?>
+<script>
+  window.__pabFlash = <?= json_encode(['type' => $flashType, 'messages' => $flashMsgs], JSON_UNESCAPED_UNICODE) ?>;
+</script>
+<?php endif; ?>
+
 <script>
 (function () {
   'use strict';
+
+  /* ── Modal alert ── */
+  (function initFlashModal() {
+    var data = window.__pabFlash;
+    if (!data || !data.messages || !data.messages.length) return;
+
+    var overlay = document.getElementById('pab-modal-overlay');
+    var iconEl  = document.getElementById('pab-modal-icon');
+    var titleEl = document.getElementById('pab-modal-title');
+    var bodyEl  = document.getElementById('pab-modal-body');
+    var btnEl   = document.getElementById('pab-modal-btn');
+    if (!overlay) return;
+
+    var type = data.type === 'success' ? 'success' : (data.type === 'info' ? 'info' : 'error');
+
+    var icons = {
+      success: '<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+      error:   '<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+      info:    '<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12.01"/><line x1="12" y1="16" x2="12" y2="16.01"/></svg>'
+    };
+    var titles = { success: 'Berhasil!', error: 'Periksa Lagi', info: 'Informasi' };
+
+    iconEl.className   = 'pab-modal-icon ' + type;
+    iconEl.innerHTML   = icons[type];
+    titleEl.textContent = titles[type];
+
+    bodyEl.innerHTML = '';
+    if (data.messages.length > 1) {
+      var ul = document.createElement('ul');
+      data.messages.forEach(function (m) {
+        var li = document.createElement('li');
+        li.textContent = m;
+        ul.appendChild(li);
+      });
+      bodyEl.appendChild(ul);
+    } else {
+      var p = document.createElement('p');
+      p.textContent = data.messages[0];
+      bodyEl.appendChild(p);
+    }
+
+    btnEl.className   = 'pab-modal-btn' + (type === 'success' ? ' is-success' : '');
+    btnEl.textContent = type === 'success' ? 'Selesai' : 'Mengerti';
+
+    function closeModal() { overlay.classList.remove('show'); }
+    btnEl.addEventListener('click', closeModal);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+    requestAnimationFrame(function () { overlay.classList.add('show'); });
+  })();
 
   /* ── Toggle password visibility ── */
   var passInput  = document.getElementById('pab-pass');
@@ -711,7 +819,7 @@ $extra_head .= '
   var matchText    = document.getElementById('pass-match-text');
   function checkMatch() {
     if (!passInput || !pass2Input || !pass2Input.value) {
-      matchIcon.style.display = 'none';
+      if (matchIcon) matchIcon.style.display = 'none';
       if (matchText) matchText.textContent = '';
       return;
     }
@@ -830,6 +938,7 @@ $extra_head .= '
     if (steps[1]) { steps[1].className = 'pab-step ' + (step1done && step2done ? 'done' : step1done ? 'active' : ''); steps[1].querySelector('.pab-step-dot').textContent = step2done ? '✓' : '2'; }
     if (steps[2]) { steps[2].className = 'pab-step ' + (step2done && step3done ? 'done' : step2done ? 'active' : ''); steps[2].querySelector('.pab-step-dot').textContent = step3done ? '✓' : '3'; }
   }
+  updateSteps();
 
   [namaEl, kelasEl, hpEl, passInput, pass2Input].forEach(function (el) {
     if (el) el.addEventListener('input', updateSteps);
