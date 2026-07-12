@@ -10,8 +10,11 @@
   /* ─── Hero section ─── */
   .angp-hero {
     position: relative;
-    margin: 0 -1.5rem 2.5rem;
-    padding: 3.25rem 1.5rem 3rem;
+    margin: 0 -1.5rem 2.75rem;
+    padding: clamp(2.25rem, 5vw, 3.5rem) 1.5rem;
+    min-height: clamp(13rem, 24vw, 17rem);
+    display: flex;
+    align-items: center;
     overflow: hidden;
     isolation: isolate;
   }
@@ -19,43 +22,45 @@
     /* background image, blurred + darkened */
     content: '';
     position: absolute; inset: 0;
-    background-image:
-      linear-gradient(160deg, rgba(8,29,42,.88) 10%, rgba(8,47,63,.80) 55%, rgba(6,182,212,.55) 130%),
-      url('<?= BASE_URL ?>/assets/img/gedung-smkn2.webp');
+    background-image: url('<?= BASE_URL ?>/assets/img/gedung-smkn2.webp');
     background-size: cover;
     background-position: center 55%;
-    filter: blur(2px) saturate(1.05);
-    transform: scale(1.06); /* avoid blur edge gaps */
+    filter: blur(3px) saturate(.9);
+    transform: scale(1.08); /* avoid blur edge gaps */
     z-index: -2;
   }
   .angp-hero::after {
-    /* soft dot-grid texture on top, purely decorative */
+    /* single, even, solid-feeling scrim — no colour banding */
     content: '';
     position: absolute; inset: 0;
-    background-image: radial-gradient(rgba(255,255,255,.14) 1px, transparent 1px);
-    background-size: 22px 22px;
-    opacity: .5;
+    background: linear-gradient(100deg, rgba(6,22,32,.93) 0%, rgba(6,32,42,.87) 45%, rgba(6,32,42,.72) 100%);
     z-index: -1;
   }
-  .angp-hero__inner { position: relative; max-width: var(--container-w, 75rem); margin: 0 auto; }
+  .angp-hero__inner {
+    position: relative;
+    width: 100%;
+    max-width: var(--container-w, 75rem);
+    margin: 0 auto;
+  }
 
   .angp__eyebrow {
     display: inline-flex; align-items: center; gap: 0.44rem;
-    font-size: .68rem; font-weight: 700; letter-spacing: .12em;
-    text-transform: uppercase; color: #7fe6f5; margin-bottom: .6rem;
+    font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: #8fe9f6; margin-bottom: .65rem;
   }
   .angp__eyebrow::before {
     content: ''; width: .375rem; height: .375rem; border-radius: 50%;
-    background: #22d3ee; box-shadow: 0 0 8px #22d3ee;
+    background: #22d3ee; box-shadow: 0 0 8px #22d3ee; flex-shrink: 0;
   }
   .angp__title {
     font-family: var(--font-display);
-    font-size: 2.15rem; font-weight: 800; letter-spacing: -.03em;
-    color: #fff; line-height: 1.15; margin-bottom: .6rem;
-    text-shadow: 0 2px 18px rgba(0,0,0,.25);
+    font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+    font-weight: 800; letter-spacing: -.02em;
+    color: #fff; line-height: 1.2; margin-bottom: .6rem;
   }
   .angp__sub {
-    font-size: .92rem; color: rgba(255,255,255,.82); max-width: 38rem; line-height: 1.65;
+    font-size: clamp(.82rem, 1.3vw, .9rem);
+    color: rgba(255,255,255,.78); max-width: 34rem; line-height: 1.6;
   }
 
   /* ─── Section label ─── */
@@ -169,6 +174,15 @@
     display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
     gap: .9rem;
   }
+  @media (max-width: 640px) {
+    .member-grid { grid-template-columns: repeat(2, 1fr); gap: .7rem; }
+    .member-card { padding: 1.1rem .6rem .9rem; }
+    .member-card__photo-wrap { width: 4.25rem; height: 4.25rem; margin-bottom: .6rem; }
+    .member-card__name { font-size: .8rem; }
+  }
+  @media (max-width: 360px) {
+    .member-card__photo-wrap { width: 3.75rem; height: 3.75rem; }
+  }
   .member-card {
     display: flex; flex-direction: column; align-items: center; text-align: center;
     background: var(--c-white); border: 1px solid var(--c-border);
@@ -218,8 +232,6 @@
   @media (max-width: 480px) {
     .angp-fi input, .angp-fi select { width: 100%; }
     .angp-filter { flex-direction: column; align-items: stretch; }
-    .angp-hero { padding: 2.5rem 1.5rem 2.25rem; }
-    .angp__title { font-size: 1.7rem; }
   }
 </style>
 
