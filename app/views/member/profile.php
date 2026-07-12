@@ -256,10 +256,18 @@
   <?php
     $type = $flash['type'] ?? 'info';
     $safeType = in_array($type, ['success','danger','error','warning','info']) ? $type : 'info';
+    $iconMap = [
+      'success' => 'ti-circle-check',
+      'danger'  => 'ti-alert-triangle',
+      'error'   => 'ti-alert-triangle',
+      'warning' => 'ti-alert-circle',
+      'info'    => 'ti-info-circle',
+    ];
+    $iconClass = $iconMap[$safeType] ?? 'ti-info-circle';
   ?>
   <div class="flash-local">
     <div class="alert alert--<?= $safeType ?>" role="alert">
-      <?= alertIcon($type) ?>
+      <i class="ti <?= $iconClass ?>" aria-hidden="true"></i>
       <span><?= htmlspecialchars($flash['msg'] ?? '') ?></span>
     </div>
   </div>

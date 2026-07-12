@@ -606,12 +606,12 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
             <tbody>
               <tr>
                 <td>Kamis</td>
-                <td>Pukul 17.00 WITA, setelah jam pelajaran berakhir</td>
+                <td>Pukul 15.30 WITA, setelah jam pelajaran berakhir sampai dengan Pukul 17.00 WITA</td>
                 <td>Laboratorium Komputer SMK Negeri 2 Pinrang</td>
               </tr>
               <tr>
                 <td>Jumat</td>
-                <td>Pukul 17.00 WITA, setelah jam pelajaran berakhir</td>
+                <td>Pukul 14.30 WITA, setelah jam pelajaran berakhir sampai dengan Pukul 17.00 WITA</td>
                 <td>Laboratorium Komputer SMK Negeri 2 Pinrang</td>
               </tr>
             </tbody>
