@@ -186,7 +186,7 @@
   <div class="angp__eyebrow">Profil Organisasi</div>
   <h1 class="angp__title">Daftar Anggota</h1>
   <p class="angp__sub">
-    Kenali pembina, ketua, serta seluruh anggota aktif Community Of Multimedia
+    Kenali pembina, ketua, serta seluruh anggota aktif Community Programmer
     (COM) SMKN 2 Pinrang.
   </p>
 
