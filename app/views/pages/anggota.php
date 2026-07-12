@@ -4,26 +4,58 @@
   .angp {
     max-width: var(--container-w, 75rem);
     margin: 0 auto;
-    padding: 2.5rem 1.5rem 4rem;
+    padding: 0 1.5rem 4rem;
   }
 
-  /* ─── Page header ─── */
+  /* ─── Hero section ─── */
+  .angp-hero {
+    position: relative;
+    margin: 0 -1.5rem 2.5rem;
+    padding: 3.25rem 1.5rem 3rem;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .angp-hero::before {
+    /* background image, blurred + darkened */
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(160deg, rgba(8,29,42,.88) 10%, rgba(8,47,63,.80) 55%, rgba(6,182,212,.55) 130%),
+      url('<?= BASE_URL ?>/assets/img/gedung-smkn2.webp');
+    background-size: cover;
+    background-position: center 55%;
+    filter: blur(2px) saturate(1.05);
+    transform: scale(1.06); /* avoid blur edge gaps */
+    z-index: -2;
+  }
+  .angp-hero::after {
+    /* soft dot-grid texture on top, purely decorative */
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,.14) 1px, transparent 1px);
+    background-size: 22px 22px;
+    opacity: .5;
+    z-index: -1;
+  }
+  .angp-hero__inner { position: relative; max-width: var(--container-w, 75rem); margin: 0 auto; }
+
   .angp__eyebrow {
     display: inline-flex; align-items: center; gap: 0.44rem;
     font-size: .68rem; font-weight: 700; letter-spacing: .12em;
-    text-transform: uppercase; color: var(--c-primary); margin-bottom: .5rem;
+    text-transform: uppercase; color: #7fe6f5; margin-bottom: .6rem;
   }
   .angp__eyebrow::before {
     content: ''; width: .375rem; height: .375rem; border-radius: 50%;
-    background: var(--c-primary); box-shadow: 0 0 6px var(--c-primary);
+    background: #22d3ee; box-shadow: 0 0 8px #22d3ee;
   }
   .angp__title {
     font-family: var(--font-display);
-    font-size: 1.9rem; font-weight: 800; letter-spacing: -.03em;
-    color: var(--c-primary-dk); line-height: 1.15; margin-bottom: .5rem;
+    font-size: 2.15rem; font-weight: 800; letter-spacing: -.03em;
+    color: #fff; line-height: 1.15; margin-bottom: .6rem;
+    text-shadow: 0 2px 18px rgba(0,0,0,.25);
   }
   .angp__sub {
-    font-size: .88rem; color: var(--c-muted); max-width: 38rem; line-height: 1.6;
+    font-size: .92rem; color: rgba(255,255,255,.82); max-width: 38rem; line-height: 1.65;
   }
 
   /* ─── Section label ─── */
@@ -41,7 +73,7 @@
     gap: 1rem;
   }
   .pengurus-card {
-    display: flex; align-items: center; gap: 1rem;
+    display: flex; align-items: center; gap: 1.1rem;
     background: var(--c-white); border: 1px solid var(--c-border);
     border-radius: var(--radius-lg); padding: 1.25rem 1.4rem;
     box-shadow: 0 20px 46px -22px rgba(15,23,42,.12), 0 3px 10px rgba(15,23,42,.04);
@@ -51,15 +83,20 @@
     transform: translateY(-2px);
     box-shadow: 0 24px 52px -20px rgba(15,23,42,.16), 0 4px 14px rgba(15,23,42,.06);
   }
+  .pengurus-card__photo-wrap {
+    position: relative; flex-shrink: 0; width: 5.25rem; height: 5.25rem;
+    border-radius: 50%; padding: 3px;
+    background: conic-gradient(from 180deg, var(--c-primary), var(--c-primary-lt, #22d3ee), var(--c-primary));
+  }
   .pengurus-card__photo {
-    width: 4.5rem; height: 4.5rem; border-radius: 50%; object-fit: cover; flex-shrink: 0;
-    border: 2px solid rgba(14,116,144,.25);
+    width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+    display: block; border: 3px solid #fff;
   }
   .pengurus-card__photo-fallback {
-    width: 4.5rem; height: 4.5rem; border-radius: 50%; flex-shrink: 0;
-    background: rgba(14,116,144,.1); border: 2px solid rgba(14,116,144,.25);
+    width: 100%; height: 100%; border-radius: 50%;
+    background: rgba(14,116,144,.1); border: 3px solid #fff;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem; font-weight: 800; color: var(--c-primary); text-transform: uppercase;
+    font-size: 1.5rem; font-weight: 800; color: var(--c-primary); text-transform: uppercase;
   }
   .pengurus-card__body { min-width: 0; }
   .pengurus-card__badge {
@@ -129,13 +166,13 @@
   .angp-meta strong { color: var(--c-ink); font-weight: 700; }
 
   .member-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
-    gap: .81rem;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+    gap: .9rem;
   }
   .member-card {
     display: flex; flex-direction: column; align-items: center; text-align: center;
     background: var(--c-white); border: 1px solid var(--c-border);
-    border-radius: var(--radius-md); padding: 1.1rem .81rem;
+    border-radius: var(--radius-md); padding: 1.35rem .9rem 1.1rem;
     transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   }
   .member-card:hover {
@@ -143,23 +180,27 @@
     box-shadow: 0 18px 38px -18px rgba(15,23,42,.18), 0 3px 10px rgba(15,23,42,.05);
     border-color: rgba(14,116,144,.25);
   }
+  .member-card__photo-wrap {
+    position: relative; width: 5rem; height: 5rem; margin-bottom: .75rem;
+    border-radius: 50%; padding: 3px;
+    background: linear-gradient(135deg, rgba(14,116,144,.35), rgba(6,182,212,.35));
+  }
   .member-card__photo {
-    width: 3.75rem; height: 3.75rem; border-radius: 50%; object-fit: cover;
-    border: 2px solid var(--c-border); margin-bottom: .69rem;
+    width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+    display: block; border: 3px solid #fff;
   }
   .member-card__photo-fallback {
-    width: 3.75rem; height: 3.75rem; border-radius: 50%;
-    background: #f4f7fa; border: 2px solid var(--c-border);
+    width: 100%; height: 100%; border-radius: 50%;
+    background: #f4f7fa; border: 3px solid #fff;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.05rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase;
-    margin-bottom: .69rem;
+    font-size: 1.25rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase;
   }
   .member-card__name {
-    font-size: .82rem; font-weight: 700; color: var(--c-ink); line-height: 1.3;
+    font-size: .83rem; font-weight: 700; color: var(--c-ink); line-height: 1.3;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
   .member-card__kelas {
-    display: inline-block; margin-top: .38rem;
+    display: inline-block; margin-top: .4rem;
     font-size: .66rem; font-weight: 700; color: var(--c-primary);
     background: rgba(14,116,144,.08); border: 1px solid rgba(14,116,144,.16);
     border-radius: .38rem; padding: .15rem .5rem; letter-spacing: .01em;
@@ -177,18 +218,24 @@
   @media (max-width: 480px) {
     .angp-fi input, .angp-fi select { width: 100%; }
     .angp-filter { flex-direction: column; align-items: stretch; }
+    .angp-hero { padding: 2.5rem 1.5rem 2.25rem; }
+    .angp__title { font-size: 1.7rem; }
   }
 </style>
 
-<div class="angp">
+<!-- ── Hero section with blurred background ── -->
+<div class="angp-hero">
+  <div class="angp-hero__inner">
+    <div class="angp__eyebrow">Profil Organisasi</div>
+    <h1 class="angp__title">Daftar Anggota</h1>
+    <p class="angp__sub">
+      Kenali pembina, ketua, serta seluruh anggota aktif Community Programmer
+      (COM) SMKN 2 Pinrang.
+    </p>
+  </div>
+</div>
 
-  <!-- ── Page header ── -->
-  <div class="angp__eyebrow">Profil Organisasi</div>
-  <h1 class="angp__title">Daftar Anggota</h1>
-  <p class="angp__sub">
-    Kenali pembina, ketua, serta seluruh anggota aktif Community Programmer
-    (COM) SMKN 2 Pinrang.
-  </p>
+<div class="angp">
 
   <!-- ── Pembina & Ketua Terkini ── -->
   <div class="angp-sec">
@@ -208,15 +255,17 @@
 
       <?php if ($pembina): ?>
       <div class="pengurus-card">
-        <?php if (!empty($pembina['foto'])): ?>
-          <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($pembina['foto']) ?>"
-               class="pengurus-card__photo"
-               alt="Foto <?= htmlspecialchars($pembina['nama']) ?>">
-        <?php else: ?>
-          <div class="pengurus-card__photo-fallback" aria-hidden="true">
-            <?= htmlspecialchars(mb_strtoupper(mb_substr($pembina['nama'] ?? '?', 0, 2))) ?>
-          </div>
-        <?php endif; ?>
+        <div class="pengurus-card__photo-wrap">
+          <?php if (!empty($pembina['foto'])): ?>
+            <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($pembina['foto']) ?>"
+                 class="pengurus-card__photo"
+                 alt="Foto <?= htmlspecialchars($pembina['nama']) ?>">
+          <?php else: ?>
+            <div class="pengurus-card__photo-fallback" aria-hidden="true">
+              <?= htmlspecialchars(mb_strtoupper(mb_substr($pembina['nama'] ?? '?', 0, 2))) ?>
+            </div>
+          <?php endif; ?>
+        </div>
         <div class="pengurus-card__body">
           <span class="pengurus-card__badge"><i class="ti ti-shield-star" style="font-size:.85em;"></i> Pembina</span>
           <p class="pengurus-card__name"><?= htmlspecialchars($pembina['nama'] ?? '—') ?></p>
@@ -230,15 +279,17 @@
 
       <?php if ($ketua): ?>
       <div class="pengurus-card">
-        <?php if (!empty($ketua['foto'])): ?>
-          <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($ketua['foto']) ?>"
-               class="pengurus-card__photo"
-               alt="Foto <?= htmlspecialchars($ketua['nama']) ?>">
-        <?php else: ?>
-          <div class="pengurus-card__photo-fallback" aria-hidden="true">
-            <?= htmlspecialchars(mb_strtoupper(mb_substr($ketua['nama'] ?? '?', 0, 2))) ?>
-          </div>
-        <?php endif; ?>
+        <div class="pengurus-card__photo-wrap">
+          <?php if (!empty($ketua['foto'])): ?>
+            <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($ketua['foto']) ?>"
+                 class="pengurus-card__photo"
+                 alt="Foto <?= htmlspecialchars($ketua['nama']) ?>">
+          <?php else: ?>
+            <div class="pengurus-card__photo-fallback" aria-hidden="true">
+              <?= htmlspecialchars(mb_strtoupper(mb_substr($ketua['nama'] ?? '?', 0, 2))) ?>
+            </div>
+          <?php endif; ?>
+        </div>
         <div class="pengurus-card__body">
           <span class="pengurus-card__badge"><i class="ti ti-crown" style="font-size:.85em;"></i> Ketua</span>
           <p class="pengurus-card__name"><?= htmlspecialchars($ketua['nama'] ?? '—') ?></p>
@@ -301,15 +352,17 @@
     <div class="member-grid">
       <?php foreach ($list as $m): ?>
         <div class="member-card">
-          <?php if (!empty($m['foto'])): ?>
-            <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($m['foto']) ?>"
-                 class="member-card__photo"
-                 alt="Foto <?= htmlspecialchars($m['nama_lengkap']) ?>">
-          <?php else: ?>
-            <div class="member-card__photo-fallback" aria-hidden="true">
-              <?= htmlspecialchars(mb_strtoupper(mb_substr($m['nama_lengkap'], 0, 2))) ?>
-            </div>
-          <?php endif; ?>
+          <div class="member-card__photo-wrap">
+            <?php if (!empty($m['foto'])): ?>
+              <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($m['foto']) ?>"
+                   class="member-card__photo"
+                   alt="Foto <?= htmlspecialchars($m['nama_lengkap']) ?>">
+            <?php else: ?>
+              <div class="member-card__photo-fallback" aria-hidden="true">
+                <?= htmlspecialchars(mb_strtoupper(mb_substr($m['nama_lengkap'], 0, 2))) ?>
+              </div>
+            <?php endif; ?>
+          </div>
           <p class="member-card__name"><?= htmlspecialchars($m['nama_lengkap']) ?></p>
           <span class="member-card__kelas"><?= htmlspecialchars($m['kelas'] ?? '—') ?></span>
         </div>
