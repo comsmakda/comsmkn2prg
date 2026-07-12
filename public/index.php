@@ -31,6 +31,8 @@ $router->get('/login',          [AuthController::class, 'loginPage']);
 $router->post('/login',         [AuthController::class, 'loginPost']);
 $router->get('/logout',         [AuthController::class, 'logout']);
 
+$router->get('/anggota', [HomeController::class, 'anggota']);
+
 // PAB
 $router->get('/pab',            [PabController::class, 'index']);
 $router->post('/pab/register',  [PabController::class, 'register']);

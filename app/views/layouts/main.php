@@ -552,6 +552,14 @@
               <span class="dd-item-desc">Dokumentasi kegiatan COM</span>
             </div>
           </a>
+          <div class="dd-sep"></div>
+          <a href="<?= BASE_URL ?>/anggota" class="dd-item" role="menuitem">
+            <div class="dd-item-icon"><i class="ti ti-users-group"></i></div>
+            <div class="dd-item-text">
+              <span class="dd-item-label">Daftar Anggota</span>
+              <span class="dd-item-desc">Profil pembina, ketua &amp; anggota</span>
+            </div>
+          </a>
           <div class="dd-footer">
             <span class="dd-footer-dot"></span>
             Diperbarui secara berkala
@@ -606,6 +614,10 @@
       <a href="<?= BASE_URL ?>/galeri" class="mob-sub-item">
         <i class="ti ti-photo"></i>
         Galeri Foto
+      </a>
+      <a href="<?= BASE_URL ?>/anggota" class="mob-sub-item">
+        <i class="ti ti-users-group"></i>
+        Daftar Anggota
       </a>
     </div>
   </div>

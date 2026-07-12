@@ -198,6 +198,32 @@ class UserModel extends Model
     }
 
     /**
+     * Anggota aktif untuk halaman PUBLIK "Daftar Anggota" — hanya
+     * mengembalikan kolom yang aman ditampilkan ke publik (nama, kelas,
+     * foto). TIDAK menyertakan email, no_hp, password_hash, nia, dsb.
+     */
+    public function getAnggotaPublik(array $filter = []): array
+    {
+        $where  = ["role = 'anggota'", "status = 'aktif'"];
+        $params = [];
+
+        if (!empty($filter['kelas'])) {
+            $where[]  = "kelas = ?";
+            $params[] = $filter['kelas'];
+        }
+        if (!empty($filter['search'])) {
+            $where[]  = "nama_lengkap LIKE ?";
+            $params[] = '%' . $filter['search'] . '%';
+        }
+
+        $sql = "SELECT nama_lengkap, kelas, foto
+                FROM users WHERE " . implode(' AND ', $where) . "
+                ORDER BY kelas ASC, nama_lengkap ASC";
+
+        return $this->fetchAll($sql, $params);
+    }
+
+    /**
      * Cek apakah email sudah dipakai user lain — dipakai saat IMPORT anggota
      * supaya baris duplikat (email sudah terdaftar) otomatis dilewati.
      */
