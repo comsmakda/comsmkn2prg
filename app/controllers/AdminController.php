@@ -31,17 +31,30 @@ class AdminController extends Controller
     //  ANGGOTA
     // ================================================================
     public function anggota(): void
-    {
-        $this->requireAdmin();
-        $filter    = ['kelas' => $_GET['kelas'] ?? '', 'search' => $_GET['search'] ?? ''];
-        $um        = new UserModel();
-        $list      = $um->getAnggotaAktif($filter);
-        $pending   = $um->getPendingAnggota();
-        $kelasList = $um->getKelasList();
-        $flash     = $this->getFlash();
-        $csrf      = $this->csrfToken();
-        $this->view('admin/anggota', compact('list', 'pending', 'kelasList', 'filter', 'flash', 'csrf'), 'admin');
-    }
+{
+    $this->requireAdmin();
+    $filter    = [
+        'kelas'  => $_GET['kelas']  ?? '',
+        'search' => $_GET['search'] ?? '',
+        'sumber' => $_GET['sumber'] ?? '',
+    ];
+    $um        = new UserModel();
+    $list      = $um->getAnggotaAktif($filter);
+    $pending   = $um->getPendingAnggota();
+    $kelasList = $um->getKelasList();
+
+    $db = Database::getInstance();
+    $stats = [
+        'total_aktif'   => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif'")->fetchColumn(),
+        'total_pending' => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='pending'")->fetchColumn(),
+        'total_pab'     => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND sumber='pab'")->fetchColumn(),
+        'total_manual'  => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND sumber='manual'")->fetchColumn(),
+    ];
+
+    $flash     = $this->getFlash();
+    $csrf      = $this->csrfToken();
+    $this->view('admin/anggota', compact('list', 'pending', 'kelasList', 'filter', 'stats', 'flash', 'csrf'), 'admin');
+}
 
     public function anggotaCreate(): void
     {
