@@ -10,7 +10,10 @@
   /* ─── Hero section ─── */
   .angp-hero {
     position: relative;
-    margin: 0 -1.5rem 2.75rem;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-bottom: 2.75rem;
     padding: clamp(2.25rem, 5vw, 3.5rem) 1.5rem;
     min-height: clamp(13rem, 24vw, 17rem);
     display: flex;
@@ -25,15 +28,23 @@
     background-image: url('<?= BASE_URL ?>/assets/img/gedung-smkn2.webp');
     background-size: cover;
     background-position: center 55%;
-    filter: blur(3px) saturate(.9);
-    transform: scale(1.08); /* avoid blur edge gaps */
-    z-index: -2;
+    filter: blur(2px) saturate(1.05);
+    transform: scale(1.06); /* avoid blur edge gaps */
+    z-index: -3;
   }
   .angp-hero::after {
     /* single, even, solid-feeling scrim — no colour banding */
     content: '';
     position: absolute; inset: 0;
     background: linear-gradient(100deg, rgba(6,22,32,.93) 0%, rgba(6,32,42,.87) 45%, rgba(6,32,42,.72) 100%);
+    z-index: -2;
+  }
+  .angp-hero__dots {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,.14) 1px, transparent 1px);
+    background-size: 22px 22px;
+    opacity: .5;
     z-index: -1;
   }
   .angp-hero__inner {
@@ -41,6 +52,10 @@
     width: 100%;
     max-width: var(--container-w, 75rem);
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
   .angp__eyebrow {
@@ -61,6 +76,7 @@
   .angp__sub {
     font-size: clamp(.82rem, 1.3vw, .9rem);
     color: rgba(255,255,255,.78); max-width: 34rem; line-height: 1.6;
+    margin-left: auto; margin-right: auto;
   }
 
   /* ─── Section label ─── */
@@ -237,6 +253,7 @@
 
 <!-- ── Hero section with blurred background ── -->
 <div class="angp-hero">
+  <div class="angp-hero__dots"></div>
   <div class="angp-hero__inner">
     <div class="angp__eyebrow">Profil Organisasi</div>
     <h1 class="angp__title">Daftar Anggota</h1>
