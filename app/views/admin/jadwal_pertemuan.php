@@ -71,8 +71,8 @@ $hariUrut = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
           <?php foreach ($hariUrut as $hari):
               $j = $jadwalMap[$hari] ?? null;
               $aktif = $j['aktif'] ?? 0;
-              $jm = $j['jam_mulai'] ? substr($j['jam_mulai'], 0, 5) : '';
-              $js = $j['jam_selesai'] ? substr($j['jam_selesai'], 0, 5) : '';
+              $jm = !empty($j['jam_mulai']) ? substr($j['jam_mulai'], 0, 5) : '';
+              $js = !empty($j['jam_selesai']) ? substr($j['jam_selesai'], 0, 5) : '';
               $ket = $j['keterangan'] ?? '';
               $isRutin = in_array($hari, ['kamis','jumat'], true);
           ?>
