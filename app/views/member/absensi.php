@@ -31,6 +31,8 @@
   --amber-d: var(--c-amber-bg,   #fef6e2);
   --gray:    #64748b;
   --gray-d:  #f1f5f9;
+  --blue:    #2563eb;
+  --blue-d:  #eff6ff;
 
   --r-xs: 6px;
   --r-sm: var(--radius-sm, 9px);
@@ -239,6 +241,7 @@
 .absw-badge--red   { background: var(--red-d);   color: var(--red); }
 .absw-badge--amber { background: var(--amber-d); color: var(--amber); }
 .absw-badge--gray  { background: var(--gray-d);  color: var(--gray); }
+.absw-badge--blue  { background: var(--blue-d);  color: var(--blue); }
 
 @media (max-width: 640px) {
   .absw-stats { grid-template-columns: 1fr; }
@@ -329,16 +332,18 @@
               <?php foreach ($riwayat as $row): ?>
                   <?php
                       $badgeClass = match ($row['status']) {
-                          'hadir'     => 'absw-badge--green',
-                          'terlambat' => 'absw-badge--amber',
-                          'libur'     => 'absw-badge--gray',
-                          default     => 'absw-badge--red',
+                          'hadir'        => 'absw-badge--green',
+                          'terlambat'    => 'absw-badge--amber',
+                          'libur'        => 'absw-badge--gray',
+                          'belum_mulai'  => 'absw-badge--blue',
+                          default        => 'absw-badge--red',
                       };
                       $badgeLabel = match ($row['status']) {
-                          'hadir'     => 'Hadir',
-                          'terlambat' => 'Terlambat',
-                          'libur'     => 'Libur',
-                          default     => 'Alpa',
+                          'hadir'        => 'Hadir',
+                          'terlambat'    => 'Terlambat',
+                          'libur'        => 'Libur',
+                          'belum_mulai'  => 'Belum Mulai',
+                          default        => 'Alpa',
                       };
                   ?>
                   <tr>

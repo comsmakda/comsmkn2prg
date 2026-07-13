@@ -97,13 +97,22 @@ class MemberController extends Controller
         $fpModel = new FingerprintModel();
         $riwayat = $fpModel->getRiwayatAbsensiAnggota($userId, $tanggalMulai, $tanggalAkhir);
 
+        // Key lengkap disiapkan di awal (termasuk 'libur' & 'belum_mulai') supaya
+        // tidak ada warning "Undefined array key" saat increment, dan supaya
+        // status baru di masa depan tetap aman lewat fallback isset() di bawah.
         $stats = [
-            'hadir'     => 0,
-            'terlambat' => 0,
-            'alpa'      => 0,
+            'hadir'       => 0,
+            'terlambat'   => 0,
+            'alpa'        => 0,
+            'libur'       => 0,
+            'belum_mulai' => 0,
         ];
         foreach ($riwayat as $r) {
-            $stats[$r['status']]++;
+            $status = $r['status'] ?? 'alpa';
+            if (!isset($stats[$status])) {
+                $stats[$status] = 0; // jaga-jaga kalau ada status baru di masa depan
+            }
+            $stats[$status]++;
         }
 
         $flash = $this->getFlash();

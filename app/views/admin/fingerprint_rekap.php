@@ -35,6 +35,10 @@
   --red-d:   var(--c-red-bg,     #fef2f2);
   --amber:   var(--c-amber-icon, #d9910c);
   --amber-d: var(--c-amber-bg,   #fef6e2);
+  --gray:    #64748b;
+  --gray-d:  #f1f5f9;
+  --blue:    #2563eb;
+  --blue-d:  #eff6ff;
 
   --r-xs: 6px;
   --r-sm: var(--radius-sm, 9px);
@@ -124,6 +128,36 @@
   letter-spacing: -.01em;
 }
 .fpr-panel__body { padding: 18px 20px; }
+
+/* ── Quick date presets ── */
+.fpr-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+.fpr-preset-btn {
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1.5px solid var(--bd-subtle);
+  background: var(--bg-elevated);
+  color: var(--tx-secondary);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.fpr-preset-btn:hover {
+  border-color: var(--bd-accent);
+  background: var(--ac-dim);
+  color: var(--ac-dk);
+}
+.fpr-preset-btn.is-active {
+  background: var(--ac);
+  border-color: var(--ac);
+  color: #fff;
+}
 
 /* ── Filter form ── */
 .fpr-filter {
@@ -246,6 +280,8 @@
 .fpr-badge--green { background: var(--green-d); color: var(--green); }
 .fpr-badge--red   { background: var(--red-d);   color: var(--red); }
 .fpr-badge--amber { background: var(--amber-d); color: var(--amber); }
+.fpr-badge--gray  { background: var(--gray-d);  color: var(--gray); }
+.fpr-badge--blue  { background: var(--blue-d);  color: var(--blue); }
 
 @media (max-width: 640px) {
   .fpr-filter { flex-direction: column; align-items: stretch; }
@@ -281,7 +317,17 @@
   <!-- ── Filter ── -->
   <div class="fpr-panel">
     <div class="fpr-panel__body">
-      <form method="get" action="/admin/fingerprint/rekap" class="fpr-filter">
+
+      <!-- Pintasan tanggal cepat -->
+      <div class="fpr-presets" id="fpr-presets">
+        <button type="button" class="fpr-preset-btn" data-preset="today">Hari Ini</button>
+        <button type="button" class="fpr-preset-btn" data-preset="week">Minggu Ini</button>
+        <button type="button" class="fpr-preset-btn" data-preset="month">Bulan Ini</button>
+        <button type="button" class="fpr-preset-btn" data-preset="last7">7 Hari Terakhir</button>
+        <button type="button" class="fpr-preset-btn" data-preset="last30">30 Hari Terakhir</button>
+      </div>
+
+      <form method="get" action="/admin/fingerprint/rekap" class="fpr-filter" id="fpr-filter-form">
         <div class="fpr-field">
           <label for="fpr-tgl-mulai">Tanggal Mulai</label>
           <input type="date" id="fpr-tgl-mulai" name="tanggal_mulai"
@@ -294,7 +340,7 @@
         </div>
         <div class="fpr-field">
           <label for="fpr-kelas">Kelas</label>
-          <select id="fpr-kelas" name="kelas">
+          <select id="fpr-kelas" name="kelas" onchange="document.getElementById('fpr-filter-form').submit()">
               <option value="">Semua Kelas</option>
               <?php foreach ($kelasList as $k): ?>
                   <option value="<?= htmlspecialchars($k) ?>"
@@ -358,14 +404,18 @@
               <?php foreach ($rekap as $row): ?>
                   <?php
                       $badgeClass = match ($row['status']) {
-                          'hadir'     => 'fpr-badge--green',
-                          'terlambat' => 'fpr-badge--amber',
-                          default     => 'fpr-badge--red',
+                          'hadir'        => 'fpr-badge--green',
+                          'terlambat'    => 'fpr-badge--amber',
+                          'libur'        => 'fpr-badge--gray',
+                          'belum_mulai'  => 'fpr-badge--blue',
+                          default        => 'fpr-badge--red',
                       };
                       $badgeLabel = match ($row['status']) {
-                          'hadir'     => 'Hadir',
-                          'terlambat' => 'Terlambat',
-                          default     => 'Alpa',
+                          'hadir'        => 'Hadir',
+                          'terlambat'    => 'Terlambat',
+                          'libur'        => 'Libur',
+                          'belum_mulai'  => 'Belum Mulai',
+                          default        => 'Alpa',
                       };
                   ?>
                   <tr>
@@ -387,3 +437,54 @@
   </div>
 
 </div>
+
+<script>
+(function () {
+  const inputMulai = document.getElementById('fpr-tgl-mulai');
+  const inputAkhir = document.getElementById('fpr-tgl-akhir');
+  const form        = document.getElementById('fpr-filter-form');
+  const presetBtns  = document.querySelectorAll('.fpr-preset-btn');
+
+  function fmt(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function setRange(start, end) {
+    inputMulai.value = fmt(start);
+    inputAkhir.value = fmt(end);
+    form.submit();
+  }
+
+  presetBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const today = new Date();
+      const preset = btn.dataset.preset;
+
+      if (preset === 'today') {
+        setRange(today, today);
+      } else if (preset === 'week') {
+        // Senin s.d. hari ini (minggu berjalan)
+        const day = today.getDay(); // 0 = Minggu
+        const diffToMonday = day === 0 ? 6 : day - 1;
+        const monday = new Date(today);
+        monday.setDate(today.getDate() - diffToMonday);
+        setRange(monday, today);
+      } else if (preset === 'month') {
+        const first = new Date(today.getFullYear(), today.getMonth(), 1);
+        setRange(first, today);
+      } else if (preset === 'last7') {
+        const start = new Date(today);
+        start.setDate(today.getDate() - 6);
+        setRange(start, today);
+      } else if (preset === 'last30') {
+        const start = new Date(today);
+        start.setDate(today.getDate() - 29);
+        setRange(start, today);
+      }
+    });
+  });
+})();
+</script>

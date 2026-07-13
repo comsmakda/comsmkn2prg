@@ -46,6 +46,47 @@ class FingerprintModel
         return $val !== '' ? $val : '07:15:00';
     }
 
+    /**
+     * Tanggal mulai efektif absensi (fp_tanggal_mulai_absensi).
+     * Sebelum tanggal ini (atau kalau belum pernah diisi di halaman Setting),
+     * sistem TIDAK BOLEH menghasilkan status 'alpa' — walaupun tanggalnya
+     * cocok hari jadwal pertemuan. Ini untuk menghindari organisasi yang
+     * baru dibuat (jadwal sudah dikonfigurasi duluan) langsung dianggap
+     * "alpa" padahal pertemuan pertamanya sendiri belum pernah terjadi.
+     *
+     * @return string|null null artinya belum diatur -> anggap "belum mulai"
+     *                      untuk SEMUA tanggal (tidak pernah ada alpa).
+     */
+    private function getTanggalMulaiAbsensi(): ?string
+    {
+        $val = trim((string) $this->settingModel->get('fp_tanggal_mulai_absensi'));
+
+        if ($val === '') {
+            return null;
+        }
+
+        // Validasi format tanggal, biar setting yang salah isi tidak bikin crash
+        $d = DateTime::createFromFormat('Y-m-d', $val);
+        if (!$d || $d->format('Y-m-d') !== $val) {
+            return null;
+        }
+
+        return $val;
+    }
+
+    /**
+     * True kalau $tanggal sudah berada pada/​setelah tanggal mulai efektif absensi.
+     * Kalau tanggal mulai belum diatur sama sekali, selalu false (belum ada yang
+     * boleh dianggap alpa sampai admin mengisi setting ini).
+     */
+    private function isSudahMelewatiTanggalMulai(string $tanggal, ?string $tanggalMulaiAbsensi): bool
+    {
+        if ($tanggalMulaiAbsensi === null) {
+            return false;
+        }
+        return $tanggal >= $tanggalMulaiAbsensi;
+    }
+
     // =====================================================================
     // HTTP CLIENT KE SYNC AGENT
     // =====================================================================
@@ -359,9 +400,14 @@ class FingerprintModel
 
     /**
      * Rekap presensi harian dari fp_scan_logs untuk rentang tanggal tertentu.
-     * Anggota aktif tanpa scan pada tanggal pertemuan dihitung 'alpa'.
-     * Tanggal yang BUKAN hari pertemuan (nonaktif di jadwal atau ditandai libur
-     * manual) dihitung 'libur', bukan 'alpa'.
+     *
+     * Aturan status per tanggal:
+     * - Bukan hari pertemuan (nonaktif di jadwal / libur manual)  -> 'libur'
+     * - Hari pertemuan, TAPI sebelum tanggal mulai efektif absensi
+     *   (fp_tanggal_mulai_absensi belum diisi, atau tanggal < nilainya)
+     *   dan anggota tidak scan                                    -> 'belum_mulai'
+     * - Hari pertemuan, sudah lewat tanggal mulai efektif, tidak scan -> 'alpa'
+     * - Ada scan (kapan pun, termasuk sebelum tanggal mulai resmi)     -> 'hadir' / 'terlambat'
      *
      * @param array{kelas?:string} $filter
      * @return array<int, array{
@@ -372,6 +418,7 @@ class FingerprintModel
     public function getRekapHarian(string $tanggalMulai, string $tanggalAkhir, array $filter = []): array
     {
         $batasTerlambat = $this->getBatasTerlambat();
+        $tanggalMulaiAbsensi = $this->getTanggalMulaiAbsensi();
 
         $params = [
             'tgl_mulai' => $tanggalMulai,
@@ -458,12 +505,17 @@ class FingerprintModel
 
                 $jamMasuk = null;
                 $jamPulang = null;
-                $status = 'alpa';
 
                 if ($scan) {
+                    // Ada scan -> selalu hadir/terlambat, tidak peduli tanggal mulai efektif
                     $jamMasuk = date('H:i:s', strtotime($scan['scan_pertama']));
                     $jamPulang = date('H:i:s', strtotime($scan['scan_terakhir']));
                     $status = ($jamMasuk > $batasTerlambat) ? 'terlambat' : 'hadir';
+                } elseif (!$this->isSudahMelewatiTanggalMulai($tanggal, $tanggalMulaiAbsensi)) {
+                    // Belum ada pertemuan resmi sampai tanggal ini -> jangan tandai alpa
+                    $status = 'belum_mulai';
+                } else {
+                    $status = 'alpa';
                 }
 
                 $rekap[] = [
@@ -485,13 +537,16 @@ class FingerprintModel
     /**
      * Riwayat absensi milik SATU anggota (dipakai halaman member/absensi).
      * Beda dengan getRekapHarian() yang untuk semua anggota (dipakai admin).
-     * Tanggal yang bukan hari pertemuan dihitung 'libur', bukan 'alpa'.
+     *
+     * Aturan status sama persis dengan getRekapHarian() — lihat dokumentasi
+     * di sana untuk penjelasan 'libur' vs 'belum_mulai' vs 'alpa'.
      *
      * @return array<int, array{tanggal:string, jam_masuk:?string, jam_pulang:?string, status:string}>
      */
     public function getRiwayatAbsensiAnggota(int $userId, string $tanggalMulai, string $tanggalAkhir): array
     {
         $batasTerlambat = $this->getBatasTerlambat();
+        $tanggalMulaiAbsensi = $this->getTanggalMulaiAbsensi();
 
         $stmtScan = $this->db->prepare(
             "SELECT
@@ -540,12 +595,17 @@ class FingerprintModel
 
             $jamMasuk  = null;
             $jamPulang = null;
-            $status    = 'alpa';
 
             if ($scan) {
+                // Ada scan -> selalu hadir/terlambat, tidak peduli tanggal mulai efektif
                 $jamMasuk  = date('H:i:s', strtotime($scan['scan_pertama']));
                 $jamPulang = date('H:i:s', strtotime($scan['scan_terakhir']));
                 $status    = ($jamMasuk > $batasTerlambat) ? 'terlambat' : 'hadir';
+            } elseif (!$this->isSudahMelewatiTanggalMulai($tanggal, $tanggalMulaiAbsensi)) {
+                // Belum ada pertemuan resmi sampai tanggal ini -> jangan tandai alpa
+                $status = 'belum_mulai';
+            } else {
+                $status = 'alpa';
             }
 
             $rekap[] = [
