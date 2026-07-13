@@ -29,6 +29,8 @@
   --red-d:   var(--c-red-bg,     #fef2f2);
   --amber:   var(--c-amber-icon, #d9910c);
   --amber-d: var(--c-amber-bg,   #fef6e2);
+  --gray:    #64748b;
+  --gray-d:  #f1f5f9;
 
   --r-xs: 6px;
   --r-sm: var(--radius-sm, 9px);
@@ -236,6 +238,7 @@
 .absw-badge--green { background: var(--green-d); color: var(--green); }
 .absw-badge--red   { background: var(--red-d);   color: var(--red); }
 .absw-badge--amber { background: var(--amber-d); color: var(--amber); }
+.absw-badge--gray  { background: var(--gray-d);  color: var(--gray); }
 
 @media (max-width: 640px) {
   .absw-stats { grid-template-columns: 1fr; }
@@ -257,21 +260,21 @@
     <div class="absw-stat absw-stat--green">
       <div class="absw-stat__icon"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
       <div>
-        <div class="absw-stat__num"><?= (int)$stats['hadir'] ?></div>
+        <div class="absw-stat__num"><?= (int)($stats['hadir'] ?? 0) ?></div>
         <div class="absw-stat__label">Hadir</div>
       </div>
     </div>
     <div class="absw-stat absw-stat--amber">
       <div class="absw-stat__icon"><i class="ti ti-clock-hour-4" aria-hidden="true"></i></div>
       <div>
-        <div class="absw-stat__num"><?= (int)$stats['terlambat'] ?></div>
+        <div class="absw-stat__num"><?= (int)($stats['terlambat'] ?? 0) ?></div>
         <div class="absw-stat__label">Terlambat</div>
       </div>
     </div>
     <div class="absw-stat absw-stat--red">
       <div class="absw-stat__icon"><i class="ti ti-alert-circle" aria-hidden="true"></i></div>
       <div>
-        <div class="absw-stat__num"><?= (int)$stats['alpa'] ?></div>
+        <div class="absw-stat__num"><?= (int)($stats['alpa'] ?? 0) ?></div>
         <div class="absw-stat__label">Alpa</div>
       </div>
     </div>
@@ -328,11 +331,13 @@
                       $badgeClass = match ($row['status']) {
                           'hadir'     => 'absw-badge--green',
                           'terlambat' => 'absw-badge--amber',
+                          'libur'     => 'absw-badge--gray',
                           default     => 'absw-badge--red',
                       };
                       $badgeLabel = match ($row['status']) {
                           'hadir'     => 'Hadir',
                           'terlambat' => 'Terlambat',
+                          'libur'     => 'Libur',
                           default     => 'Alpa',
                       };
                   ?>
