@@ -110,17 +110,21 @@ $hariUrut = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
   <div class="jp-card-desc">Kalau pertemuan tiba-tiba tidak ada di tanggal yang seharusnya pertemuan, tambahkan tanggalnya di sini supaya anggota tidak dihitung alpa.</div>
 
   <form method="post" action="<?= BASE_URL ?>/admin/jadwal-pertemuan/libur" class="jp-form-inline">
-    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
-    <div class="jp-field">
-      <label for="jp-tgl">Tanggal Libur</label>
-      <input type="date" id="jp-tgl" name="tanggal" class="jp-input-time" style="width:9.5rem" required>
-    </div>
-    <div class="jp-field" style="flex:1">
-      <label for="jp-ket">Keterangan</label>
-      <input type="text" id="jp-ket" name="keterangan" class="jp-input-text" placeholder="Opsional, mis. Libur nasional / Pembina berhalangan">
-    </div>
-    <button type="submit" class="jp-btn"><i class="ti ti-plus"></i> Tambah</button>
-  </form>
+  <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
+  <div class="jp-field">
+    <label for="jp-tgl-mulai">Dari Tanggal</label>
+    <input type="date" id="jp-tgl-mulai" name="tanggal_mulai" class="jp-input-time" style="width:9.5rem" required>
+  </div>
+  <div class="jp-field">
+    <label for="jp-tgl-akhir">Sampai Tanggal <span style="font-weight:400;color:var(--c-muted2)">(opsional)</span></label>
+    <input type="date" id="jp-tgl-akhir" name="tanggal_akhir" class="jp-input-time" style="width:9.5rem">
+  </div>
+  <div class="jp-field" style="flex:1">
+    <label for="jp-ket">Keterangan</label>
+    <input type="text" id="jp-ket" name="keterangan" class="jp-input-text" placeholder="Opsional, mis. Libur nasional / Pembina berhalangan">
+  </div>
+  <button type="submit" class="jp-btn"><i class="ti ti-plus"></i> Tambah</button>
+</form>
 
   <div class="jp-table-wrap">
     <table class="jp-table">

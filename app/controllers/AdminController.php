@@ -635,28 +635,59 @@ class AdminController extends Controller
     }
 
     public function jadwalPertemuanLiburStore(): void
-    {
-        $this->requireAdmin();
-        $this->verifyCsrf();
+{
+    $this->requireAdmin();
+    $this->verifyCsrf();
 
-        $tanggal    = $_POST['tanggal'] ?? '';
-        $keterangan = htmlspecialchars(trim($_POST['keterangan'] ?? ''), ENT_QUOTES);
+    $tglMulai   = $_POST['tanggal_mulai'] ?? '';
+    $tglAkhir   = trim($_POST['tanggal_akhir'] ?? '') ?: $tglMulai;
+    $keterangan = htmlspecialchars(trim($_POST['keterangan'] ?? ''), ENT_QUOTES);
 
-        if (!$tanggal || !DateTime::createFromFormat('Y-m-d', $tanggal)) {
-            $this->flash('error', 'Tanggal tidak valid.');
-            $this->redirect('/admin/jadwal-pertemuan');
-        }
+    $dMulai = DateTime::createFromFormat('Y-m-d', $tglMulai);
+    $dAkhir = DateTime::createFromFormat('Y-m-d', $tglAkhir);
 
-        $ok = (new JadwalPertemuanModel())->tambahLibur($tanggal, $keterangan ?: null);
-
-        if ($ok) {
-            $this->flash('success', 'Tanggal libur berhasil ditambahkan. Anggota tidak akan dihitung alpa pada tanggal tsb.');
-        } else {
-            $this->flash('warning', 'Tanggal tersebut sudah ada di daftar libur.');
-        }
-
+    if (!$tglMulai || !$dMulai || !$dAkhir) {
+        $this->flash('error', 'Tanggal tidak valid.');
         $this->redirect('/admin/jadwal-pertemuan');
     }
+
+    if ($dAkhir < $dMulai) {
+        $this->flash('error', 'Tanggal akhir tidak boleh sebelum tanggal mulai.');
+        $this->redirect('/admin/jadwal-pertemuan');
+    }
+
+    // Batas wajar supaya tidak disalahgunakan untuk generate ribuan baris sekaligus
+    $maxHari = 366;
+    $selisihHari = (int)$dMulai->diff($dAkhir)->format('%a') + 1;
+    if ($selisihHari > $maxHari) {
+        $this->flash('error', "Rentang tanggal terlalu panjang (maksimal {$maxHari} hari).");
+        $this->redirect('/admin/jadwal-pertemuan');
+    }
+
+    $jpm = new JadwalPertemuanModel();
+
+    $sukses  = 0;
+    $dilewati = 0;
+
+    $periode = new DatePeriod($dMulai, new DateInterval('P1D'), (clone $dAkhir)->modify('+1 day'));
+    foreach ($periode as $tgl) {
+        $ok = $jpm->tambahLibur($tgl->format('Y-m-d'), $keterangan ?: null);
+        $ok ? $sukses++ : $dilewati++;
+    }
+
+    if ($sukses > 0 && $dilewati === 0) {
+        $msg = $sukses === 1
+            ? 'Tanggal libur berhasil ditambahkan. Anggota tidak akan dihitung alpa pada tanggal tsb.'
+            : "{$sukses} tanggal libur berhasil ditambahkan.";
+        $this->flash('success', $msg);
+    } elseif ($sukses > 0 && $dilewati > 0) {
+        $this->flash('warning', "{$sukses} tanggal ditambahkan, {$dilewati} tanggal dilewati (sudah ada di daftar libur).");
+    } else {
+        $this->flash('warning', 'Semua tanggal pada rentang ini sudah ada di daftar libur.');
+    }
+
+    $this->redirect('/admin/jadwal-pertemuan');
+}
 
     public function jadwalPertemuanLiburDelete(string $id): void
     {
