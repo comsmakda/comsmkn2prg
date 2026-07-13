@@ -84,6 +84,33 @@ class MemberController extends Controller
     }
 
     // ════════════════════════════════════════════════════════
+    //  ABSENSI SAYA
+    // ════════════════════════════════════════════════════════
+    public function absensi(): void
+    {
+        $this->requireAnggota();
+
+        $userId       = (int)$_SESSION['user_id'];
+        $tanggalMulai = $_GET['tanggal_mulai'] ?? date('Y-m-01');
+        $tanggalAkhir = $_GET['tanggal_akhir'] ?? date('Y-m-d');
+
+        $fpModel = new FingerprintModel();
+        $riwayat = $fpModel->getRiwayatAbsensiAnggota($userId, $tanggalMulai, $tanggalAkhir);
+
+        $stats = [
+            'hadir'     => 0,
+            'terlambat' => 0,
+            'alpa'      => 0,
+        ];
+        foreach ($riwayat as $r) {
+            $stats[$r['status']]++;
+        }
+
+        $flash = $this->getFlash();
+        $this->view('member/absensi', compact('riwayat', 'tanggalMulai', 'tanggalAkhir', 'stats'), 'member');
+    }
+
+    // ════════════════════════════════════════════════════════
     //  SURAT PERNYATAAN (download/print)
     // ════════════════════════════════════════════════════════
     public function suratPernyataan(): void

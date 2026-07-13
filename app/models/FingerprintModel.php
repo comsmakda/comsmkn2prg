@@ -457,6 +457,71 @@ class FingerprintModel
     }
 
     /**
+     * Riwayat absensi milik SATU anggota (dipakai halaman member/absensi).
+     * Beda dengan getRekapHarian() yang untuk semua anggota (dipakai admin).
+     *
+     * @return array<int, array{tanggal:string, jam_masuk:?string, jam_pulang:?string, status:string}>
+     */
+    public function getRiwayatAbsensiAnggota(int $userId, string $tanggalMulai, string $tanggalAkhir): array
+    {
+        $batasTerlambat = $this->getBatasTerlambat();
+
+        $stmtScan = $this->db->prepare(
+            "SELECT
+                DATE(waktu_scan) AS tanggal,
+                MIN(waktu_scan) AS scan_pertama,
+                MAX(waktu_scan) AS scan_terakhir
+             FROM fp_scan_logs
+             WHERE user_id = :user_id
+               AND DATE(waktu_scan) BETWEEN :tgl_mulai AND :tgl_akhir
+             GROUP BY DATE(waktu_scan)"
+        );
+        $stmtScan->execute([
+            'user_id'   => $userId,
+            'tgl_mulai' => $tanggalMulai,
+            'tgl_akhir' => $tanggalAkhir,
+        ]);
+
+        $scanMap = [];
+        foreach ($stmtScan->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $scanMap[$row['tanggal']] = $row;
+        }
+
+        $tanggalList = [];
+        $cursor = new DateTime($tanggalMulai);
+        $end    = new DateTime($tanggalAkhir);
+        while ($cursor <= $end) {
+            $tanggalList[] = $cursor->format('Y-m-d');
+            $cursor->modify('+1 day');
+        }
+
+        $rekap = [];
+        foreach ($tanggalList as $tanggal) {
+            $scan = $scanMap[$tanggal] ?? null;
+
+            $jamMasuk  = null;
+            $jamPulang = null;
+            $status    = 'alpa';
+
+            if ($scan) {
+                $jamMasuk  = date('H:i:s', strtotime($scan['scan_pertama']));
+                $jamPulang = date('H:i:s', strtotime($scan['scan_terakhir']));
+                $status    = ($jamMasuk > $batasTerlambat) ? 'terlambat' : 'hadir';
+            }
+
+            $rekap[] = [
+                'tanggal'    => $tanggal,
+                'jam_masuk'  => $jamMasuk,
+                'jam_pulang' => $jamPulang,
+                'status'     => $status,
+            ];
+        }
+
+        // Terbaru di atas
+        return array_reverse($rekap);
+    }
+
+    /**
      * Simpan/update satu baris fp_rekap_harian (opsional dipakai oleh job terjadwal
      * agar rekap tersimpan permanen, bukan cuma dihitung on-the-fly saat halaman dibuka).
      */
