@@ -34,6 +34,12 @@ $router->get('/logout',         [AuthController::class, 'logout']);
 $router->get('/anggota', [HomeController::class, 'anggota']);
 $router->get('/member/absensi', [MemberController::class, 'absensi']);
 
+// Jadwal Pertemuan
+$router->get('/admin/jadwal-pertemuan',                    [AdminController::class, 'jadwalPertemuan']);
+$router->post('/admin/jadwal-pertemuan/simpan',             [AdminController::class, 'jadwalPertemuanSimpan']);
+$router->post('/admin/jadwal-pertemuan/libur',              [AdminController::class, 'jadwalPertemuanLiburStore']);
+$router->post('/admin/jadwal-pertemuan/libur/:id/delete',   [AdminController::class, 'jadwalPertemuanLiburDelete']);
+
 // PAB
 $router->get('/pab',            [PabController::class, 'index']);
 $router->post('/pab/register',  [PabController::class, 'register']);

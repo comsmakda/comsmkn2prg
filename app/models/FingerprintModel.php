@@ -13,6 +13,7 @@ class FingerprintModel
 {
     private PDO $db;
     private SettingModel $settingModel;
+    private JadwalPertemuanModel $jadwalModel;
 
     /** @var int Timeout koneksi ke Sync Agent (detik) */
     private const HTTP_TIMEOUT = 10;
@@ -21,6 +22,7 @@ class FingerprintModel
     {
         $this->db = Database::getInstance();
         $this->settingModel = new SettingModel();
+        $this->jadwalModel = new JadwalPertemuanModel();
     }
 
     // =====================================================================
@@ -357,7 +359,9 @@ class FingerprintModel
 
     /**
      * Rekap presensi harian dari fp_scan_logs untuk rentang tanggal tertentu.
-     * Anggota aktif tanpa scan pada tanggal tsb dihitung 'alpa'.
+     * Anggota aktif tanpa scan pada tanggal pertemuan dihitung 'alpa'.
+     * Tanggal yang BUKAN hari pertemuan (nonaktif di jadwal atau ditandai libur
+     * manual) dihitung 'libur', bukan 'alpa'.
      *
      * @param array{kelas?:string} $filter
      * @return array<int, array{
@@ -425,9 +429,31 @@ class FingerprintModel
             $cursor->modify('+1 day');
         }
 
+        // Precompute status hari pertemuan (hindari query berulang per user x tanggal)
+        $isPertemuanMap = [];
+        foreach ($tanggalList as $tgl) {
+            $isPertemuanMap[$tgl] = $this->jadwalModel->isHariPertemuan($tgl);
+        }
+
         $rekap = [];
         foreach ($users as $user) {
             foreach ($tanggalList as $tanggal) {
+
+                // Bukan hari pertemuan (hari nonaktif di jadwal ATAU ditandai libur manual)
+                if (!$isPertemuanMap[$tanggal]) {
+                    $rekap[] = [
+                        'user_id'      => (int) $user['id'],
+                        'nama_lengkap' => $user['nama_lengkap'],
+                        'nia'          => $user['nia'],
+                        'kelas'        => $user['kelas'],
+                        'tanggal'      => $tanggal,
+                        'jam_masuk'    => null,
+                        'jam_pulang'   => null,
+                        'status'       => 'libur',
+                    ];
+                    continue;
+                }
+
                 $scan = $scanMap[$user['id']][$tanggal] ?? null;
 
                 $jamMasuk = null;
@@ -459,6 +485,7 @@ class FingerprintModel
     /**
      * Riwayat absensi milik SATU anggota (dipakai halaman member/absensi).
      * Beda dengan getRekapHarian() yang untuk semua anggota (dipakai admin).
+     * Tanggal yang bukan hari pertemuan dihitung 'libur', bukan 'alpa'.
      *
      * @return array<int, array{tanggal:string, jam_masuk:?string, jam_pulang:?string, status:string}>
      */
@@ -497,6 +524,18 @@ class FingerprintModel
 
         $rekap = [];
         foreach ($tanggalList as $tanggal) {
+
+            // Bukan hari pertemuan -> tandai libur, bukan alpa
+            if (!$this->jadwalModel->isHariPertemuan($tanggal)) {
+                $rekap[] = [
+                    'tanggal'    => $tanggal,
+                    'jam_masuk'  => null,
+                    'jam_pulang' => null,
+                    'status'     => 'libur',
+                ];
+                continue;
+            }
+
             $scan = $scanMap[$tanggal] ?? null;
 
             $jamMasuk  = null;

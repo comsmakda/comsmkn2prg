@@ -610,23 +610,29 @@ button { font-family: inherit; cursor: pointer; }
           ],
 
           'Absensi' => [
-            [
-              'href'  => '/admin/absensi',
-              'label' => 'Absensi Kegiatan',
-              'icon'  => 'ti-calendar-event',
-            ],
-            [
-              'href'  => '/admin/absensi-pertemuan',
-              'label' => 'Absensi Pertemuan',
-              'icon'  => 'ti-users-group',
-            ],
-            [
-              'href'  => '/admin/fingerprint',
-              'label' => 'Absensi Fingerprint',
-              'icon'  => 'ti-fingerprint',
-              'new'   => true,
-            ],
-          ],
+    [
+      'href'  => '/admin/absensi',
+      'label' => 'Absensi Kegiatan',
+      'icon'  => 'ti-calendar-event',
+    ],
+    [
+      'href'  => '/admin/absensi-pertemuan',
+      'label' => 'Absensi Pertemuan',
+      'icon'  => 'ti-users-group',
+    ],
+    [
+      'href'  => '/admin/fingerprint',
+      'label' => 'Absensi Fingerprint',
+      'icon'  => 'ti-fingerprint',
+      'new'   => true,
+    ],
+    [
+      'href'  => '/admin/jadwal-pertemuan',
+      'label' => 'Jadwal Pertemuan',
+      'icon'  => 'ti-calendar-time',
+      'new'   => true,
+    ],
+],
 
           'Sistem' => [
   [

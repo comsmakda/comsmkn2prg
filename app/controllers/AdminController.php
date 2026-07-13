@@ -4,6 +4,7 @@
 require_once APP_PATH . '/models/BeritaModel.php';
 require_once APP_PATH . '/models/GaleriModel.php';
 require_once APP_PATH . '/models/FingerprintModel.php';
+require_once APP_PATH . '/models/JadwalPertemuanModel.php';
 
 class AdminController extends Controller
 {
@@ -31,30 +32,30 @@ class AdminController extends Controller
     //  ANGGOTA
     // ================================================================
     public function anggota(): void
-{
-    $this->requireAdmin();
-    $filter    = [
-        'kelas'  => $_GET['kelas']  ?? '',
-        'search' => $_GET['search'] ?? '',
-        'sumber' => $_GET['sumber'] ?? '',
-    ];
-    $um        = new UserModel();
-    $list      = $um->getAnggotaAktif($filter);
-    $pending   = $um->getPendingAnggota();
-    $kelasList = $um->getKelasList();
+    {
+        $this->requireAdmin();
+        $filter    = [
+            'kelas'  => $_GET['kelas']  ?? '',
+            'search' => $_GET['search'] ?? '',
+            'sumber' => $_GET['sumber'] ?? '',
+        ];
+        $um        = new UserModel();
+        $list      = $um->getAnggotaAktif($filter);
+        $pending   = $um->getPendingAnggota();
+        $kelasList = $um->getKelasList();
 
-    $db = Database::getInstance();
-    $stats = [
-        'total_aktif'   => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif'")->fetchColumn(),
-        'total_pending' => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='pending'")->fetchColumn(),
-        'total_pab'     => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND sumber='pab'")->fetchColumn(),
-        'total_manual'  => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND sumber='manual'")->fetchColumn(),
-    ];
+        $db = Database::getInstance();
+        $stats = [
+            'total_aktif'   => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif'")->fetchColumn(),
+            'total_pending' => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='pending'")->fetchColumn(),
+            'total_pab'     => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND sumber='pab'")->fetchColumn(),
+            'total_manual'  => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND sumber='manual'")->fetchColumn(),
+        ];
 
-    $flash     = $this->getFlash();
-    $csrf      = $this->csrfToken();
-    $this->view('admin/anggota', compact('list', 'pending', 'kelasList', 'filter', 'stats', 'flash', 'csrf'), 'admin');
-}
+        $flash     = $this->getFlash();
+        $csrf      = $this->csrfToken();
+        $this->view('admin/anggota', compact('list', 'pending', 'kelasList', 'filter', 'stats', 'flash', 'csrf'), 'admin');
+    }
 
     public function anggotaCreate(): void
     {
@@ -160,41 +161,41 @@ class AdminController extends Controller
     }
 
     public function anggotaDelete(string $id): void
-{
-    $this->requireAdmin();
-    $this->verifyCsrf();
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
 
-    $um   = new UserModel();
-    $user = $um->find((int)$id);
+        $um   = new UserModel();
+        $user = $um->find((int)$id);
 
-    if (!$user) {
-        $this->flash('error', 'Anggota tidak ditemukan.');
+        if (!$user) {
+            $this->flash('error', 'Anggota tidak ditemukan.');
+            $this->redirect('/admin/anggota');
+        }
+
+        // Best-effort: hapus dari mesin fingerprint dulu (kalau anggota punya NIA)
+        if (!empty($user['nia'])) {
+            try {
+                (new FingerprintModel())->deleteUser($user['nia']);
+            } catch (\Throwable $e) {
+                error_log('Gagal hapus dari fingerprint saat hardDelete: ' . $e->getMessage());
+            }
+        }
+
+        // Hapus foto fisik anggota
+        if (!empty($user['foto'])) {
+            $fotoPath = ROOT . '/public/uploads/' . $user['foto'];
+            if (file_exists($fotoPath)) @unlink($fotoPath);
+        }
+
+        if ($um->hardDelete((int)$id)) {
+            $this->flash('success', 'Anggota berhasil dihapus permanen dari database.');
+        } else {
+            $this->flash('error', 'Gagal menghapus anggota. Cek log server.');
+        }
+
         $this->redirect('/admin/anggota');
     }
-
-    // Best-effort: hapus dari mesin fingerprint dulu (kalau anggota punya NIA)
-    if (!empty($user['nia'])) {
-        try {
-            (new FingerprintModel())->deleteUser($user['nia']);
-        } catch (\Throwable $e) {
-            error_log('Gagal hapus dari fingerprint saat hardDelete: ' . $e->getMessage());
-        }
-    }
-
-    // Hapus foto fisik anggota
-    if (!empty($user['foto'])) {
-        $fotoPath = ROOT . '/public/uploads/' . $user['foto'];
-        if (file_exists($fotoPath)) @unlink($fotoPath);
-    }
-
-    if ($um->hardDelete((int)$id)) {
-        $this->flash('success', 'Anggota berhasil dihapus permanen dari database.');
-    } else {
-        $this->flash('error', 'Gagal menghapus anggota. Cek log server.');
-    }
-
-    $this->redirect('/admin/anggota');
-}
 
     public function anggotaResetPassword(string $id): void
     {
@@ -432,17 +433,17 @@ class AdminController extends Controller
     // ================================================================
     //  FINGERPRINT (GEISA X107)
     // ================================================================
-public function fingerprint(): void
-{
-    $this->requireAdmin();
-    $title     = 'Perangkat Fingerprint';
-    $fpModel   = new FingerprintModel();
-    $health    = $fpModel->checkDeviceHealth();
-    $anggota   = $fpModel->getAnggotaAktifDenganStatus();
-    $flash     = $this->getFlash();
-    $csrfToken = $this->csrfToken();
-    $this->view('admin/fingerprint', compact('title', 'health', 'anggota', 'flash', 'csrfToken'), 'admin');
-}
+    public function fingerprint(): void
+    {
+        $this->requireAdmin();
+        $title     = 'Perangkat Fingerprint';
+        $fpModel   = new FingerprintModel();
+        $health    = $fpModel->checkDeviceHealth();
+        $anggota   = $fpModel->getAnggotaAktifDenganStatus();
+        $flash     = $this->getFlash();
+        $csrfToken = $this->csrfToken();
+        $this->view('admin/fingerprint', compact('title', 'health', 'anggota', 'flash', 'csrfToken'), 'admin');
+    }
 
     public function fingerprintPush(string $id): void
     {
@@ -566,8 +567,6 @@ public function fingerprint(): void
         $kelas        = $_GET['kelas'] ?? '';
         $filter       = ['kelas' => $kelas];
         $rekap = (new FingerprintModel())->getRekapHarian($tanggalMulai, $tanggalAkhir, $filter);
-        // Sesuaikan nama kolom di sini dengan field yang benar-benar dikembalikan
-        // oleh getRekapHarian() di FingerprintModel.php kamu.
         $headers = ['Nama', 'NIA', 'Kelas', 'Tanggal', 'Jam Masuk', 'Jam Pulang', 'Status'];
         $data = [];
         foreach ($rekap as $r) {
@@ -582,7 +581,6 @@ public function fingerprint(): void
             ];
         }
         $filename = 'rekap_absensi_' . $tanggalMulai . '_sd_' . $tanggalAkhir;
-        // Xlsx sudah di-autoload otomatis dari folder core/, tidak perlu require_once manual
         $content = Xlsx::write($headers, $data);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $filename . '.xlsx"');
@@ -590,6 +588,84 @@ public function fingerprint(): void
         header('Cache-Control: max-age=0');
         echo $content;
         exit;
+    }
+
+    // ================================================================
+    //  JADWAL PERTEMUAN
+    // ================================================================
+    public function jadwalPertemuan(): void
+    {
+        $this->requireAdmin();
+
+        $jpm = new JadwalPertemuanModel();
+
+        $jadwalMap = [];
+        foreach ($jpm->getAllJadwal() as $j) {
+            $jadwalMap[$j['hari']] = $j;
+        }
+
+        $liburList = $jpm->getAllLibur();
+        $flash     = $this->getFlash();
+        $csrf      = $this->csrfToken();
+
+        $this->view('admin/jadwal_pertemuan', compact('jadwalMap', 'liburList', 'flash', 'csrf'), 'admin');
+    }
+
+    public function jadwalPertemuanSimpan(): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $jpm = new JadwalPertemuanModel();
+
+        foreach (JadwalPertemuanModel::HARI_URUT as $hari) {
+            $aktif      = isset($_POST['aktif'][$hari]);
+            $jamMulai   = trim($_POST['jam_mulai'][$hari] ?? '');
+            $jamSelesai = trim($_POST['jam_selesai'][$hari] ?? '');
+            $keterangan = htmlspecialchars(trim($_POST['keterangan'][$hari] ?? ''), ENT_QUOTES);
+
+            if ($jamMulai === '')   $jamMulai = '00:00';
+            if ($jamSelesai === '') $jamSelesai = '00:00';
+
+            $jpm->upsertJadwal($hari, $jamMulai, $jamSelesai, $aktif, $keterangan ?: null);
+        }
+
+        $this->flash('success', 'Jadwal pertemuan berhasil disimpan.');
+        $this->redirect('/admin/jadwal-pertemuan');
+    }
+
+    public function jadwalPertemuanLiburStore(): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $tanggal    = $_POST['tanggal'] ?? '';
+        $keterangan = htmlspecialchars(trim($_POST['keterangan'] ?? ''), ENT_QUOTES);
+
+        if (!$tanggal || !DateTime::createFromFormat('Y-m-d', $tanggal)) {
+            $this->flash('error', 'Tanggal tidak valid.');
+            $this->redirect('/admin/jadwal-pertemuan');
+        }
+
+        $ok = (new JadwalPertemuanModel())->tambahLibur($tanggal, $keterangan ?: null);
+
+        if ($ok) {
+            $this->flash('success', 'Tanggal libur berhasil ditambahkan. Anggota tidak akan dihitung alpa pada tanggal tsb.');
+        } else {
+            $this->flash('warning', 'Tanggal tersebut sudah ada di daftar libur.');
+        }
+
+        $this->redirect('/admin/jadwal-pertemuan');
+    }
+
+    public function jadwalPertemuanLiburDelete(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        (new JadwalPertemuanModel())->hapusLibur((int) $id);
+        $this->flash('success', 'Tanggal libur berhasil dihapus.');
+        $this->redirect('/admin/jadwal-pertemuan');
     }
 
     // ================================================================
@@ -1249,6 +1325,7 @@ public function fingerprint(): void
         $this->flash('success', 'Foto berhasil dihapus.');
         $this->redirect('/admin/galeri/' . $albumId . '/foto');
     }
+
     // ================================================================
     //  ANGGOTA — EXPORT
     // ================================================================
@@ -1284,7 +1361,6 @@ public function fingerprint(): void
         $filename = 'anggota_' . date('Ymd_His');
 
         if ($format === 'xlsx') {
-            // Xlsx sudah di-autoload otomatis dari folder core/, tidak perlu require_once manual
             $content = Xlsx::write($headers, $data);
 
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -1319,7 +1395,6 @@ public function fingerprint(): void
         $flash = $this->getFlash();
         $csrf  = $this->csrfToken();
 
-        // ambil detail baris yang dilewati (kalau ada, dari proses sebelumnya)
         $importErrors = $_SESSION['import_errors'] ?? [];
         unset($_SESSION['import_errors']);
 
@@ -1360,7 +1435,6 @@ public function fingerprint(): void
             $this->redirect('/admin/anggota/import');
         }
 
-        // ── Baca file jadi array baris ──────────────────────────────
         $rows = [];
 
         if ($ext === 'csv') {
@@ -1369,7 +1443,6 @@ public function fingerprint(): void
                 $this->flash('error', 'Gagal membaca file CSV.');
                 $this->redirect('/admin/anggota/import');
             }
-            // buang BOM UTF-8 kalau ada, biar kolom pertama header ga aneh
             $first = fread($handle, 3);
             if ($first !== "\xEF\xBB\xBF") {
                 rewind($handle);
@@ -1379,7 +1452,6 @@ public function fingerprint(): void
             }
             fclose($handle);
         } else {
-            // Xlsx sudah di-autoload otomatis dari folder core/, tidak perlu require_once manual
             try {
                 $rows = Xlsx::read($_FILES['file']['tmp_name']);
             } catch (RuntimeException $e) {
@@ -1393,11 +1465,8 @@ public function fingerprint(): void
             $this->redirect('/admin/anggota/import');
         }
 
-        // baris pertama dianggap header, dibuang
         array_shift($rows);
 
-        // ── Proses tiap baris ────────────────────────────────────────
-        // Urutan kolom yang diharapkan: Nama Lengkap | Kelas | No HP | Email | Tahun Daftar (opsional)
         $um = new UserModel();
         $defaultPasswordHash = password_hash('comsmakda', PASSWORD_BCRYPT, ['cost' => 12]);
 
@@ -1406,7 +1475,7 @@ public function fingerprint(): void
         $errors   = [];
 
         foreach ($rows as $i => $row) {
-            $lineNum = $i + 2; // +1 utk index 0-based, +1 lagi utk baris header
+            $lineNum = $i + 2;
 
             $nama  = trim((string)($row[0] ?? ''));
             $kelas = trim((string)($row[1] ?? ''));
@@ -1414,14 +1483,12 @@ public function fingerprint(): void
             $email = trim((string)($row[3] ?? ''));
             $email = filter_var($email, FILTER_VALIDATE_EMAIL) ?: null;
 
-            // ── Tahun Daftar (opsional, kolom ke-5) ─────────────────────────
             $tahunRaw = trim((string)($row[4] ?? ''));
-            $tahunMax = (int)date('Y') + 1; // toleransi input tahun depan
+            $tahunMax = (int)date('Y') + 1;
             $tahun = (ctype_digit($tahunRaw) && (int)$tahunRaw >= 2000 && (int)$tahunRaw <= $tahunMax)
                 ? (int)$tahunRaw
-                : (int)date('Y'); // fallback tahun berjalan kalau kosong/invalid
+                : (int)date('Y');
 
-            // baris kosong (misal baris terakhir file) dilewati diam-diam
             if ($nama === '' && $kelas === '' && $noHp === '' && !$email) {
                 continue;
             }
@@ -1432,7 +1499,6 @@ public function fingerprint(): void
                 continue;
             }
 
-            // Skip duplikat: cek by email ATAU no HP (bukan nama, krn nama boleh sama)
             if (($email && $um->existsByEmail($email)) || ($noHp && $um->existsByPhone($noHp))) {
                 $errors[] = "Baris {$lineNum}: {$nama} — email/No HP sudah terdaftar, dilewati.";
                 $dilewati++;
@@ -1444,14 +1510,12 @@ public function fingerprint(): void
                 'kelas'         => htmlspecialchars($kelas, ENT_QUOTES),
                 'no_hp'         => $noHp,
                 'email'         => $email,
-                'password_hash' => $defaultPasswordHash, // password TIDAK diimpor, pakai default
+                'password_hash' => $defaultPasswordHash,
                 'foto'          => null,
                 'sumber'        => 'manual',
                 'tahun_daftar'  => $tahun,
             ]);
 
-            // NIA belum ada di file import -> generate otomatis lewat aktivasi()
-            // aktivasi() akan memakai tahun_daftar milik user ini saat memanggil NiaGenerator::generate()
             $um->aktivasi($userId);
             $sukses++;
         }
@@ -1502,5 +1566,4 @@ public function fingerprint(): void
         $this->flash('success', "Sequence NIA tahun {$tahun} diset manual. NIA berikutnya urut #{$nextUrut}.");
         $this->redirect('/admin/nia-sequence');
     }
-
 }
