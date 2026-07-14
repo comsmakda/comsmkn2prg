@@ -12,25 +12,19 @@
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/custom.css">
   <?= $extra_head ?? '' ?>
   <style>
-    /* ─── FLUID ROOT ───
-       Semua ukuran turunan (rem) di bawah ini otomatis mengikuti nilai ini.
-       Skala dari layar kecil (~15px) sampai layar besar/PC monitor (~19px). */
     html {
       font-size: clamp(15px, 0.4vw + 12px, 19px);
     }
     :root {
-      /* Base surface — sama seperti design-system.md §2 */
       --c-page:        #eef2f6;
       --c-white:       #ffffff;
       --c-ink:         #0f172a;
       --c-muted:       #64748b;
       --c-muted2:      #94a3b8;
       --c-border:      #e6ebf1;
-      /* Aksen utama — SATU warna, dipakai konsisten */
       --c-primary:     #0e7490;
       --c-primary-dk:  #0b5a70;
       --c-primary-lt:  #06b6d4;
-      /* Status */
       --c-amber-bg:     #fef6e2;
       --c-amber-border: #fbe3a8;
       --c-amber-text:   #8a5a06;
@@ -41,15 +35,11 @@
       --c-green-bg:    #f0fdf4;
       --c-green-border:#bbf7d0;
       --c-green-text:  #15803d;
-      /* Radius (rem — ikut skala root font) */
       --radius-sm: 0.56rem;
       --radius-md: 0.81rem;
       --radius-lg: 1.38rem;
-      /* Navbar & topbar height — clamp sendiri (rem + vh) supaya proporsinya
-         terkontrol independen dari skala font, tidak melar berlebihan */
       --nav-h:  clamp(3.9rem, 6.2vh, 4.6rem);
       --top-h:  clamp(1.85rem, 3vh, 2.15rem);
-      /* Lebar maksimum kontainer — melebar sedikit di layar sangat besar */
       --container-w: clamp(77.5rem, 64vw + 20rem, 92rem);
       --font-display: 'Plus Jakarta Sans', sans-serif;
       --font-body:    'Plus Jakarta Sans', sans-serif;
@@ -66,7 +56,6 @@
     }
     main { flex: 1; padding-top: calc(var(--nav-h) + var(--top-h)); }
     @media(max-width: 640px) { main { padding-top: var(--nav-h); } }
-    /* ─── TOPBAR ─── */
     #topbar {
       height: var(--top-h);
       background: var(--c-white);
@@ -102,12 +91,6 @@
     .topbar-right a:hover { color: var(--c-primary); }
     .tb-sep { width: 1px; height: 0.625rem; background: var(--c-border); }
     @media(max-width: 640px) { #topbar { display: none; } }
-    /* ─── NAVBAR ───
-       Selalu tetap terlihat (fixed) saat scroll — tidak lagi disembunyikan.
-       Saat halaman di-scroll: topbar mengecil ke 0 dan navbar "naik" mengisi
-       posisinya (top:0), plus efek glass/blur + shadow + garis aksen tipis
-       supaya terasa lebih premium & tidak polos, namun tetap balance dengan
-       warna netral Design System. */
     #nav {
       position: fixed; top: var(--top-h); left: 0; right: 0; z-index: 200;
       height: var(--nav-h);
@@ -161,10 +144,6 @@
       letter-spacing: .07em; text-transform: uppercase; display: block; margin-top: 0.19rem;
     }
     .nav-sep { width: 1px; height: 1.25rem; background: var(--c-border); flex-shrink: 0; }
-    /* ─── NAV LINKS ───
-       FIX: link jadi flex container (icon + <span> teks) supaya ikon
-       otomatis center secara vertikal terhadap teks — tidak lagi
-       bergantung pada vertical-align inline yang gampang meleset. */
     .nav-links { display: flex; align-items: center; gap: 0.125rem; }
     .nav-link {
       position: relative;
@@ -193,7 +172,6 @@
     }
     .nav-link:hover .nav-link-icon,
     .nav-link.active .nav-link-icon { color: currentColor; }
-    /* ─── DROPDOWN (hover-based) ─── */
     .nav-dd { position: relative; }
     .nav-dd::after {
       content: ''; position: absolute; top: 100%; left: 0; right: 0; height: 0.75rem; background: transparent;
@@ -267,7 +245,6 @@
       font-size: .68rem; color: var(--c-muted2); font-weight: 500;
     }
     .dd-footer-dot { width: 0.31rem; height: 0.31rem; border-radius: 50%; background: var(--c-green-text); animation: fp 2.4s ease-in-out infinite; }
-    /* Mobile sub-menu */
     .mob-sub { padding-left: 1rem; display: none; }
     .mob-sub.open { display: block; }
     .mob-sub-item {
@@ -277,10 +254,6 @@
       transition: color .15s, background .15s;
     }
     .mob-sub-item:hover { color: var(--c-ink); background: #f4f7fa; }
-    /* ─── TOMBOL AKSI NAVBAR ───
-       Daftar PAB (ghost) & Masuk/Dashboard (CTA) disamakan tinggi, padding,
-       radius, dan ukuran ikon supaya terlihat sepasang tombol yang seimbang
-       dan profesional, bukan dua tombol berbeda bobot. */
     .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
     .nav-btn-ghost,
     .nav-btn-cta {
@@ -373,7 +346,6 @@
     }
     .mob-cta:hover { background: var(--c-primary-lt); }
     @media(max-width:860px) { .nav-links,.nav-actions,.nav-sep { display:none; } .hamburger { display:flex; } }
-    /* ─── ALERT ─── */
     .alert-wrap { max-width: var(--container-w); margin:1rem auto; padding:0 1.5rem; }
     .alert {
       display:flex; align-items:center; gap:0.56rem; padding:0.75rem 1rem; border-radius:var(--radius-md);
@@ -383,7 +355,6 @@
     .alert-error   { background: var(--c-red-bg);   border-color: var(--c-red-border);   color: var(--c-red-text); }
     .alert-success { background: var(--c-green-bg); border-color: var(--c-green-border); color: var(--c-green-text); }
     .alert-info    { background: var(--c-amber-bg); border-color: var(--c-amber-border); color: var(--c-amber-text); }
-    /* ─── FOOTER ─── */
     .site-footer { position:relative; overflow:hidden; background: var(--c-white); border-top:1px solid var(--c-border); }
     .site-footer::before {
       content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
@@ -483,7 +454,6 @@
   </style>
 </head>
 <body>
-<!-- ══ TOPBAR ══ -->
 <div id="topbar">
   <div class="topbar-inner">
     <div class="topbar-left">
@@ -506,7 +476,6 @@
     </div>
   </div>
 </div>
-<!-- ══ NAVBAR ══ -->
 <nav id="nav">
   <div class="nav-wrap">
     <a href="<?= BASE_URL ?>/" class="nav-brand">
@@ -529,7 +498,6 @@
       <a href="<?= BASE_URL ?>/#about"    class="nav-link"><span>Tentang</span></a>
       <a href="<?= BASE_URL ?>/#features" class="nav-link"><span>Layanan</span></a>
       <a href="<?= BASE_URL ?>/#programs" class="nav-link"><span>Program</span></a>
-      <!-- Dropdown: Konten — hover only, no JS click needed -->
       <div class="nav-dd" id="dd-konten">
         <button class="nav-dd-toggle" type="button" aria-haspopup="true" aria-expanded="false">
           Konten
@@ -590,7 +558,6 @@
     </button>
   </div>
 </nav>
-<!-- ══ MOBILE DRAWER ══ -->
 <div class="mobile-drawer" id="mobile-drawer">
   <a href="<?= BASE_URL ?>/" class="mob-link">
     Home
@@ -599,7 +566,6 @@
   <a href="<?= BASE_URL ?>/#about"    class="mob-link">Tentang Kami <i class="ti ti-chevron-right"></i></a>
   <a href="<?= BASE_URL ?>/#features" class="mob-link">Layanan <i class="ti ti-chevron-right"></i></a>
   <a href="<?= BASE_URL ?>/#programs" class="mob-link">Program <i class="ti ti-chevron-right"></i></a>
-  <!-- Konten sub-menu mobile -->
   <div>
     <button onclick="this.nextElementSibling.classList.toggle('open')"
             style="width:100%;display:flex;align-items:center;justify-content:space-between;font-size:.88rem;font-weight:700;color:var(--c-ink);background:none;border:none;cursor:pointer;padding:.68rem .75rem;border-radius:var(--radius-sm);font-family:var(--font-body)">
@@ -632,7 +598,6 @@
     <?php endif; ?>
   </div>
 </div>
-<!-- Alert -->
 <?php if (!empty($flash)): ?>
 <div class="alert-wrap">
   <div class="alert alert-<?= $flash['type'] ?>">
@@ -642,11 +607,9 @@
 </div>
 <?php endif; ?>
 <main><?= $content ?></main>
-<!-- ══ FOOTER ══ -->
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="f-grid">
-      <!-- Brand -->
       <div data-reveal>
         <a href="<?= BASE_URL ?>/" class="fb-row">
           <?php if (!empty($settings['org_logo']['value'])): ?>
@@ -688,7 +651,6 @@
           <button class="fb-nl-btn" id="nl-btn">Ikuti</button>
         </div>
       </div>
-      <!-- Navigasi -->
       <div data-reveal>
         <div class="fc-head"><h4>Navigasi</h4><div class="fc-line"></div></div>
         <ul class="fc-ul">
@@ -701,7 +663,6 @@
           <li><a href="<?= BASE_URL ?>/#contact">Hubungi Kami</a></li>
         </ul>
       </div>
-      <!-- Anggota -->
       <div data-reveal>
         <div class="fc-head"><h4>Anggota</h4><div class="fc-line"></div></div>
         <ul class="fc-ul">
@@ -714,7 +675,6 @@
           <li><a href="<?= BASE_URL ?>/#faq">FAQ</a></li>
         </ul>
       </div>
-      <!-- Kontak -->
       <div data-reveal>
         <div class="fc-head"><h4>Kontak</h4><div class="fc-line"></div></div>
         <div class="fc-contacts">
@@ -745,7 +705,6 @@
         </div>
       </div>
     </div>
-    <!-- Bottom -->
     <div class="f-bottom">
       <p class="f-copy"><?= htmlspecialchars($settings['footer_text']['value'] ?? '© ' . date('Y') . ' ' . ($settings['org_name']['value'] ?? APP_NAME) . '. All rights reserved.') ?></p>
       <div class="f-bottom-r">
@@ -764,15 +723,12 @@
 </button>
 <script>
 (function(){
-  /* ── Clock ── */
   function tick(){
     const d=new Date(), u=new Date(d.getTime()+8*3600000);
     const t=[u.getUTCHours(),u.getUTCMinutes(),u.getUTCSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
     ['server-clock','footer-clock'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=t; });
   }
   tick(); setInterval(tick,1000);
-  /* ── Scroll: navbar tetap terlihat (fixed), topbar mengecil,
-        navbar naik ke top:0 + efek glass/shadow untuk kesan premium ── */
   const nav=document.getElementById('nav');
   const topbar=document.getElementById('topbar');
   window.addEventListener('scroll',()=>{
@@ -782,7 +738,6 @@
     if (topbar) topbar.classList.toggle('collapsed', collapsed);
     nav.classList.toggle('pinned', collapsed);
   },{passive:true});
-  /* ── Mobile drawer ── */
   const btn=document.getElementById('hamburger'),drw=document.getElementById('mobile-drawer');
   btn.addEventListener('click',()=>{
     btn.classList.toggle('open'); drw.classList.toggle('open');
@@ -792,17 +747,14 @@
     btn.classList.remove('open'); drw.classList.remove('open');
     document.body.style.overflow='';
   }));
-  /* ── Back to top ── */
   const bt=document.getElementById('back-top');
   window.addEventListener('scroll',()=>bt.classList.toggle('show',window.scrollY>500),{passive:true});
   bt.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
-  /* ── Dropdown: update aria-expanded on hover for accessibility ── */
   document.querySelectorAll('.nav-dd').forEach(dd => {
     const toggle = dd.querySelector('.nav-dd-toggle');
     dd.addEventListener('mouseenter', () => toggle && toggle.setAttribute('aria-expanded','true'));
     dd.addEventListener('mouseleave', () => toggle && toggle.setAttribute('aria-expanded','false'));
   });
-  /* ── Active nav link ── */
   const path = window.location.pathname.replace(/\/+$/,'');
   const base = '<?= rtrim(BASE_URL, '/') ?>';
   const isHome = (path === base || path === base + '/');
@@ -821,12 +773,10 @@
       });
     },{threshold:0.35}).observe(s);
   });
-  /* ── Reveal on scroll ── */
   const rv=new IntersectionObserver(entries=>{
     entries.forEach((e,i)=>{ if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('_vis'),i*65); rv.unobserve(e.target); } });
   },{threshold:0.1});
   document.querySelectorAll('[data-reveal]').forEach(el=>rv.observe(el));
-  /* ── Newsletter ── */
   const nb=document.getElementById('nl-btn'),ni=document.getElementById('nl-inp');
   if(nb&&ni) nb.addEventListener('click',()=>{
     if(!ni.value.trim()) return;

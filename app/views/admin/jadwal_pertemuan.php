@@ -89,7 +89,7 @@ $hariUrut = ['senin','selasa','rabu','kamis','jumat','sabtu','minggu'];
             </td>
             <td><input type="time" class="jp-input-time" name="jam_mulai[<?= $hari ?>]" value="<?= htmlspecialchars($jm) ?>"></td>
             <td><input type="time" class="jp-input-time" name="jam_selesai[<?= $hari ?>]" value="<?= htmlspecialchars($js) ?>"></td>
-            <td><input type="text" class="jp-input-text" name="keterangan[<?= $hari ?>]" value="<?= htmlspecialchars($ket) ?>" placeholder="Opsional, mis. Ruang Lab TKJ"></td>
+            <td><input type="text" class="jp-input-text" name="keterangan[<?= $hari ?>]" value="<?= htmlspecialchars($ket) ?>" placeholder="Opsional, mis. Ruang Lab RPL"></td>
           </tr>
           <?php endforeach; ?>
         </tbody>
