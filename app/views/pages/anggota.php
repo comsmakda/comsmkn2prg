@@ -88,10 +88,11 @@
   .angp-sec__hint { font-size: .76rem; color: var(--c-muted2); margin-top: -.15rem; }
 
   /* ══════════════════════════════════════════════
-     ORG TREE — bagan struktur dengan garis penghubung
+     ORG TREE — bagan tunggal: pembina → ... → seluruh anggota
      ══════════════════════════════════════════════ */
   .org-tree {
     --org-card-w: 9.75rem;
+    --org-card-h: 11rem;
     --org-photo: 4.25rem;
     --org-line: var(--c-border);
     --org-gap: 1.5rem;
@@ -100,15 +101,14 @@
     flex-direction: column;
     align-items: center;
     padding: .25rem 0 0;
-    overflow-x: auto;
   }
 
-  /* Satu level (tier) dalam bagan, termasuk garis vertikal dari level di atasnya */
   .org-level-wrap {
     position: relative;
     display: flex;
     justify-content: center;
     padding-top: var(--org-stem);
+    max-width: 100%;
   }
   .org-level-wrap.is-root { padding-top: 0; }
   .org-level-wrap:not(.is-root)::before {
@@ -120,7 +120,6 @@
     transform: translateX(-50%);
   }
 
-  /* Baris kartu dalam satu level */
   .org-row {
     position: relative;
     display: flex;
@@ -128,11 +127,11 @@
     align-items: flex-start;
     gap: var(--org-gap);
     flex-wrap: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+    padding-bottom: .25rem;
   }
-  /* Bus line horizontal: dari tengah kartu pertama sampai tengah kartu terakhir */
-  .org-row.has-bus {
-    padding-top: var(--org-stem);
-  }
+  .org-row.has-bus { padding-top: var(--org-stem); }
   .org-row.has-bus::before {
     content: '';
     position: absolute;
@@ -153,13 +152,15 @@
 
   .org-node { position: relative; flex-shrink: 0; }
 
-  /* ── Kartu — satu ukuran untuk SEMUA jenjang (pembina s/d ketua bidang) ── */
+  /* ── Kartu — SATU ukuran untuk seluruh jenjang (pembina s/d anggota) ── */
   .org-card {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     width: var(--org-card-w);
+    min-height: var(--org-card-h);
     background: var(--c-white);
     border: 1px solid var(--c-border);
     border-radius: var(--radius-lg);
@@ -178,6 +179,7 @@
   }
 
   .org-card__photo-wrap {
+    box-sizing: border-box;
     width: var(--org-photo); height: var(--org-photo); margin-bottom: .65rem;
     border-radius: 50%; padding: 2.5px; flex-shrink: 0;
     background: linear-gradient(135deg, rgba(14,116,144,.4), rgba(6,182,212,.4));
@@ -205,7 +207,7 @@
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
   .org-card__kelas {
-    display: inline-block; margin-top: .35rem;
+    display: inline-block; margin-top: .4rem;
     font-size: .63rem; font-weight: 700; color: var(--c-muted2);
   }
   .org-card__periode {
@@ -220,32 +222,38 @@
     color: var(--c-muted2); font-size: .82rem;
   }
 
-  /* Sambungan dari level bagan terakhir turun ke seksi "Seluruh Anggota" */
-  .org-tail {
+  /* ── Tier terakhir: Seluruh Anggota — grup dengan garis label, isinya wrap ── */
+  .org-leaf-group {
     position: relative;
+    box-sizing: border-box;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    padding-top: var(--org-stem, 1.5rem);
+    gap: 1rem;
+    max-width: min(72rem, calc(100vw - 3rem));
+    background: rgba(14,116,144,.025);
+    border: 1px dashed rgba(14,116,144,.28);
+    border-radius: var(--radius-lg);
+    padding: 1.9rem 1.25rem 1.35rem;
   }
-  .org-tail::before {
-    content: '';
-    position: absolute; top: 0; left: 50%;
-    width: 2px; height: 1.5rem;
-    background: var(--c-border);
+  .org-leaf-group__label {
+    position: absolute;
+    top: -.65rem; left: 50%;
     transform: translateX(-50%);
-  }
-  .org-tail__node {
-    position: relative;
-    width: .55rem; height: .55rem; border-radius: 50%;
-    background: var(--c-primary);
-    box-shadow: 0 0 0 4px rgba(14,116,144,.14);
+    background: var(--c-white);
+    padding: .1rem .7rem;
+    font-size: .66rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--c-primary);
+    border: 1px solid rgba(14,116,144,.28);
+    border-radius: 999px;
   }
 
   /* ── Mode mobile: level jadi "kotak grup", tanpa bus/stem per-kartu ── */
   @media (max-width: 640px) {
-    .org-tree { --org-card-w: 7.4rem; --org-photo: 3.5rem; --org-gap: .6rem; overflow-x: visible; }
+    .org-tree { --org-card-w: 7.4rem; --org-card-h: 9.75rem; --org-photo: 3.5rem; --org-gap: .6rem; }
     .org-row {
       flex-wrap: wrap;
+      overflow-x: visible;
       background: var(--c-white);
       border: 1px solid var(--c-border);
       border-radius: var(--radius-lg);
@@ -256,98 +264,7 @@
     .org-row.has-bus > .org-node::before { display: none; }
     .org-card { box-shadow: none; border: none; padding: 0; }
     .org-card:hover { transform: none; box-shadow: none; }
-  }
-
-  /* ─── Filter bar ─── */
-  .angp-filter {
-    display: flex; align-items: center; gap: .56rem; flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-  }
-  .angp-fi { position: relative; display: flex; align-items: center; }
-  .angp-fi__icon {
-    position: absolute; left: .69rem; color: var(--c-muted2); pointer-events: none;
-    display: flex; font-size: .85rem;
-  }
-  .angp-fi input, .angp-fi select {
-    font-family: var(--font-body); font-size: .82rem; color: var(--c-ink);
-    background: var(--c-white); border: 1.5px solid var(--c-border);
-    border-radius: var(--radius-sm); padding: .56rem .88rem .56rem 2rem;
-    outline: none; -webkit-appearance: none;
-    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-  }
-  .angp-fi input { width: 15.5rem; }
-  .angp-fi select { width: 11rem; }
-  .angp-fi input:focus, .angp-fi select:focus {
-    border-color: var(--c-primary-lt); background: #fff;
-    box-shadow: 0 0 0 3px rgba(6,182,212,.12);
-  }
-  .angp-fi input::placeholder { color: var(--c-muted2); }
-  .angp-filter-btn {
-    display: inline-flex; align-items: center; gap: .38rem;
-    padding: .56rem .94rem; background: var(--c-primary); color: #fff;
-    font-family: var(--font-body); font-size: .82rem; font-weight: 700;
-    border: none; border-radius: var(--radius-sm); cursor: pointer;
-    box-shadow: 0 8px 20px rgba(14,116,144,.2); transition: all .18s ease;
-  }
-  .angp-filter-btn:hover { background: var(--c-primary-lt); transform: translateY(-1px); }
-  .angp-filter-reset {
-    font-size: .74rem; font-weight: 600; color: var(--c-muted2);
-    padding: .3rem .5rem; transition: color .15s ease;
-  }
-  .angp-filter-reset:hover { color: var(--c-red-text); }
-
-  /* ─── Member grid ─── */
-  .angp-meta { font-size: .78rem; color: var(--c-muted); margin-bottom: .88rem; }
-  .angp-meta strong { color: var(--c-ink); font-weight: 700; }
-
-  .member-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
-    gap: .9rem;
-  }
-  @media (max-width: 640px) {
-    .member-grid { grid-template-columns: repeat(2, 1fr); gap: .7rem; }
-    .member-card { padding: 1.1rem .6rem .9rem; }
-    .member-card__photo-wrap { width: 4.25rem; height: 4.25rem; margin-bottom: .6rem; }
-    .member-card__name { font-size: .8rem; }
-  }
-  @media (max-width: 360px) {
-    .member-card__photo-wrap { width: 3.75rem; height: 3.75rem; }
-  }
-  .member-card {
-    display: flex; flex-direction: column; align-items: center; text-align: center;
-    background: var(--c-white); border: 1px solid var(--c-border);
-    border-radius: var(--radius-md); padding: 1.35rem .9rem 1.1rem;
-    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-  }
-  .member-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 18px 38px -18px rgba(15,23,42,.18), 0 3px 10px rgba(15,23,42,.05);
-    border-color: rgba(14,116,144,.25);
-  }
-  .member-card__photo-wrap {
-    position: relative; width: 5rem; height: 5rem; margin-bottom: .75rem;
-    border-radius: 50%; padding: 3px;
-    background: linear-gradient(135deg, rgba(14,116,144,.35), rgba(6,182,212,.35));
-  }
-  .member-card__photo {
-    width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-    display: block; border: 3px solid #fff;
-  }
-  .member-card__photo-fallback {
-    width: 100%; height: 100%; border-radius: 50%;
-    background: #f4f7fa; border: 3px solid #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.25rem; font-weight: 800; color: var(--c-muted); text-transform: uppercase;
-  }
-  .member-card__name {
-    font-size: .83rem; font-weight: 700; color: var(--c-ink); line-height: 1.3;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-  }
-  .member-card__kelas {
-    display: inline-block; margin-top: .4rem;
-    font-size: .66rem; font-weight: 700; color: var(--c-primary);
-    background: rgba(14,116,144,.08); border: 1px solid rgba(14,116,144,.16);
-    border-radius: .38rem; padding: .15rem .5rem; letter-spacing: .01em;
+    .org-leaf-group { padding: 1.6rem .8rem 1rem; gap: .7rem; }
   }
 
   /* ─── Empty state ─── */
@@ -358,11 +275,6 @@
   .angp-empty i { font-size: 2.4rem; opacity: .35; display: block; margin-bottom: .75rem; }
   .angp-empty__title { font-size: .95rem; font-weight: 700; color: var(--c-muted); margin-bottom: .25rem; }
   .angp-empty__sub { font-size: .8rem; }
-
-  @media (max-width: 480px) {
-    .angp-fi input, .angp-fi select { width: 100%; }
-    .angp-filter { flex-direction: column; align-items: stretch; }
-  }
 </style>
 
 <!-- ── Hero section with blurred background ── -->
@@ -381,8 +293,8 @@
 <div class="angp">
 
   <?php
-    // ── Bangun daftar level bagan: Pembina di puncak, lalu tier struktur.
-    // Koordinator & Ketua Bidang digabung jadi SATU tier (setara).
+    // ── Bangun daftar level bagan: Pembina di puncak, lalu tier struktur,
+    // ditutup dengan tier Seluruh Anggota di paling bawah — semua jadi SATU bagan.
     $orgLevelDefs = [
       'ketua_umum'  => ['ketua_umum'],
       'wakil_ketua' => ['wakil_ketua'],
@@ -410,7 +322,7 @@
       ];
     }
 
-    // Level selanjutnya: dari $struktur
+    // Level pengurus dari $struktur
     $adaPengurus = false;
     foreach ($orgLevelDefs as $levelKeys) {
       $tierPeople = [];
@@ -431,7 +343,7 @@
     }
   ?>
 
-  <!-- ── Struktur Organisasi (bagan) ── -->
+  <!-- ── Struktur Organisasi (satu bagan, sampai anggota) ── -->
   <div class="angp-sec" style="margin-top:0;">
     <div class="angp-sec__row">
       <span class="angp-sec__title">Struktur Organisasi</span>
@@ -440,14 +352,14 @@
     <p class="angp-sec__hint">Bagan kepengurusan aktif, dari pembina hingga seluruh anggota.</p>
   </div>
 
-  <?php if (empty($pembina) && !$adaPengurus): ?>
+  <?php if (empty($pembina) && !$adaPengurus && empty($list)): ?>
     <div class="org-empty">
       <i class="ti ti-info-circle" style="font-size:1.2rem;"></i>
       <span>Struktur pengurus belum tersedia.</span>
     </div>
   <?php else: ?>
     <div class="org-tree">
-      <?php foreach ($renderLevels as $li => $level): ?>
+      <?php foreach ($renderLevels as $level): ?>
         <div class="org-level-wrap<?= $level['is_root'] ? ' is-root' : '' ?>">
           <div class="org-row<?= count($level['people']) > 1 ? ' has-bus' : '' ?>">
             <?php foreach ($level['people'] as $p): ?>
@@ -479,74 +391,34 @@
         </div>
       <?php endforeach; ?>
 
-      <!-- Sambungan turun ke seksi Seluruh Anggota -->
-      <div class="org-tail"><span class="org-tail__node"></span></div>
-    </div>
-  <?php endif; ?>
-
-  <!-- ── Daftar Anggota ── -->
-  <div class="angp-sec">
-    <div class="angp-sec__row">
-      <span class="angp-sec__title">Seluruh Anggota Aktif</span>
-      <div class="angp-sec__line"></div>
-    </div>
-  </div>
-
-  <form method="GET" action="<?= BASE_URL ?>/anggota" class="angp-filter">
-    <div class="angp-fi">
-      <span class="angp-fi__icon"><i class="ti ti-search"></i></span>
-      <input type="text" name="search" placeholder="Cari nama…"
-             value="<?= htmlspecialchars($filter['search'] ?? '') ?>" autocomplete="off">
-    </div>
-    <div class="angp-fi">
-      <span class="angp-fi__icon"><i class="ti ti-school"></i></span>
-      <select name="kelas">
-        <option value="">Semua Kelas</option>
-        <?php foreach ($kelasList as $k): ?>
-          <option value="<?= htmlspecialchars($k['kelas']) ?>"
-                  <?= ($filter['kelas'] ?? '') === $k['kelas'] ? 'selected' : '' ?>>
-            <?= htmlspecialchars($k['kelas']) ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-    <button type="submit" class="angp-filter-btn">
-      <i class="ti ti-filter"></i> Filter
-    </button>
-    <?php if (!empty($filter['search']) || !empty($filter['kelas'])): ?>
-      <a href="<?= BASE_URL ?>/anggota" class="angp-filter-reset">✕ Reset</a>
-    <?php endif; ?>
-  </form>
-
-  <p class="angp-meta">
-    Menampilkan <strong><?= number_format(count($list)) ?></strong> anggota
-  </p>
-
-  <?php if (empty($list)): ?>
-    <div class="angp-empty">
-      <i class="ti ti-users-group" aria-hidden="true"></i>
-      <div class="angp-empty__title">Tidak ada anggota ditemukan</div>
-      <div class="angp-empty__sub">Coba ubah kata kunci pencarian atau filter kelas.</div>
-    </div>
-  <?php else: ?>
-    <div class="member-grid">
-      <?php foreach ($list as $m): ?>
-        <div class="member-card">
-          <div class="member-card__photo-wrap">
-            <?php if (!empty($m['foto'])): ?>
-              <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($m['foto']) ?>"
-                   class="member-card__photo"
-                   alt="Foto <?= htmlspecialchars($m['nama_lengkap']) ?>">
-            <?php else: ?>
-              <div class="member-card__photo-fallback" aria-hidden="true">
-                <?= htmlspecialchars(mb_strtoupper(mb_substr($m['nama_lengkap'], 0, 2))) ?>
+      <!-- ── Tier terakhir: Seluruh Anggota (satu grup, masih bagian bagan yang sama) ── -->
+      <?php if (!empty($list)): ?>
+        <div class="org-level-wrap">
+          <div class="org-leaf-group">
+            <span class="org-leaf-group__label">Seluruh Anggota (<?= number_format(count($list)) ?>)</span>
+            <?php foreach ($list as $m): ?>
+              <div class="org-node">
+                <div class="org-card">
+                  <div class="org-card__photo-wrap">
+                    <?php if (!empty($m['foto'])): ?>
+                      <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($m['foto']) ?>"
+                           class="org-card__photo"
+                           alt="Foto <?= htmlspecialchars($m['nama_lengkap']) ?>">
+                    <?php else: ?>
+                      <div class="org-card__photo-fallback" aria-hidden="true">
+                        <?= htmlspecialchars(mb_strtoupper(mb_substr($m['nama_lengkap'], 0, 2))) ?>
+                      </div>
+                    <?php endif; ?>
+                  </div>
+                  <span class="org-card__jabatan">Anggota</span>
+                  <p class="org-card__name"><?= htmlspecialchars($m['nama_lengkap']) ?></p>
+                  <span class="org-card__kelas"><?= htmlspecialchars($m['kelas'] ?? '—') ?></span>
+                </div>
               </div>
-            <?php endif; ?>
+            <?php endforeach; ?>
           </div>
-          <p class="member-card__name"><?= htmlspecialchars($m['nama_lengkap']) ?></p>
-          <span class="member-card__kelas"><?= htmlspecialchars($m['kelas'] ?? '—') ?></span>
         </div>
-      <?php endforeach; ?>
+      <?php endif; ?>
     </div>
   <?php endif; ?>
 

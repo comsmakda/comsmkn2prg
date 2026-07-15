@@ -42,19 +42,15 @@ class HomeController extends Controller
 
     // ================================================================
     //  DAFTAR ANGGOTA / STRUKTUR ORGANISASI (PUBLIK)
+    //  Satu bagan tunggal: pembina → pengurus → seluruh anggota.
+    //  Tidak ada lagi filter/pencarian di halaman ini.
     // ================================================================
     public function anggota(): void
     {
         $um = new UserModel();
 
-        $filter = [
-            'kelas'  => $_GET['kelas']  ?? '',
-            'search' => $_GET['search'] ?? '',
-        ];
-
         $struktur     = $um->getStrukturOrganisasi();
-        $list         = $um->getAnggotaPublik($filter);
-        $kelasList    = $um->getKelasList();
+        $list         = $um->getAnggotaPublik();
         $jabatanLabel = UserModel::JABATAN_LIST;
         $pembina      = $this->_getPembinaAktif();
 
@@ -63,7 +59,7 @@ class HomeController extends Controller
 
         $this->view(
             'pages/anggota',
-            compact('struktur', 'list', 'kelasList', 'filter', 'jabatanLabel', 'pembina', 'settings', 'flash'),
+            compact('struktur', 'list', 'jabatanLabel', 'pembina', 'settings', 'flash'),
             'main'
         );
     }

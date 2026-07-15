@@ -43,11 +43,10 @@ class UserModel extends Model
      *
      * Aturan filter:
      * - is_super_admin = 0  → admin utama TIDAK PERNAH tampil di struktur publik.
-     * - (role != 'admin' OR nia IS NOT NULL) → user dengan role 'anggota' tetap
-     *   tampil apa adanya (ketua/pengurus yang belum di-upgrade jadi admin),
-     *   TAPI user dengan role 'admin' HANYA tampil jika sudah punya NIA.
-     *   Admin yang dibuat tanpa proses aktivasi (tidak ada NIA) dianggap
-     *   akun teknis, bukan representasi anggota organisasi, jadi disembunyikan.
+     * - nia IS NOT NULL     → HANYA akun yang sudah punya NIA (sudah lewat proses
+     *   aktivasi anggota) yang ditampilkan. Akun tanpa NIA dianggap akun teknis
+     *   (admin/operator yang dibuat manual tanpa proses aktivasi), jadi disembunyikan
+     *   dari struktur publik — berlaku untuk role apapun, bukan cuma role admin.
      *
      * @return array<string, array> key = jabatan, value = list user pada jabatan itu
      */
@@ -64,7 +63,7 @@ class UserModel extends Model
              FROM users
              WHERE status = 'aktif'
                AND is_super_admin = 0
-               AND (role != 'admin' OR nia IS NOT NULL)
+               AND nia IS NOT NULL
                AND jabatan IN ($in)
              ORDER BY nama_lengkap ASC",
             $jabatanAktif
@@ -290,12 +289,12 @@ class UserModel extends Model
     /**
      * Anggota BIASA untuk grid publik "Daftar Anggota" — sengaja difilter
      * jabatan = 'anggota' (bukan role) supaya pengurus yang sudah tampil
-     * di struktur organisasi tidak dobel muncul di grid bawah. Hanya
-     * mengembalikan kolom yang aman ditampilkan ke publik.
+     * di struktur organisasi tidak dobel muncul. nia IS NOT NULL memastikan
+     * akun admin/operator tanpa NIA tidak ikut tampil ke publik.
      */
     public function getAnggotaPublik(array $filter = []): array
     {
-        $where  = ["status = 'aktif'", "jabatan = 'anggota'"];
+        $where  = ["status = 'aktif'", "jabatan = 'anggota'", "nia IS NOT NULL"];
         $params = [];
 
         if (!empty($filter['kelas'])) {
