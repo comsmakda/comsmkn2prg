@@ -87,88 +87,83 @@
   .angp-sec__line { flex: 1; height: 1px; background: linear-gradient(to right, var(--c-border), transparent); }
   .angp-sec__hint { font-size: .76rem; color: var(--c-muted2); margin-top: -.15rem; }
 
-  /* ─── Pembina card ─── */
-  .pembina-wrap {
-    display: flex;
-    justify-content: center;
-    padding: .5rem 0 .75rem;
-  }
-  .pembina-card {
-    display: flex;
-    align-items: center;
-    gap: 1.1rem;
-    width: 100%;
-    max-width: 26rem;
-    background: linear-gradient(135deg, rgba(14,116,144,.05), rgba(6,182,212,.05));
-    border: 1px solid rgba(14,116,144,.18);
-    border-radius: var(--radius-lg);
-    padding: 1.1rem 1.3rem;
-    box-shadow: 0 16px 34px -20px rgba(15,23,42,.14), 0 3px 8px rgba(15,23,42,.04);
-  }
-  .pembina-card__photo-wrap {
-    width: 4.5rem; height: 4.5rem; flex-shrink: 0;
-    border-radius: 50%; padding: 2.5px;
-    background: conic-gradient(from 180deg, var(--c-primary), #22d3ee, var(--c-primary));
-  }
-  .pembina-card__photo {
-    width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-    display: block; border: 2.5px solid #fff;
-  }
-  .pembina-card__photo-fallback {
-    width: 100%; height: 100%; border-radius: 50%;
-    background: rgba(14,116,144,.1); border: 2.5px solid #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; font-weight: 800; color: var(--c-primary); text-transform: uppercase;
-  }
-  .pembina-card__body { text-align: left; min-width: 0; }
-  .pembina-card__jabatan {
-    font-size: .66rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-    color: var(--c-primary); margin-bottom: .3rem;
-  }
-  .pembina-card__name {
-    font-size: 1rem; font-weight: 800; color: var(--c-ink); line-height: 1.3;
-    margin-bottom: .15rem;
-  }
-  .pembina-card__periode { font-size: .74rem; color: var(--c-muted2); }
-
-  /* ─── Struktur Organisasi (org-chart) ─── */
-  .org-chart {
+  /* ══════════════════════════════════════════════
+     ORG TREE — bagan struktur dengan garis penghubung
+     ══════════════════════════════════════════════ */
+  .org-tree {
+    --org-card-w: 9.75rem;
+    --org-photo: 4.25rem;
+    --org-line: var(--c-border);
+    --org-gap: 1.5rem;
+    --org-stem: 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0;
-    padding: .5rem 0 1rem;
+    padding: .25rem 0 0;
+    overflow-x: auto;
   }
-  .org-tier {
+
+  /* Satu level (tier) dalam bagan, termasuk garis vertikal dari level di atasnya */
+  .org-level-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding-top: var(--org-stem);
+  }
+  .org-level-wrap.is-root { padding-top: 0; }
+  .org-level-wrap:not(.is-root)::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    width: 2px; height: var(--org-stem);
+    background: var(--org-line);
+    transform: translateX(-50%);
+  }
+
+  /* Baris kartu dalam satu level */
+  .org-row {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: .85rem;
-    flex-wrap: wrap;
-    padding-top: 2.25rem;
+    gap: var(--org-gap);
+    flex-wrap: nowrap;
   }
-  .org-tier:first-child { padding-top: 0; }
-  .org-tier::before {
+  /* Bus line horizontal: dari tengah kartu pertama sampai tengah kartu terakhir */
+  .org-row.has-bus {
+    padding-top: var(--org-stem);
+  }
+  .org-row.has-bus::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: calc(var(--org-card-w) / 2);
+    right: calc(var(--org-card-w) / 2);
+    height: 2px;
+    background: var(--org-line);
+  }
+  .org-row.has-bus > .org-node::before {
     content: '';
     position: absolute;
     top: 0; left: 50%;
-    width: 2px; height: 1.75rem;
-    background: var(--c-border);
+    width: 2px; height: var(--org-stem);
+    background: var(--org-line);
     transform: translateX(-50%);
   }
-  .org-tier:first-child::before { display: none; }
 
+  .org-node { position: relative; flex-shrink: 0; }
+
+  /* ── Kartu — satu ukuran untuk SEMUA jenjang (pembina s/d ketua bidang) ── */
   .org-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    width: 9.5rem;
+    width: var(--org-card-w);
     background: var(--c-white);
     border: 1px solid var(--c-border);
     border-radius: var(--radius-lg);
-    padding: 1rem .8rem .9rem;
+    padding: 1.1rem .75rem .95rem;
     box-shadow: 0 16px 34px -20px rgba(15,23,42,.14), 0 3px 8px rgba(15,23,42,.04);
     transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   }
@@ -177,15 +172,17 @@
     box-shadow: 0 20px 40px -18px rgba(15,23,42,.18), 0 4px 12px rgba(15,23,42,.06);
     border-color: rgba(14,116,144,.25);
   }
-  .org-card--ketua { width: 11.5rem; padding: 1.35rem 1rem 1.15rem; }
+  .org-card--root {
+    border-color: rgba(14,116,144,.3);
+    background: linear-gradient(135deg, rgba(14,116,144,.05), rgba(6,182,212,.05));
+  }
 
   .org-card__photo-wrap {
-    width: 4rem; height: 4rem; margin-bottom: .6rem;
+    width: var(--org-photo); height: var(--org-photo); margin-bottom: .65rem;
     border-radius: 50%; padding: 2.5px; flex-shrink: 0;
     background: linear-gradient(135deg, rgba(14,116,144,.4), rgba(6,182,212,.4));
   }
-  .org-card--ketua .org-card__photo-wrap {
-    width: 5.5rem; height: 5.5rem; margin-bottom: .75rem;
+  .org-card--root .org-card__photo-wrap {
     background: conic-gradient(from 180deg, var(--c-primary), #22d3ee, var(--c-primary));
   }
   .org-card__photo {
@@ -196,23 +193,24 @@
     width: 100%; height: 100%; border-radius: 50%;
     background: rgba(14,116,144,.1); border: 2.5px solid #fff;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1rem; font-weight: 800; color: var(--c-primary); text-transform: uppercase;
+    font-size: 1.05rem; font-weight: 800; color: var(--c-primary); text-transform: uppercase;
   }
-  .org-card--ketua .org-card__photo-fallback { font-size: 1.3rem; }
 
   .org-card__jabatan {
-    font-size: .64rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    font-size: .63rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
     color: var(--c-primary); margin-bottom: .3rem; line-height: 1.3;
   }
-  .org-card--ketua .org-card__jabatan { font-size: .68rem; }
   .org-card__name {
-    font-size: .8rem; font-weight: 800; color: var(--c-ink); line-height: 1.3;
+    font-size: .82rem; font-weight: 800; color: var(--c-ink); line-height: 1.3;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
-  .org-card--ketua .org-card__name { font-size: .96rem; }
   .org-card__kelas {
     display: inline-block; margin-top: .35rem;
-    font-size: .64rem; font-weight: 700; color: var(--c-muted2);
+    font-size: .63rem; font-weight: 700; color: var(--c-muted2);
+  }
+  .org-card__periode {
+    display: block; margin-top: .3rem;
+    font-size: .66rem; color: var(--c-muted2);
   }
 
   .org-empty {
@@ -220,6 +218,44 @@
     background: var(--c-white); border: 1px dashed var(--c-border);
     border-radius: var(--radius-lg); padding: 1.25rem 1.4rem;
     color: var(--c-muted2); font-size: .82rem;
+  }
+
+  /* Sambungan dari level bagan terakhir turun ke seksi "Seluruh Anggota" */
+  .org-tail {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding-top: var(--org-stem, 1.5rem);
+  }
+  .org-tail::before {
+    content: '';
+    position: absolute; top: 0; left: 50%;
+    width: 2px; height: 1.5rem;
+    background: var(--c-border);
+    transform: translateX(-50%);
+  }
+  .org-tail__node {
+    position: relative;
+    width: .55rem; height: .55rem; border-radius: 50%;
+    background: var(--c-primary);
+    box-shadow: 0 0 0 4px rgba(14,116,144,.14);
+  }
+
+  /* ── Mode mobile: level jadi "kotak grup", tanpa bus/stem per-kartu ── */
+  @media (max-width: 640px) {
+    .org-tree { --org-card-w: 7.4rem; --org-photo: 3.5rem; --org-gap: .6rem; overflow-x: visible; }
+    .org-row {
+      flex-wrap: wrap;
+      background: var(--c-white);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-lg);
+      padding: .9rem .7rem;
+    }
+    .org-row.has-bus { padding-top: .9rem; }
+    .org-row.has-bus::before,
+    .org-row.has-bus > .org-node::before { display: none; }
+    .org-card { box-shadow: none; border: none; padding: 0; }
+    .org-card:hover { transform: none; box-shadow: none; }
   }
 
   /* ─── Filter bar ─── */
@@ -273,10 +309,6 @@
     .member-card { padding: 1.1rem .6rem .9rem; }
     .member-card__photo-wrap { width: 4.25rem; height: 4.25rem; margin-bottom: .6rem; }
     .member-card__name { font-size: .8rem; }
-    .org-card { width: 8rem; }
-    .org-card--ketua { width: 9.5rem; }
-    .pembina-card { flex-direction: column; text-align: center; }
-    .pembina-card__body { text-align: center; }
   }
   @media (max-width: 360px) {
     .member-card__photo-wrap { width: 3.75rem; height: 3.75rem; }
@@ -348,104 +380,107 @@
 
 <div class="angp">
 
-  <!-- ── Kartu Pembina ── -->
-  <?php if (!empty($pembina)): ?>
-  <div class="angp-sec" style="margin-top:0;">
-    <div class="angp-sec__row">
-      <span class="angp-sec__title">Pembina</span>
-      <div class="angp-sec__line"></div>
-    </div>
-  </div>
-  <div class="pembina-wrap">
-    <div class="pembina-card">
-      <div class="pembina-card__photo-wrap">
-        <?php if (!empty($pembina['foto'])): ?>
-          <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($pembina['foto']) ?>"
-               class="pembina-card__photo"
-               alt="Foto <?= htmlspecialchars($pembina['nama']) ?>">
-        <?php else: ?>
-          <div class="pembina-card__photo-fallback" aria-hidden="true">
-            <?= htmlspecialchars(mb_strtoupper(mb_substr($pembina['nama'], 0, 2))) ?>
-          </div>
-        <?php endif; ?>
-      </div>
-      <div class="pembina-card__body">
-        <div class="pembina-card__jabatan"><?= htmlspecialchars($pembina['jabatan'] ?? 'Pembina') ?></div>
-        <p class="pembina-card__name"><?= htmlspecialchars($pembina['nama']) ?></p>
-        <?php if (!empty($pembina['periode'])): ?>
-          <span class="pembina-card__periode">Periode <?= htmlspecialchars($pembina['periode']) ?></span>
-        <?php endif; ?>
-      </div>
-    </div>
-  </div>
-  <?php endif; ?>
+  <?php
+    // ── Bangun daftar level bagan: Pembina di puncak, lalu tier struktur.
+    // Koordinator & Ketua Bidang digabung jadi SATU tier (setara).
+    $orgLevelDefs = [
+      'ketua_umum'  => ['ketua_umum'],
+      'wakil_ketua' => ['wakil_ketua'],
+      'tier_inti'   => ['bendahara', 'wakil_bendahara', 'sekretaris', 'wakil_sekretaris'],
+      'tier_koor_bidang' => [
+        'koordinator_humas', 'koordinator_perlengkapan', 'koordinator_pdd',
+        'ketua_bidang_it_software', 'ketua_bidang_it_network',
+        'ketua_bidang_multimedia', 'ketua_bidang_iot_robotic',
+      ],
+    ];
 
-  <!-- ── Struktur Organisasi ── -->
-  <div class="angp-sec">
+    $renderLevels = [];
+
+    // Level 0: Pembina (root bagan)
+    if (!empty($pembina)) {
+      $renderLevels[] = [
+        'is_root' => true,
+        'people'  => [[
+          'jabatan_label' => $pembina['jabatan'] ?? 'Pembina',
+          'nama'          => $pembina['nama'],
+          'foto'          => $pembina['foto'] ?? null,
+          'periode'       => $pembina['periode'] ?? null,
+          'kelas'         => null,
+        ]],
+      ];
+    }
+
+    // Level selanjutnya: dari $struktur
+    $adaPengurus = false;
+    foreach ($orgLevelDefs as $levelKeys) {
+      $tierPeople = [];
+      foreach ($levelKeys as $jk) {
+        foreach (($struktur[$jk] ?? []) as $orang) {
+          $tierPeople[] = [
+            'jabatan_label' => $jabatanLabel[$jk] ?? '',
+            'nama'          => $orang['nama_lengkap'],
+            'foto'          => $orang['foto'] ?? null,
+            'periode'       => null,
+            'kelas'         => $orang['kelas'] ?? null,
+          ];
+        }
+      }
+      if (empty($tierPeople)) continue;
+      $adaPengurus = true;
+      $renderLevels[] = ['is_root' => false, 'people' => $tierPeople];
+    }
+  ?>
+
+  <!-- ── Struktur Organisasi (bagan) ── -->
+  <div class="angp-sec" style="margin-top:0;">
     <div class="angp-sec__row">
       <span class="angp-sec__title">Struktur Organisasi</span>
       <div class="angp-sec__line"></div>
     </div>
-    <p class="angp-sec__hint">Susunan pengurus aktif berdasarkan jabatan yang sedang menjabat.</p>
+    <p class="angp-sec__hint">Bagan kepengurusan aktif, dari pembina hingga seluruh anggota.</p>
   </div>
 
-  <?php
-    // Jenjang tampilan struktur (dari puncak ke bawah).
-    // Setiap tier bisa berisi lebih dari satu key jabatan yang tampil sebaris.
-    $orgTiers = [
-      ['ketua_umum'],
-      ['wakil_ketua'],
-      ['bendahara', 'wakil_bendahara', 'sekretaris', 'wakil_sekretaris'],
-      ['koordinator_humas', 'koordinator_perlengkapan', 'koordinator_pdd'],
-      ['ketua_bidang_it_software', 'ketua_bidang_it_network', 'ketua_bidang_multimedia', 'ketua_bidang_iot_robotic'],
-    ];
-
-    $adaPengurus = false;
-    foreach ($struktur as $jab => $orang) {
-      if (!empty($orang)) { $adaPengurus = true; break; }
-    }
-  ?>
-
-  <?php if (!$adaPengurus): ?>
+  <?php if (empty($pembina) && !$adaPengurus): ?>
     <div class="org-empty">
       <i class="ti ti-info-circle" style="font-size:1.2rem;"></i>
       <span>Struktur pengurus belum tersedia.</span>
     </div>
   <?php else: ?>
-    <div class="org-chart">
-      <?php foreach ($orgTiers as $tierIndex => $tierKeys): ?>
-        <?php
-          $tierPeople = [];
-          foreach ($tierKeys as $jk) {
-            foreach (($struktur[$jk] ?? []) as $orang) {
-              $tierPeople[] = ['jabatan' => $jk, 'data' => $orang];
-            }
-          }
-          if (empty($tierPeople)) continue; // lompati tier yang belum ada orangnya
-        ?>
-        <div class="org-tier">
-          <?php foreach ($tierPeople as $entry): $o = $entry['data']; ?>
-            <div class="org-card <?= $tierIndex === 0 ? 'org-card--ketua' : '' ?>">
-              <div class="org-card__photo-wrap">
-                <?php if (!empty($o['foto'])): ?>
-                  <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($o['foto']) ?>"
-                       class="org-card__photo"
-                       alt="Foto <?= htmlspecialchars($o['nama_lengkap']) ?>">
-                <?php else: ?>
-                  <div class="org-card__photo-fallback" aria-hidden="true">
-                    <?= htmlspecialchars(mb_strtoupper(mb_substr($o['nama_lengkap'], 0, 2))) ?>
+    <div class="org-tree">
+      <?php foreach ($renderLevels as $li => $level): ?>
+        <div class="org-level-wrap<?= $level['is_root'] ? ' is-root' : '' ?>">
+          <div class="org-row<?= count($level['people']) > 1 ? ' has-bus' : '' ?>">
+            <?php foreach ($level['people'] as $p): ?>
+              <div class="org-node">
+                <div class="org-card<?= $level['is_root'] ? ' org-card--root' : '' ?>">
+                  <div class="org-card__photo-wrap">
+                    <?php if (!empty($p['foto'])): ?>
+                      <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($p['foto']) ?>"
+                           class="org-card__photo"
+                           alt="Foto <?= htmlspecialchars($p['nama']) ?>">
+                    <?php else: ?>
+                      <div class="org-card__photo-fallback" aria-hidden="true">
+                        <?= htmlspecialchars(mb_strtoupper(mb_substr($p['nama'], 0, 2))) ?>
+                      </div>
+                    <?php endif; ?>
                   </div>
-                <?php endif; ?>
+                  <span class="org-card__jabatan"><?= htmlspecialchars($p['jabatan_label']) ?></span>
+                  <p class="org-card__name"><?= htmlspecialchars($p['nama']) ?></p>
+                  <?php if (!empty($p['kelas'])): ?>
+                    <span class="org-card__kelas"><?= htmlspecialchars($p['kelas']) ?></span>
+                  <?php endif; ?>
+                  <?php if (!empty($p['periode'])): ?>
+                    <span class="org-card__periode">Periode <?= htmlspecialchars($p['periode']) ?></span>
+                  <?php endif; ?>
+                </div>
               </div>
-              <span class="org-card__jabatan"><?= htmlspecialchars($jabatanLabel[$entry['jabatan']] ?? '') ?></span>
-              <p class="org-card__name"><?= htmlspecialchars($o['nama_lengkap']) ?></p>
-              <?php if (!empty($o['kelas'])): ?>
-                <span class="org-card__kelas"><?= htmlspecialchars($o['kelas']) ?></span>
-              <?php endif; ?>
-            </div>
-          <?php endforeach; ?>
+            <?php endforeach; ?>
+          </div>
         </div>
       <?php endforeach; ?>
+
+      <!-- Sambungan turun ke seksi Seluruh Anggota -->
+      <div class="org-tail"><span class="org-tail__node"></span></div>
     </div>
   <?php endif; ?>
 
