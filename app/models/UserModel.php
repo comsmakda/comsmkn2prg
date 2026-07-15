@@ -39,9 +39,10 @@ class UserModel extends Model
 
     /**
      * Ambil semua pengurus (jabatan != 'anggota') yang statusnya aktif,
-     * dikelompokkan per key jabatan. Role (admin/anggota) TIDAK difilter —
-     * siapa pun yang jabatannya terisi & statusnya aktif akan tetap muncul,
-     * termasuk Ketua Umum meskipun rolenya sudah 'admin'.
+     * dikelompokkan per key jabatan. Role admin/anggota TIDAK dibedakan,
+     * TAPI admin utama (is_super_admin = 1) sengaja DIKECUALIKAN — akun
+     * super admin adalah akun teknis pengelola sistem, bukan representasi
+     * jabatan organisasi, jadi tidak boleh tampil di struktur publik.
      *
      * @return array<string, array> key = jabatan, value = list user pada jabatan itu
      */
@@ -56,7 +57,9 @@ class UserModel extends Model
         $rows = $this->fetchAll(
             "SELECT nama_lengkap, foto, jabatan, kelas
              FROM users
-             WHERE status = 'aktif' AND jabatan IN ($in)
+             WHERE status = 'aktif'
+               AND is_super_admin = 0
+               AND jabatan IN ($in)
              ORDER BY nama_lengkap ASC",
             $jabatanAktif
         );
