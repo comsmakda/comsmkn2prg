@@ -68,11 +68,11 @@ $router->post('/admin/anggota/:id/delete',              [AdminController::class,
 $router->post('/admin/anggota/:id/reset-password',      [AdminController::class, 'anggotaResetPassword']);
 
 
-//manajemen admin
-$router->get('/admin/kelola-admin',             'AdminController@kelolaAdmin');
-$router->post('/admin/kelola-admin/promote',    'AdminController@kelolaAdminPromote');
-$router->post('/admin/kelola-admin/{id}/demote','AdminController@kelolaAdminDemote');
-$router->post('/admin/berhenti-admin',          'AdminController@berhentiAdmin');
+// Manajemen Admin (Kelola Admin)
+$router->get('/admin/kelola-admin',                     [AdminController::class, 'kelolaAdmin']);
+$router->post('/admin/kelola-admin/promote',            [AdminController::class, 'kelolaAdminPromote']);
+$router->post('/admin/kelola-admin/:id/demote',         [AdminController::class, 'kelolaAdminDemote']);
+$router->post('/admin/berhenti-admin',                  [AdminController::class, 'berhentiAdmin']);
 
 // PAB verifikasi
 $router->get('/admin/pab',                              [AdminController::class, 'pab']);
