@@ -5,6 +5,69 @@ class UserModel extends Model
 {
     protected string $table = 'users';
 
+    /**
+     * Daftar jabatan struktural organisasi (terpisah dari `role` yang
+     * hanya membedakan anggota/admin). Key disimpan di kolom `jabatan`,
+     * value adalah label tampilan.
+     */
+    public const JABATAN_LIST = [
+        'anggota'                   => 'Anggota',
+        'ketua_umum'                => 'Ketua Umum',
+        'wakil_ketua'               => 'Wakil Ketua',
+        'bendahara'                 => 'Bendahara',
+        'wakil_bendahara'           => 'Wakil Bendahara',
+        'sekretaris'                => 'Sekretaris',
+        'wakil_sekretaris'          => 'Wakil Sekretaris',
+        'koordinator_humas'         => 'Koordinator Humas',
+        'koordinator_perlengkapan'  => 'Koordinator Perlengkapan',
+        'koordinator_pdd'           => 'Koordinator PDD',
+        'ketua_bidang_it_software'  => 'Ketua Bidang IT Software',
+        'ketua_bidang_it_network'   => 'Ketua Bidang IT Network',
+        'ketua_bidang_multimedia'   => 'Ketua Bidang Multimedia & Desain Grafis',
+        'ketua_bidang_iot_robotic'  => 'Ketua Bidang IoT & Robotic',
+    ];
+
+    public static function getJabatanList(): array
+    {
+        return self::JABATAN_LIST;
+    }
+
+    public static function jabatanLabel(?string $key): string
+    {
+        return self::JABATAN_LIST[$key] ?? 'Anggota';
+    }
+
+    /**
+     * Ambil semua pengurus (jabatan != 'anggota') yang statusnya aktif,
+     * dikelompokkan per key jabatan. Role (admin/anggota) TIDAK difilter —
+     * siapa pun yang jabatannya terisi & statusnya aktif akan tetap muncul,
+     * termasuk Ketua Umum meskipun rolenya sudah 'admin'.
+     *
+     * @return array<string, array> key = jabatan, value = list user pada jabatan itu
+     */
+    public function getStrukturOrganisasi(): array
+    {
+        $jabatanAktif = array_keys(self::JABATAN_LIST);
+        $jabatanAktif = array_values(array_filter($jabatanAktif, fn($k) => $k !== 'anggota'));
+
+        if (empty($jabatanAktif)) return [];
+
+        $in   = implode(',', array_fill(0, count($jabatanAktif), '?'));
+        $rows = $this->fetchAll(
+            "SELECT nama_lengkap, foto, jabatan, kelas
+             FROM users
+             WHERE status = 'aktif' AND jabatan IN ($in)
+             ORDER BY nama_lengkap ASC",
+            $jabatanAktif
+        );
+
+        $grouped = array_fill_keys($jabatanAktif, []);
+        foreach ($rows as $r) {
+            $grouped[$r['jabatan']][] = $r;
+        }
+        return $grouped;
+    }
+
     public function findByEmail(string $email): array|false
     {
         return $this->fetch(
@@ -24,7 +87,7 @@ class UserModel extends Model
     public function find(int $id): array|false
     {
         return $this->fetch(
-            "SELECT id, nama_lengkap, email, no_hp, foto, role, status, is_super_admin,
+            "SELECT id, nama_lengkap, email, no_hp, foto, role, jabatan, status, is_super_admin,
                     password_hash, nia, kelas, sumber, tahun_daftar, created_at
              FROM users WHERE id = ? LIMIT 1",
             [$id]
@@ -33,10 +96,14 @@ class UserModel extends Model
 
     public function createAnggota(array $d): int
     {
+        $jabatan = array_key_exists($d['jabatan'] ?? null, self::JABATAN_LIST)
+            ? $d['jabatan']
+            : 'anggota';
+
         $this->execute(
             "INSERT INTO users
-               (nama_lengkap, kelas, no_hp, email, password_hash, foto, role, status, sumber, tahun_daftar)
-             VALUES (?, ?, ?, ?, ?, ?, 'anggota', 'pending', ?, ?)",
+               (nama_lengkap, kelas, no_hp, email, password_hash, foto, role, jabatan, status, sumber, tahun_daftar)
+             VALUES (?, ?, ?, ?, ?, ?, 'anggota', ?, 'pending', ?, ?)",
             [
                 $d['nama_lengkap'],
                 $d['kelas'],
@@ -44,6 +111,7 @@ class UserModel extends Model
                 $d['email'] ?? null,
                 $d['password_hash'],
                 $d['foto'] ?? null,
+                $jabatan,
                 $d['sumber'],
                 $d['tahun_daftar'],
             ]
@@ -71,25 +139,30 @@ class UserModel extends Model
     }
 
     /**
-     * Update profil — support anggota (nama, kelas, no_hp, foto)
+     * Update profil — support anggota (nama, kelas, no_hp, foto, jabatan)
      * maupun admin (+ email).
      * Hanya key yang ada di $d yang di-update.
      */
     public function updateProfile(int $id, array $d): void
     {
-        $allowed = ['nama_lengkap', 'kelas', 'no_hp', 'email', 'foto'];
+        $allowed = ['nama_lengkap', 'kelas', 'no_hp', 'email', 'foto', 'jabatan'];
         $fields  = [];
         $params  = [];
 
         foreach ($allowed as $col) {
             if (array_key_exists($col, $d)) {
-                // foto: kalau null gunakan nilai lama (COALESCE)
                 if ($col === 'foto') {
+                    // foto: kalau null gunakan nilai lama (COALESCE)
                     $fields[]  = "foto = COALESCE(?, foto)";
+                    $params[]  = $d[$col];
+                } elseif ($col === 'jabatan') {
+                    // pastikan hanya value valid yang masuk
+                    $fields[]  = "jabatan = ?";
+                    $params[]  = array_key_exists($d['jabatan'], self::JABATAN_LIST) ? $d['jabatan'] : 'anggota';
                 } else {
                     $fields[]  = "{$col} = ?";
+                    $params[]  = $d[$col];
                 }
-                $params[] = $d[$col];
             }
         }
 
@@ -154,6 +227,10 @@ class UserModel extends Model
             $where[]  = "kelas = ?";
             $params[] = $filter['kelas'];
         }
+        if (!empty($filter['jabatan'])) {
+            $where[]  = "jabatan = ?";
+            $params[] = $filter['jabatan'];
+        }
         if (!empty($filter['search'])) {
             $where[]  = "(nama_lengkap LIKE ? OR nia LIKE ?)";
             $params[] = '%' . $filter['search'] . '%';
@@ -184,6 +261,10 @@ class UserModel extends Model
             $where[]  = "sumber = ?";
             $params[] = $filter['sumber'];
         }
+        if (!empty($filter['jabatan'])) {
+            $where[]  = "jabatan = ?";
+            $params[] = $filter['jabatan'];
+        }
         if (!empty($filter['search'])) {
             $where[]  = "(nama_lengkap LIKE ? OR nia LIKE ? OR no_hp LIKE ?)";
             $params[] = '%' . $filter['search'] . '%';
@@ -191,20 +272,21 @@ class UserModel extends Model
             $params[] = '%' . $filter['search'] . '%';
         }
 
-        $sql = "SELECT nia, nama_lengkap, kelas, no_hp, email, sumber, status, tahun_daftar
+        $sql = "SELECT nia, nama_lengkap, kelas, no_hp, email, sumber, jabatan, status, tahun_daftar
                 FROM users WHERE " . implode(' AND ', $where) . " ORDER BY nama_lengkap ASC";
 
         return $this->fetchAll($sql, $params);
     }
 
     /**
-     * Anggota aktif untuk halaman PUBLIK "Daftar Anggota" — hanya
-     * mengembalikan kolom yang aman ditampilkan ke publik (nama, kelas,
-     * foto). TIDAK menyertakan email, no_hp, password_hash, nia, dsb.
+     * Anggota BIASA untuk grid publik "Daftar Anggota" — sengaja difilter
+     * jabatan = 'anggota' (bukan role) supaya pengurus yang sudah tampil
+     * di struktur organisasi tidak dobel muncul di grid bawah. Hanya
+     * mengembalikan kolom yang aman ditampilkan ke publik.
      */
     public function getAnggotaPublik(array $filter = []): array
     {
-        $where  = ["role = 'anggota'", "status = 'aktif'"];
+        $where  = ["status = 'aktif'", "jabatan = 'anggota'"];
         $params = [];
 
         if (!empty($filter['kelas'])) {
@@ -216,7 +298,7 @@ class UserModel extends Model
             $params[] = '%' . $filter['search'] . '%';
         }
 
-        $sql = "SELECT nama_lengkap, kelas, foto
+        $sql = "SELECT nama_lengkap, kelas, foto, jabatan
                 FROM users WHERE " . implode(' AND ', $where) . "
                 ORDER BY kelas ASC, nama_lengkap ASC";
 

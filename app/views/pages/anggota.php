@@ -22,18 +22,16 @@
     isolation: isolate;
   }
   .angp-hero::before {
-    /* background image, blurred + darkened */
     content: '';
     position: absolute; inset: 0;
     background-image: url('<?= BASE_URL ?>/assets/img/gedung-smkn2.webp');
     background-size: cover;
     background-position: center 55%;
     filter: blur(2px) saturate(1.05);
-    transform: scale(1.06); /* avoid blur edge gaps */
+    transform: scale(1.06);
     z-index: -3;
   }
   .angp-hero::after {
-    /* single, even, solid-feeling scrim — no colour banding */
     content: '';
     position: absolute; inset: 0;
     background: linear-gradient(100deg, rgba(6,22,32,.93) 0%, rgba(6,32,42,.87) 45%, rgba(6,32,42,.72) 100%);
@@ -87,57 +85,93 @@
     white-space: nowrap;
   }
   .angp-sec__line { flex: 1; height: 1px; background: linear-gradient(to right, var(--c-border), transparent); }
+  .angp-sec__hint { font-size: .76rem; color: var(--c-muted2); margin-top: -.15rem; }
 
-  /* ─── Pengurus cards (Pembina & Ketua) ─── */
-  .pengurus-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(17.5rem, 1fr));
-    gap: 1rem;
+  /* ─── Struktur Organisasi (org-chart) ─── */
+  .org-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: .5rem 0 1rem;
   }
-  .pengurus-card {
-    display: flex; align-items: center; gap: 1.1rem;
-    background: var(--c-white); border: 1px solid var(--c-border);
-    border-radius: var(--radius-lg); padding: 1.25rem 1.4rem;
-    box-shadow: 0 20px 46px -22px rgba(15,23,42,.12), 0 3px 10px rgba(15,23,42,.04);
-    transition: transform .2s ease, box-shadow .2s ease;
+  .org-tier {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: .85rem;
+    flex-wrap: wrap;
+    padding-top: 2.25rem;
   }
-  .pengurus-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 24px 52px -20px rgba(15,23,42,.16), 0 4px 14px rgba(15,23,42,.06);
+  .org-tier:first-child { padding-top: 0; }
+  .org-tier::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    width: 2px; height: 1.75rem;
+    background: var(--c-border);
+    transform: translateX(-50%);
   }
-  .pengurus-card__photo-wrap {
-    position: relative; flex-shrink: 0; width: 5.25rem; height: 5.25rem;
-    border-radius: 50%; padding: 3px;
-    background: conic-gradient(from 180deg, var(--c-primary), var(--c-primary-lt, #22d3ee), var(--c-primary));
+  .org-tier:first-child::before { display: none; }
+
+  .org-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 9.5rem;
+    background: var(--c-white);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-lg);
+    padding: 1rem .8rem .9rem;
+    box-shadow: 0 16px 34px -20px rgba(15,23,42,.14), 0 3px 8px rgba(15,23,42,.04);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   }
-  .pengurus-card__photo {
+  .org-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px -18px rgba(15,23,42,.18), 0 4px 12px rgba(15,23,42,.06);
+    border-color: rgba(14,116,144,.25);
+  }
+  .org-card--ketua { width: 11.5rem; padding: 1.35rem 1rem 1.15rem; }
+
+  .org-card__photo-wrap {
+    width: 4rem; height: 4rem; margin-bottom: .6rem;
+    border-radius: 50%; padding: 2.5px; flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(14,116,144,.4), rgba(6,182,212,.4));
+  }
+  .org-card--ketua .org-card__photo-wrap {
+    width: 5.5rem; height: 5.5rem; margin-bottom: .75rem;
+    background: conic-gradient(from 180deg, var(--c-primary), #22d3ee, var(--c-primary));
+  }
+  .org-card__photo {
     width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-    display: block; border: 3px solid #fff;
+    display: block; border: 2.5px solid #fff;
   }
-  .pengurus-card__photo-fallback {
+  .org-card__photo-fallback {
     width: 100%; height: 100%; border-radius: 50%;
-    background: rgba(14,116,144,.1); border: 3px solid #fff;
+    background: rgba(14,116,144,.1); border: 2.5px solid #fff;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem; font-weight: 800; color: var(--c-primary); text-transform: uppercase;
+    font-size: 1rem; font-weight: 800; color: var(--c-primary); text-transform: uppercase;
   }
-  .pengurus-card__body { min-width: 0; }
-  .pengurus-card__badge {
-    display: inline-flex; align-items: center; gap: .3rem;
-    font-size: .62rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-    color: var(--c-primary); background: rgba(14,116,144,.08);
-    border: 1px solid rgba(14,116,144,.18); border-radius: .38rem;
-    padding: .15rem .5rem; margin-bottom: .4rem;
+  .org-card--ketua .org-card__photo-fallback { font-size: 1.3rem; }
+
+  .org-card__jabatan {
+    font-size: .64rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--c-primary); margin-bottom: .3rem; line-height: 1.3;
   }
-  .pengurus-card__name {
-    font-size: 1rem; font-weight: 800; color: var(--c-ink); line-height: 1.3;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  .org-card--ketua .org-card__jabatan { font-size: .68rem; }
+  .org-card__name {
+    font-size: .8rem; font-weight: 800; color: var(--c-ink); line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
-  .pengurus-card__jabatan {
-    font-size: .78rem; color: var(--c-muted); margin-top: .15rem;
+  .org-card--ketua .org-card__name { font-size: .96rem; }
+  .org-card__kelas {
+    display: inline-block; margin-top: .35rem;
+    font-size: .64rem; font-weight: 700; color: var(--c-muted2);
   }
-  .pengurus-card__periode {
-    font-size: .7rem; color: var(--c-muted2); margin-top: .2rem; font-weight: 600;
-  }
-  .pengurus-empty {
+
+  .org-empty {
     display: flex; align-items: center; gap: .75rem;
     background: var(--c-white); border: 1px dashed var(--c-border);
     border-radius: var(--radius-lg); padding: 1.25rem 1.4rem;
@@ -195,6 +229,8 @@
     .member-card { padding: 1.1rem .6rem .9rem; }
     .member-card__photo-wrap { width: 4.25rem; height: 4.25rem; margin-bottom: .6rem; }
     .member-card__name { font-size: .8rem; }
+    .org-card { width: 8rem; }
+    .org-card--ketua { width: 9.5rem; }
   }
   @media (max-width: 360px) {
     .member-card__photo-wrap { width: 3.75rem; height: 3.75rem; }
@@ -258,7 +294,7 @@
     <div class="angp__eyebrow">Profil Organisasi</div>
     <h1 class="angp__title">Daftar Anggota</h1>
     <p class="angp__sub">
-      Kenali pembina, ketua, serta seluruh anggota aktif Community Programmer
+      Kenali struktur kepengurusan serta seluruh anggota aktif Community Programmer
       (COM) SMKN 2 Pinrang.
     </p>
   </div>
@@ -266,70 +302,72 @@
 
 <div class="angp">
 
-  <!-- ── Pembina & Ketua Terkini ── -->
+  <!-- ── Struktur Organisasi ── -->
   <div class="angp-sec">
     <div class="angp-sec__row">
-      <span class="angp-sec__title">Pembina &amp; Ketua Terkini</span>
+      <span class="angp-sec__title">Struktur Organisasi</span>
       <div class="angp-sec__line"></div>
     </div>
+    <p class="angp-sec__hint">Susunan pengurus aktif berdasarkan jabatan yang sedang menjabat.</p>
   </div>
 
-  <?php if (!$pembina && !$ketua): ?>
-    <div class="pengurus-empty">
+  <?php
+    // Jenjang tampilan struktur (dari puncak ke bawah).
+    // Setiap tier bisa berisi lebih dari satu key jabatan yang tampil sebaris.
+    $orgTiers = [
+      ['ketua_umum'],
+      ['wakil_ketua'],
+      ['bendahara', 'wakil_bendahara', 'sekretaris', 'wakil_sekretaris'],
+      ['koordinator_humas', 'koordinator_perlengkapan', 'koordinator_pdd'],
+      ['ketua_bidang_it_software', 'ketua_bidang_it_network', 'ketua_bidang_multimedia', 'ketua_bidang_iot_robotic'],
+    ];
+
+    $adaPengurus = false;
+    foreach ($struktur as $jab => $orang) {
+      if (!empty($orang)) { $adaPengurus = true; break; }
+    }
+  ?>
+
+  <?php if (!$adaPengurus): ?>
+    <div class="org-empty">
       <i class="ti ti-info-circle" style="font-size:1.2rem;"></i>
-      <span>Data pembina/ketua belum tersedia.</span>
+      <span>Struktur pengurus belum tersedia.</span>
     </div>
   <?php else: ?>
-    <div class="pengurus-grid">
-
-      <?php if ($pembina): ?>
-      <div class="pengurus-card">
-        <div class="pengurus-card__photo-wrap">
-          <?php if (!empty($pembina['foto'])): ?>
-            <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($pembina['foto']) ?>"
-                 class="pengurus-card__photo"
-                 alt="Foto <?= htmlspecialchars($pembina['nama']) ?>">
-          <?php else: ?>
-            <div class="pengurus-card__photo-fallback" aria-hidden="true">
-              <?= htmlspecialchars(mb_strtoupper(mb_substr($pembina['nama'] ?? '?', 0, 2))) ?>
+    <div class="org-chart">
+      <?php foreach ($orgTiers as $tierIndex => $tierKeys): ?>
+        <?php
+          $tierPeople = [];
+          foreach ($tierKeys as $jk) {
+            foreach (($struktur[$jk] ?? []) as $orang) {
+              $tierPeople[] = ['jabatan' => $jk, 'data' => $orang];
+            }
+          }
+          if (empty($tierPeople)) continue; // lompati tier yang belum ada orangnya
+        ?>
+        <div class="org-tier">
+          <?php foreach ($tierPeople as $entry): $o = $entry['data']; ?>
+            <div class="org-card <?= $tierIndex === 0 ? 'org-card--ketua' : '' ?>">
+              <div class="org-card__photo-wrap">
+                <?php if (!empty($o['foto'])): ?>
+                  <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($o['foto']) ?>"
+                       class="org-card__photo"
+                       alt="Foto <?= htmlspecialchars($o['nama_lengkap']) ?>">
+                <?php else: ?>
+                  <div class="org-card__photo-fallback" aria-hidden="true">
+                    <?= htmlspecialchars(mb_strtoupper(mb_substr($o['nama_lengkap'], 0, 2))) ?>
+                  </div>
+                <?php endif; ?>
+              </div>
+              <span class="org-card__jabatan"><?= htmlspecialchars($jabatanLabel[$entry['jabatan']] ?? '') ?></span>
+              <p class="org-card__name"><?= htmlspecialchars($o['nama_lengkap']) ?></p>
+              <?php if (!empty($o['kelas'])): ?>
+                <span class="org-card__kelas"><?= htmlspecialchars($o['kelas']) ?></span>
+              <?php endif; ?>
             </div>
-          <?php endif; ?>
+          <?php endforeach; ?>
         </div>
-        <div class="pengurus-card__body">
-          <span class="pengurus-card__badge"><i class="ti ti-shield-star" style="font-size:.85em;"></i> Pembina</span>
-          <p class="pengurus-card__name"><?= htmlspecialchars($pembina['nama'] ?? '—') ?></p>
-          <p class="pengurus-card__jabatan"><?= htmlspecialchars($pembina['jabatan'] ?? '') ?></p>
-          <?php if (!empty($pembina['periode'])): ?>
-            <p class="pengurus-card__periode">Periode <?= htmlspecialchars($pembina['periode']) ?></p>
-          <?php endif; ?>
-        </div>
-      </div>
-      <?php endif; ?>
-
-      <?php if ($ketua): ?>
-      <div class="pengurus-card">
-        <div class="pengurus-card__photo-wrap">
-          <?php if (!empty($ketua['foto'])): ?>
-            <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($ketua['foto']) ?>"
-                 class="pengurus-card__photo"
-                 alt="Foto <?= htmlspecialchars($ketua['nama']) ?>">
-          <?php else: ?>
-            <div class="pengurus-card__photo-fallback" aria-hidden="true">
-              <?= htmlspecialchars(mb_strtoupper(mb_substr($ketua['nama'] ?? '?', 0, 2))) ?>
-            </div>
-          <?php endif; ?>
-        </div>
-        <div class="pengurus-card__body">
-          <span class="pengurus-card__badge"><i class="ti ti-crown" style="font-size:.85em;"></i> Ketua</span>
-          <p class="pengurus-card__name"><?= htmlspecialchars($ketua['nama'] ?? '—') ?></p>
-          <p class="pengurus-card__jabatan"><?= htmlspecialchars($ketua['jabatan'] ?? '') ?></p>
-          <?php if (!empty($ketua['periode'])): ?>
-            <p class="pengurus-card__periode">Periode <?= htmlspecialchars($ketua['periode']) ?></p>
-          <?php endif; ?>
-        </div>
-      </div>
-      <?php endif; ?>
-
+      <?php endforeach; ?>
     </div>
   <?php endif; ?>
 

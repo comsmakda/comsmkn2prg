@@ -243,6 +243,21 @@
 }
 .t-input-ico i { font-size: 15px; }
 
+/* select punya panah kustom di kanan, jadi icon-nya digeser */
+.t-input-wrap--select .t-input { appearance: none; -webkit-appearance: none; padding-right: 36px; }
+.t-input-wrap--select::after {
+  content: '';
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-65%);
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid var(--tx-muted);
+  pointer-events: none;
+}
+
 /* Password toggle — punya 2 elemen kanan, jadi geser icon kunci ke kiri */
 .t-input-wrap--pwd .t-input { padding-left: 14px; padding-right: 38px; }
 .t-pwd-toggle {
@@ -637,6 +652,21 @@
                   </span>
                 </div>
               </div>
+            </div>
+
+            <!-- Jabatan -->
+            <div class="t-field">
+              <label class="t-field__lbl" for="f-jabatan">Jabatan</label>
+              <div class="t-input-wrap t-input-wrap--select">
+                <select id="f-jabatan" name="jabatan" class="t-input">
+                  <?php foreach (UserModel::JABATAN_LIST as $jKey => $jLabel): ?>
+                    <option value="<?= htmlspecialchars($jKey) ?>" <?= $jKey === 'anggota' ? 'selected' : '' ?>>
+                      <?= htmlspecialchars($jLabel) ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+              <span class="t-field__hint">Default: Anggota. Bisa diubah kapan saja lewat halaman edit.</span>
             </div>
           </div>
 

@@ -95,6 +95,28 @@
 }
 .imp-col-chip--opt { color: var(--tx-muted); font-weight: 600; }
 
+/* ── Daftar key jabatan valid (referensi cepat) ── */
+.imp-jabatan-box {
+  background: var(--bg-elevated);
+  border: 1px solid var(--bd-subtle);
+  border-radius: var(--r-lg);
+  padding: 12px 14px;
+  margin-bottom: 18px;
+}
+.imp-jabatan-box__label { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--tx-muted); margin-bottom: 8px; }
+.imp-jabatan-list {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  max-height: 130px; overflow-y: auto;
+}
+.imp-jabatan-chip {
+  font-size: 10.5px; font-weight: 600; padding: 4px 9px;
+  border-radius: var(--r-sm); background: var(--bg-surface); border: 1px solid var(--bd-subtle);
+  color: var(--tx-secondary); white-space: nowrap;
+}
+.imp-jabatan-chip code {
+  font-family: monospace; font-weight: 700; color: var(--ac); margin-right: 4px;
+}
+
 .imp-notice {
   display: flex; gap: 10px; padding: 12px 14px;
   background: var(--amber-d); border: 1px solid rgba(217,145,12,.25);
@@ -224,6 +246,16 @@
           <span class="imp-col-chip">3. No HP</span>
           <span class="imp-col-chip imp-col-chip--opt">4. Email (opsional)</span>
           <span class="imp-col-chip imp-col-chip--opt">5. Tahun Daftar (opsional)</span>
+          <span class="imp-col-chip imp-col-chip--opt">6. Jabatan (opsional)</span>
+        </div>
+      </div>
+
+      <div class="imp-jabatan-box">
+        <div class="imp-jabatan-box__label">Key Jabatan yang Valid (kolom 6)</div>
+        <div class="imp-jabatan-list">
+          <?php foreach ($jabatanList as $key => $label): ?>
+            <span class="imp-jabatan-chip"><code><?= htmlspecialchars($key) ?></code><?= htmlspecialchars($label) ?></span>
+          <?php endforeach; ?>
         </div>
       </div>
 
@@ -233,8 +265,10 @@
           <strong>Password tidak diimpor.</strong> Semua anggota baru dari import akan
           diberi password default <strong>comsmakda</strong>. NIA digenerate otomatis
           mengikuti kolom <strong>Tahun Daftar</strong> di tiap baris — kosongkan kolom itu
-          kalau mau pakai tahun berjalan. Baris dengan email/No HP yang sudah terdaftar
-          akan otomatis dilewati.
+          kalau mau pakai tahun berjalan. Kolom <strong>Jabatan</strong> juga opsional —
+          isi dengan salah satu key di atas (misalnya <code>bendahara</code>), atau kosongkan
+          untuk otomatis jadi <strong>Anggota</strong>. Baris dengan email/No HP yang sudah
+          terdaftar akan otomatis dilewati.
         </div>
       </div>
 

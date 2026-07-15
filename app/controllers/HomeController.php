@@ -48,12 +48,14 @@ class HomeController extends Controller
     }
 
     // ================================================================
-    //  DAFTAR ANGGOTA (PUBLIK)
+    //  DAFTAR ANGGOTA / STRUKTUR ORGANISASI (PUBLIK)
     // ================================================================
     /**
-     * Halaman publik yang menampilkan seluruh anggota aktif (nama, kelas,
-     * foto), plus kartu Pembina & Ketua yang sedang menjabat (diambil dari
-     * RiwayatPengurusModel). Bisa difilter lewat query string ?kelas=&search=.
+     * Halaman publik yang menampilkan struktur organisasi berjenjang
+     * (ditarik langsung dari kolom `jabatan`, TIDAK peduli role admin
+     * atau anggota — Ketua Umum tetap tampil walau sudah dipromosikan
+     * jadi admin) beserta grid anggota biasa di bagian bawah.
+     * Bisa difilter lewat query string ?kelas=&search=.
      */
     public function anggota(): void
     {
@@ -64,71 +66,18 @@ class HomeController extends Controller
             'search' => $_GET['search'] ?? '',
         ];
 
-        $list      = $um->getAnggotaPublik($filter);
-        $kelasList = $um->getKelasList();
-
-        [$ketua, $pembina] = $this->_getPengurusAktif();
+        $struktur     = $um->getStrukturOrganisasi();
+        $list         = $um->getAnggotaPublik($filter);
+        $kelasList    = $um->getKelasList();
+        $jabatanLabel = UserModel::JABATAN_LIST;
 
         $settings = (new SettingModel())->getAll();
         $flash    = $this->getFlash();
 
         $this->view(
             'pages/anggota',
-            compact('list', 'kelasList', 'filter', 'ketua', 'pembina', 'settings', 'flash'),
+            compact('struktur', 'list', 'kelasList', 'filter', 'jabatanLabel', 'settings', 'flash'),
             'main'
         );
-    }
-
-    /**
-     * Ambil Ketua & Pembina yang sedang menjabat saat ini dari
-     * RiwayatPengurusModel. Dibuat defensif (try/catch + class_exists)
-     * supaya halaman anggota tidak error kalau model/tabel belum siap.
-     *
-     * Prioritas: entri dengan tahun_sampai KOSONG (masih menjabat).
-     * Fallback: entri pertama per tipe dari getAll() (asumsi sudah
-     * diurutkan dari yang terbaru).
-     *
-     * @return array{0: array|null, 1: array|null} [$ketua, $pembina]
-     */
-    private function _getPengurusAktif(): array
-    {
-        $ketua   = null;
-        $pembina = null;
-
-        if (!class_exists('RiwayatPengurusModel')) {
-            return [$ketua, $pembina];
-        }
-
-        try {
-            $riwayat = (new RiwayatPengurusModel())->getAll();
-            $riwayat = is_array($riwayat) ? $riwayat : [];
-
-            // Prioritas: yang tahun_sampai-nya kosong (masih menjabat)
-            foreach ($riwayat as $r) {
-                $tipe = $r['tipe'] ?? '';
-                if ($tipe === 'ketua' && $ketua === null && empty($r['tahun_sampai'])) {
-                    $ketua = $r;
-                }
-                if ($tipe === 'pembina' && $pembina === null && empty($r['tahun_sampai'])) {
-                    $pembina = $r;
-                }
-            }
-
-            // Fallback: ambil entri pertama per tipe kalau tidak ada yang "aktif"
-            if (!$ketua) {
-                foreach ($riwayat as $r) {
-                    if (($r['tipe'] ?? '') === 'ketua') { $ketua = $r; break; }
-                }
-            }
-            if (!$pembina) {
-                foreach ($riwayat as $r) {
-                    if (($r['tipe'] ?? '') === 'pembina') { $pembina = $r; break; }
-                }
-            }
-        } catch (\Throwable $e) {
-            error_log('Gagal mengambil data pengurus untuk halaman anggota: ' . $e->getMessage());
-        }
-
-        return [$ketua, $pembina];
     }
 }

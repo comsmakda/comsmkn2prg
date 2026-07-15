@@ -612,6 +612,25 @@
 .src-chip--pab    { background: var(--blue-d);   color: var(--blue);   border: 1px solid rgba(14,116,144,0.22); }
 .src-chip--manual { background: var(--purple-d); color: var(--purple); border: 1px solid rgba(11,90,112,0.22); }
 
+/* Jabatan chip */
+.jbt-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--r-xs);
+  background: var(--bg-overlay);
+  color: var(--tx-secondary);
+  border: 1px solid var(--bd-subtle);
+  white-space: nowrap;
+}
+.jbt-chip--pengurus {
+  background: var(--ac-dim);
+  color: var(--ac);
+  border-color: rgba(14,116,144,0.22);
+}
+
 /* Status chip */
 .status-chip {
   display: inline-flex;
@@ -828,8 +847,8 @@
 }
 @media (max-width: 480px) {
   .stats-strip { grid-template-columns: 1fr 1fr; }
-  .mtbl th:nth-child(6),
-  .mtbl td:nth-child(6) { display: none; }
+  .mtbl th:nth-child(7),
+  .mtbl td:nth-child(7) { display: none; }
 }
 </style>
 
@@ -851,9 +870,10 @@
 
     <?php
       $exportQuery = http_build_query(array_filter([
-        'search' => $filter['search'] ?? '',
-        'kelas'  => $filter['kelas']  ?? '',
-        'sumber' => $filter['sumber'] ?? '',
+        'search'  => $filter['search']  ?? '',
+        'kelas'   => $filter['kelas']   ?? '',
+        'sumber'  => $filter['sumber']  ?? '',
+        'jabatan' => $filter['jabatan'] ?? '',
       ]));
     ?>
     <div class="export-dropdown" id="export-dropdown">
@@ -1016,12 +1036,26 @@
     </select>
   </div>
 
+  <!-- Jabatan -->
+  <div class="fi fi--select">
+    <span class="fi__icon"><i class="ti ti-id-badge-2" aria-hidden="true"></i></span>
+    <select name="jabatan">
+      <option value="">Semua Jabatan</option>
+      <?php foreach (UserModel::JABATAN_LIST as $jKey => $jLabel): ?>
+        <option value="<?= htmlspecialchars($jKey) ?>"
+                <?= ($filter['jabatan'] ?? '') === $jKey ? 'selected' : '' ?>>
+          <?= htmlspecialchars($jLabel) ?>
+        </option>
+      <?php endforeach; ?>
+    </select>
+  </div>
+
   <button type="submit" class="filter-btn">
     <i class="ti ti-filter" aria-hidden="true"></i>
     Filter
   </button>
 
-  <?php if (!empty($filter['search']) || !empty($filter['kelas']) || !empty($filter['sumber'])): ?>
+  <?php if (!empty($filter['search']) || !empty($filter['kelas']) || !empty($filter['sumber']) || !empty($filter['jabatan'])): ?>
     <a href="<?= BASE_URL ?>/admin/anggota" class="filter-reset">✕ Reset</a>
   <?php endif; ?>
 </form>
@@ -1045,6 +1079,7 @@
           <th>Nama Lengkap</th>
           <th style="width:100px;">No HP</th>
           <th style="width:90px;">Sumber</th>
+          <th style="width:170px;">Jabatan</th>
           <th style="width:80px;">Status</th>
           <th style="width:50px;">Foto</th>
           <th style="width:160px;">Aksi</th>
@@ -1053,7 +1088,7 @@
       <tbody>
         <?php if (empty($list)): ?>
         <tr>
-          <td colspan="7">
+          <td colspan="8">
             <div class="tbl-empty">
               <i class="ti ti-users-group tbl-empty__ico" aria-hidden="true"></i>
               <div class="tbl-empty__title">Tidak ada anggota ditemukan</div>
@@ -1091,6 +1126,14 @@
             <?php else: ?>
               <span class="src-chip src-chip--manual">Manual</span>
             <?php endif; ?>
+          </td>
+
+          <!-- Jabatan -->
+          <td>
+            <?php $jKeyRow = $m['jabatan'] ?? 'anggota'; ?>
+            <span class="jbt-chip <?= $jKeyRow !== 'anggota' ? 'jbt-chip--pengurus' : '' ?>">
+              <?= htmlspecialchars(UserModel::jabatanLabel($jKeyRow)) ?>
+            </span>
           </td>
 
           <!-- Status -->
@@ -1158,6 +1201,14 @@
 
   <!-- Pagination -->
   <?php if (!empty($pagination) && $pagination['total_pages'] > 1): ?>
+  <?php
+    $pagiFilterQuery = http_build_query(array_filter([
+      'search'  => $filter['search']  ?? '',
+      'kelas'   => $filter['kelas']   ?? '',
+      'sumber'  => $filter['sumber']  ?? '',
+      'jabatan' => $filter['jabatan'] ?? '',
+    ]));
+  ?>
   <div class="pagination">
     <span class="pagi-info">
       Halaman <strong><?= $pagination['current_page'] ?></strong>
@@ -1167,14 +1218,14 @@
     <div class="pagi-pages">
       <!-- Prev -->
       <?php $hasPrev = $pagination['current_page'] > 1; ?>
-      <a href="<?= $hasPrev ? BASE_URL . '/admin/anggota?page=' . ($pagination['current_page'] - 1) . '&' . http_build_query(array_filter(['search'=>$filter['search']??'','kelas'=>$filter['kelas']??'','sumber'=>$filter['sumber']??''])) : '#' ?>"
+      <a href="<?= $hasPrev ? BASE_URL . '/admin/anggota?page=' . ($pagination['current_page'] - 1) . '&' . $pagiFilterQuery : '#' ?>"
          class="pagi-btn <?= !$hasPrev ? 'pagi-btn--disabled' : '' ?>">
         <i class="ti ti-chevron-left" aria-hidden="true"></i>
       </a>
 
       <?php for ($pg = 1; $pg <= $pagination['total_pages']; $pg++): ?>
         <?php if ($pg === 1 || $pg === $pagination['total_pages'] || abs($pg - $pagination['current_page']) <= 1): ?>
-          <a href="<?= BASE_URL ?>/admin/anggota?page=<?= $pg ?>&<?= http_build_query(array_filter(['search'=>$filter['search']??'','kelas'=>$filter['kelas']??'','sumber'=>$filter['sumber']??''])) ?>"
+          <a href="<?= BASE_URL ?>/admin/anggota?page=<?= $pg ?>&<?= $pagiFilterQuery ?>"
              class="pagi-btn <?= $pg === $pagination['current_page'] ? 'pagi-btn--active' : '' ?>">
             <?= $pg ?>
           </a>
@@ -1185,7 +1236,7 @@
 
       <!-- Next -->
       <?php $hasNext = $pagination['current_page'] < $pagination['total_pages']; ?>
-      <a href="<?= $hasNext ? BASE_URL . '/admin/anggota?page=' . ($pagination['current_page'] + 1) . '&' . http_build_query(array_filter(['search'=>$filter['search']??'','kelas'=>$filter['kelas']??'','sumber'=>$filter['sumber']??''])) : '#' ?>"
+      <a href="<?= $hasNext ? BASE_URL . '/admin/anggota?page=' . ($pagination['current_page'] + 1) . '&' . $pagiFilterQuery : '#' ?>"
          class="pagi-btn <?= !$hasNext ? 'pagi-btn--disabled' : '' ?>">
         <i class="ti ti-chevron-right" aria-hidden="true"></i>
       </a>

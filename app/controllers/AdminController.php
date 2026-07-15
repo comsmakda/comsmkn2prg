@@ -60,7 +60,11 @@ class AdminController extends Controller
     public function anggotaCreate(): void
     {
         $this->requireAdmin();
-        $this->view('admin/anggota_form', ['flash' => $this->getFlash(), 'csrf' => $this->csrfToken()], 'admin');
+        $this->view('admin/anggota_form', [
+            'flash'       => $this->getFlash(),
+            'csrf'        => $this->csrfToken(),
+            'jabatanList' => UserModel::JABATAN_LIST,
+        ], 'admin');
     }
 
     public function anggotaStore(): void
@@ -74,6 +78,9 @@ class AdminController extends Controller
         $email    = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL) ?: null;
         $password = $_POST['password'] ?? '';
         $langsung = isset($_POST['aktivasi_langsung']);
+        $jabatan  = array_key_exists($_POST['jabatan'] ?? '', UserModel::JABATAN_LIST)
+            ? $_POST['jabatan']
+            : 'anggota';
 
         $errors = [];
         if (strlen($nama) < 3)     $errors[] = 'Nama minimal 3 karakter.';
@@ -102,6 +109,7 @@ class AdminController extends Controller
             'email'         => $email,
             'password_hash' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]),
             'foto'          => $foto,
+            'jabatan'       => $jabatan,
             'sumber'        => 'manual',
             'tahun_daftar'  => date('Y'),
         ]);
@@ -135,7 +143,12 @@ class AdminController extends Controller
             $this->flash('error', 'Data tidak ditemukan.');
             $this->redirect('/admin/anggota');
         }
-        $this->view('admin/anggota_edit', ['anggota' => $anggota, 'flash' => $this->getFlash(), 'csrf' => $this->csrfToken()], 'admin');
+        $this->view('admin/anggota_edit', [
+            'anggota'     => $anggota,
+            'flash'       => $this->getFlash(),
+            'csrf'        => $this->csrfToken(),
+            'jabatanList' => UserModel::JABATAN_LIST,
+        ], 'admin');
     }
 
     public function anggotaUpdate(string $id): void
@@ -146,6 +159,9 @@ class AdminController extends Controller
             'nama_lengkap' => htmlspecialchars(trim($_POST['nama_lengkap'] ?? ''), ENT_QUOTES),
             'kelas'        => htmlspecialchars(trim($_POST['kelas'] ?? ''), ENT_QUOTES),
             'no_hp'        => preg_replace('/\D/', '', $_POST['no_hp'] ?? ''),
+            'jabatan'      => array_key_exists($_POST['jabatan'] ?? '', UserModel::JABATAN_LIST)
+                                ? $_POST['jabatan']
+                                : 'anggota',
             'foto'         => null,
         ];
         if (!empty($_FILES['foto']['name'])) {
@@ -1501,15 +1517,17 @@ class AdminController extends Controller
         $importErrors = $_SESSION['import_errors'] ?? [];
         unset($_SESSION['import_errors']);
 
-        $this->view('admin/anggota_import', compact('flash', 'csrf', 'importErrors'), 'admin');
+        $jabatanList = UserModel::JABATAN_LIST;
+
+        $this->view('admin/anggota_import', compact('flash', 'csrf', 'importErrors', 'jabatanList'), 'admin');
     }
 
     public function anggotaImportTemplate(): void
     {
         $this->requireAdmin();
 
-        $headers = ['Nama Lengkap', 'Kelas', 'No HP', 'Email', 'Tahun Daftar'];
-        $example = ['Contoh Nama Siswa', 'XII RPL 1', '081234567890', 'contoh@email.com', date('Y')];
+        $headers = ['Nama Lengkap', 'Kelas', 'No HP', 'Email', 'Tahun Daftar', 'Jabatan'];
+        $example = ['Contoh Nama Siswa', 'XII RPL 1', '081234567890', 'contoh@email.com', date('Y'), 'anggota'];
 
         header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="template_import_anggota.csv"');
@@ -1592,6 +1610,9 @@ class AdminController extends Controller
                 ? (int)$tahunRaw
                 : (int)date('Y');
 
+            $jabatanRaw = trim((string)($row[5] ?? ''));
+            $jabatan    = array_key_exists($jabatanRaw, UserModel::JABATAN_LIST) ? $jabatanRaw : 'anggota';
+
             if ($nama === '' && $kelas === '' && $noHp === '' && !$email) {
                 continue;
             }
@@ -1615,6 +1636,7 @@ class AdminController extends Controller
                 'email'         => $email,
                 'password_hash' => $defaultPasswordHash,
                 'foto'          => null,
+                'jabatan'       => $jabatan,
                 'sumber'        => 'manual',
                 'tahun_daftar'  => $tahun,
             ]);

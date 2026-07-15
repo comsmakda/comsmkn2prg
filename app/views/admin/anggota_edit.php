@@ -260,6 +260,21 @@
 }
 .finput-ico i { font-size: 15px; }
 
+/* select punya panah kustom di kanan */
+.finput-wrap--select .finput { appearance: none; -webkit-appearance: none; padding-right: 36px; }
+.finput-wrap--select::after {
+  content: '';
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-65%);
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid var(--tx-muted);
+  pointer-events: none;
+}
+
 /* ── Footer / actions (form kiri) ── */
 .edit-panel__foot {
   padding: 15px 20px;
@@ -653,6 +668,21 @@
                     <i class="ti ti-phone" aria-hidden="true"></i>
                   </span>
                 </div>
+              </div>
+            </div>
+
+            <!-- Jabatan -->
+            <div class="field">
+              <label class="field__label" for="f-jabatan">Jabatan</label>
+              <div class="finput-wrap finput-wrap--select">
+                <select id="f-jabatan" name="jabatan" class="finput">
+                  <?php $currentJabatan = $anggota['jabatan'] ?? 'anggota'; ?>
+                  <?php foreach (UserModel::JABATAN_LIST as $jKey => $jLabel): ?>
+                    <option value="<?= htmlspecialchars($jKey) ?>" <?= $currentJabatan === $jKey ? 'selected' : '' ?>>
+                      <?= htmlspecialchars($jLabel) ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
               </div>
             </div>
           </div>
