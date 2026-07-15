@@ -24,7 +24,7 @@ class UserModel extends Model
     public function find(int $id): array|false
     {
         return $this->fetch(
-            "SELECT id, nama_lengkap, email, no_hp, foto, role, status,
+            "SELECT id, nama_lengkap, email, no_hp, foto, role, status, is_super_admin,
                     password_hash, nia, kelas, sumber, tahun_daftar, created_at
              FROM users WHERE id = ? LIMIT 1",
             [$id]
@@ -258,6 +258,72 @@ class UserModel extends Model
     {
         return $this->fetchAll(
             "SELECT * FROM users WHERE role='anggota' AND status='pending' AND sumber='manual' ORDER BY created_at DESC"
+        );
+    }
+
+    // ================================================================
+    //  KELOLA ADMIN (promosi/demosi, khusus dipanggil oleh admin utama)
+    // ================================================================
+
+    /**
+     * Anggota aktif yang bisa dipromosikan jadi admin.
+     */
+    public function getEligibleForAdmin(): array
+    {
+        return $this->fetchAll(
+            "SELECT id, nama_lengkap, email, kelas, nia
+             FROM users
+             WHERE role = 'anggota' AND status = 'aktif'
+             ORDER BY nama_lengkap ASC"
+        );
+    }
+
+    /**
+     * Daftar admin. Secara default admin utama (is_super_admin = 1)
+     * disembunyikan dari daftar ini.
+     */
+    public function getAdminList(bool $hideSuperAdmin = true): array
+    {
+        $sql = "SELECT id, nama_lengkap, email, nia, is_super_admin, created_at
+                FROM users WHERE role = 'admin'";
+        if ($hideSuperAdmin) {
+            $sql .= " AND is_super_admin = 0";
+        }
+        $sql .= " ORDER BY nama_lengkap ASC";
+
+        return $this->fetchAll($sql);
+    }
+
+    public function isSuperAdmin(int $id): bool
+    {
+        $row = $this->fetch(
+            "SELECT is_super_admin FROM users WHERE id = ? LIMIT 1",
+            [$id]
+        );
+        return $row ? (bool)$row['is_super_admin'] : false;
+    }
+
+    /**
+     * Naikkan anggota (role='anggota') menjadi admin biasa (is_super_admin tetap 0).
+     */
+    public function promoteToAdmin(int $id): bool
+    {
+        return (bool) $this->execute(
+            "UPDATE users SET role = 'admin' WHERE id = ? AND role = 'anggota'",
+            [$id]
+        );
+    }
+
+    /**
+     * Turunkan admin biasa kembali jadi anggota.
+     * is_super_admin = 0 di WHERE = pengaman, admin utama tidak bisa
+     * ke-demote lewat method ini walau id-nya "salah" dipanggil.
+     */
+    public function demoteToAnggota(int $id): bool
+    {
+        return (bool) $this->execute(
+            "UPDATE users SET role = 'anggota' WHERE id = ? AND role = 'admin' AND is_super_admin = 0",
+            [$id]
         );
     }
 

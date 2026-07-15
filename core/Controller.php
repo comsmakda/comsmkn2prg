@@ -61,6 +61,26 @@ class Controller
         }
     }
 
+    /**
+     * Khusus admin utama (is_super_admin = 1). Dipakai untuk fitur
+     * "Kelola Admin" yang tidak boleh diketahui admin biasa.
+     *
+     * Sengaja pakai flash + redirect ke dashboard (bukan halaman 403),
+     * supaya kalau admin biasa iseng menebak URL-nya, dia tidak mendapat
+     * sinyal "kamu ditolak akses ke fitur khusus ini" — cuma diarahkan
+     * balik ke dashboard seperti biasa.
+     */
+    protected function requireSuperAdmin(): void
+    {
+        $this->requireAdmin();
+        $id = (int)($_SESSION['user_id'] ?? 0);
+
+        if (!(new UserModel())->isSuperAdmin($id)) {
+            $this->flash('error', 'Fitur ini khusus admin utama.');
+            $this->redirect('/admin/dashboard');
+        }
+    }
+
     // ── Flash messages ───────────────────────────────────────────────────
     protected function flash(string $type, string $msg): void
     {

@@ -612,10 +612,18 @@
       <h1 class="ph__title">Edit Profil Admin</h1>
       <p class="ph__sub">Kelola informasi akun dan keamanan login administrator.</p>
     </div>
-    <a href="<?= BASE_URL ?>/admin/dashboard" class="btn-sec" style="align-self:flex-start;margin-top:4px;">
-      <i class="ti ti-arrow-left" aria-hidden="true"></i>
-      Dashboard
-    </a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-self:flex-start;margin-top:4px;">
+      <?php if (!empty($isSuperAdmin)): ?>
+      <a href="<?= BASE_URL ?>/admin/kelola-admin" class="btn-sec">
+        <i class="ti ti-shield-cog" aria-hidden="true"></i>
+        Kelola Admin
+      </a>
+      <?php endif; ?>
+      <a href="<?= BASE_URL ?>/admin/dashboard" class="btn-sec">
+        <i class="ti ti-arrow-left" aria-hidden="true"></i>
+        Dashboard
+      </a>
+    </div>
   </div>
 
   <!-- Grid Layout -->
@@ -857,6 +865,23 @@
             Logout Semua Sesi
           </button>
         </div>
+        <?php if (empty($isSuperAdmin)): ?>
+        <div class="danger-zone__body" style="border-top:1px solid rgba(185,28,28,.12);">
+          <div class="danger-zone__desc">
+            <strong>Berhenti sebagai admin.</strong><br>
+            Kamu akan diturunkan menjadi anggota biasa dan otomatis logout.
+          </div>
+          <form method="POST" action="<?= BASE_URL ?>/admin/berhenti-admin"
+                onsubmit="return confirm('Yakin ingin berhenti sebagai admin? Kamu akan logout dan jadi anggota biasa.');"
+                style="margin:0;">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
+            <button type="submit" class="btn-danger">
+              <i class="ti ti-shield-off" aria-hidden="true"></i>
+              Berhenti Jadi Admin
+            </button>
+          </form>
+        </div>
+        <?php endif; ?>
       </div>
 
     </div><!-- /right col -->

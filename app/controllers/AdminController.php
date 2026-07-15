@@ -705,14 +705,16 @@ class AdminController extends Controller
     public function profil(): void
     {
         $this->requireAdmin();
-        $admin = (new UserModel())->find((int)$_SESSION['user_id']);
+        $um    = new UserModel();
+        $admin = $um->find((int)$_SESSION['user_id']);
         if (!$admin) {
             $this->flash('error', 'Data admin tidak ditemukan.');
             $this->redirect('/admin/dashboard');
         }
+        $isSuperAdmin = (bool)($admin['is_super_admin'] ?? false);
         $flash = $this->getFlash();
         $csrf  = $this->csrfToken();
-        $this->view('admin/profil', compact('admin', 'flash', 'csrf'), 'admin');
+        $this->view('admin/profil', compact('admin', 'flash', 'csrf', 'isSuperAdmin'), 'admin');
     }
 
     public function profilSimpan(): void
@@ -803,6 +805,76 @@ class AdminController extends Controller
         $id = (int)$_SESSION['user_id'];
         (new UserModel())->invalidateAllSessions($id);
 
+        session_destroy();
+        $this->redirect('/login');
+    }
+
+    // ================================================================
+    //  KELOLA ADMIN (khusus admin utama)
+    // ================================================================
+    public function kelolaAdmin(): void
+    {
+        $this->requireSuperAdmin();
+        $um        = new UserModel();
+        $adminList = $um->getAdminList(true); // admin utama disembunyikan dari daftar ini juga
+        $eligible  = $um->getEligibleForAdmin();
+        $flash     = $this->getFlash();
+        $csrf      = $this->csrfToken();
+        $this->view('admin/kelola_admin', compact('adminList', 'eligible', 'flash', 'csrf'), 'admin');
+    }
+
+    public function kelolaAdminPromote(): void
+    {
+        $this->requireSuperAdmin();
+        $this->verifyCsrf();
+
+        $id = (int)($_POST['user_id'] ?? 0);
+        $um = new UserModel();
+        $target = $um->find($id);
+
+        if (!$target || $target['role'] !== 'anggota' || $target['status'] !== 'aktif') {
+            $this->flash('error', 'Anggota tidak valid untuk dijadikan admin.');
+            $this->redirect('/admin/kelola-admin');
+        }
+
+        $um->promoteToAdmin($id);
+        $this->flash('success', htmlspecialchars($target['nama_lengkap']) . ' berhasil dijadikan admin.');
+        $this->redirect('/admin/kelola-admin');
+    }
+
+    public function kelolaAdminDemote(string $id): void
+    {
+        $this->requireSuperAdmin();
+        $this->verifyCsrf();
+
+        $um     = new UserModel();
+        $target = $um->find((int)$id);
+
+        if (!$target || $target['role'] !== 'admin' || !empty($target['is_super_admin'])) {
+            $this->flash('error', 'Aksi tidak valid.');
+            $this->redirect('/admin/kelola-admin');
+        }
+
+        $um->demoteToAnggota((int)$id);
+        $this->flash('success', htmlspecialchars($target['nama_lengkap']) . ' diturunkan kembali menjadi anggota.');
+        $this->redirect('/admin/kelola-admin');
+    }
+
+    // Admin (bukan admin utama) berhenti dari jabatan admin sendiri
+    public function berhentiAdmin(): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $id = (int)$_SESSION['user_id'];
+        $um = new UserModel();
+
+        if ($um->isSuperAdmin($id)) {
+            $this->flash('error', 'Admin utama tidak bisa berhenti lewat fitur ini.');
+            $this->redirect('/admin/profil');
+        }
+
+        $um->demoteToAnggota($id);
         session_destroy();
         $this->redirect('/login');
     }
