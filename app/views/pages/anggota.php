@@ -87,6 +87,50 @@
   .angp-sec__line { flex: 1; height: 1px; background: linear-gradient(to right, var(--c-border), transparent); }
   .angp-sec__hint { font-size: .76rem; color: var(--c-muted2); margin-top: -.15rem; }
 
+  /* ─── Pembina card ─── */
+  .pembina-wrap {
+    display: flex;
+    justify-content: center;
+    padding: .5rem 0 .75rem;
+  }
+  .pembina-card {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    width: 100%;
+    max-width: 26rem;
+    background: linear-gradient(135deg, rgba(14,116,144,.05), rgba(6,182,212,.05));
+    border: 1px solid rgba(14,116,144,.18);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem 1.3rem;
+    box-shadow: 0 16px 34px -20px rgba(15,23,42,.14), 0 3px 8px rgba(15,23,42,.04);
+  }
+  .pembina-card__photo-wrap {
+    width: 4.5rem; height: 4.5rem; flex-shrink: 0;
+    border-radius: 50%; padding: 2.5px;
+    background: conic-gradient(from 180deg, var(--c-primary), #22d3ee, var(--c-primary));
+  }
+  .pembina-card__photo {
+    width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+    display: block; border: 2.5px solid #fff;
+  }
+  .pembina-card__photo-fallback {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: rgba(14,116,144,.1); border: 2.5px solid #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; font-weight: 800; color: var(--c-primary); text-transform: uppercase;
+  }
+  .pembina-card__body { text-align: left; min-width: 0; }
+  .pembina-card__jabatan {
+    font-size: .66rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--c-primary); margin-bottom: .3rem;
+  }
+  .pembina-card__name {
+    font-size: 1rem; font-weight: 800; color: var(--c-ink); line-height: 1.3;
+    margin-bottom: .15rem;
+  }
+  .pembina-card__periode { font-size: .74rem; color: var(--c-muted2); }
+
   /* ─── Struktur Organisasi (org-chart) ─── */
   .org-chart {
     display: flex;
@@ -231,6 +275,8 @@
     .member-card__name { font-size: .8rem; }
     .org-card { width: 8rem; }
     .org-card--ketua { width: 9.5rem; }
+    .pembina-card { flex-direction: column; text-align: center; }
+    .pembina-card__body { text-align: center; }
   }
   @media (max-width: 360px) {
     .member-card__photo-wrap { width: 3.75rem; height: 3.75rem; }
@@ -301,6 +347,38 @@
 </div>
 
 <div class="angp">
+
+  <!-- ── Kartu Pembina ── -->
+  <?php if (!empty($pembina)): ?>
+  <div class="angp-sec" style="margin-top:0;">
+    <div class="angp-sec__row">
+      <span class="angp-sec__title">Pembina</span>
+      <div class="angp-sec__line"></div>
+    </div>
+  </div>
+  <div class="pembina-wrap">
+    <div class="pembina-card">
+      <div class="pembina-card__photo-wrap">
+        <?php if (!empty($pembina['foto'])): ?>
+          <img src="<?= UPLOAD_URL . '/' . htmlspecialchars($pembina['foto']) ?>"
+               class="pembina-card__photo"
+               alt="Foto <?= htmlspecialchars($pembina['nama']) ?>">
+        <?php else: ?>
+          <div class="pembina-card__photo-fallback" aria-hidden="true">
+            <?= htmlspecialchars(mb_strtoupper(mb_substr($pembina['nama'], 0, 2))) ?>
+          </div>
+        <?php endif; ?>
+      </div>
+      <div class="pembina-card__body">
+        <div class="pembina-card__jabatan"><?= htmlspecialchars($pembina['jabatan'] ?? 'Pembina') ?></div>
+        <p class="pembina-card__name"><?= htmlspecialchars($pembina['nama']) ?></p>
+        <?php if (!empty($pembina['periode'])): ?>
+          <span class="pembina-card__periode">Periode <?= htmlspecialchars($pembina['periode']) ?></span>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+  <?php endif; ?>
 
   <!-- ── Struktur Organisasi ── -->
   <div class="angp-sec">
