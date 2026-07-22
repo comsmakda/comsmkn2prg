@@ -3,14 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= htmlspecialchars($settings['org_name']['value'] ?? APP_NAME) ?> — COM SMKN 2 Pinrang</title>
-  <meta name="description" content="<?= htmlspecialchars($settings['org_description']['value'] ?? 'Organisasi resmi COM SMKN 2 Pinrang') ?>">
+  <title><?= htmlspecialchars($page_title ?? (($settings['org_name']['value'] ?? APP_NAME) . ' | COM SMKN 2 Pinrang (Smakda)')) ?></title>
+  <meta name="description" content="<?= htmlspecialchars($page_description ?? $settings['org_description']['value'] ?? 'COM (Community Programmer) adalah organisasi siswa resmi SMKN 2 Pinrang (Smakda) yang berfokus pada pengembangan teknologi, pemrograman, dan kreativitas digital.') ?>">
+  <meta name="keywords" content="COM SMKN 2 Pinrang, Community Programmer SMKN 2 Pinrang, COM Smakda, Smakda, SMK Negeri 2 Pinrang, organisasi siswa SMKN 2 Pinrang, ekstrakurikuler pemrograman Pinrang">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="author" content="COM (Community Programmer) SMKN 2 Pinrang">
+  <link rel="canonical" href="<?= BASE_URL . strtok($_SERVER['REQUEST_URI'], '?') ?>">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="COM (Community Programmer) SMKN 2 Pinrang">
+  <meta property="og:title" content="<?= htmlspecialchars($page_title ?? (($settings['org_name']['value'] ?? APP_NAME) . ' | COM SMKN 2 Pinrang (Smakda)')) ?>">
+  <meta property="og:description" content="<?= htmlspecialchars($page_description ?? $settings['org_description']['value'] ?? 'COM (Community Programmer) — organisasi siswa resmi SMKN 2 Pinrang / Smakda.') ?>">
+  <meta property="og:url" content="<?= BASE_URL . strtok($_SERVER['REQUEST_URI'], '?') ?>">
+  <meta property="og:locale" content="id_ID">
+  <?php if (!empty($settings['org_logo']['value'])): ?>
+  <meta property="og:image" content="<?= UPLOAD_URL . '/' . htmlspecialchars($settings['org_logo']['value']) ?>">
+  <?php endif; ?>
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<?= htmlspecialchars($page_title ?? (($settings['org_name']['value'] ?? APP_NAME) . ' | COM SMKN 2 Pinrang (Smakda)')) ?>">
+  <meta name="twitter:description" content="<?= htmlspecialchars($page_description ?? $settings['org_description']['value'] ?? 'COM (Community Programmer) — organisasi siswa resmi SMKN 2 Pinrang / Smakda.') ?>">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/custom.css">
   <?= $extra_head ?? '' ?>
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "COM (Community Programmer) SMKN 2 Pinrang",
+    "alternateName": ["COM Smakda", "Community Programmer SMKN 2 Pinrang", "Smakda", "COM SMKN 2 Pinrang"],
+    "url": "<?= rtrim(BASE_URL, '/') ?>",
+    <?php if (!empty($settings['org_logo']['value'])): ?>
+    "logo": "<?= UPLOAD_URL . '/' . htmlspecialchars($settings['org_logo']['value']) ?>",
+    <?php endif; ?>
+    "description": "<?= htmlspecialchars($settings['org_description']['value'] ?? 'Organisasi siswa resmi SMKN 2 Pinrang di bidang teknologi dan pemrograman.') ?>",
+    "parentOrganization": {
+      "@type": "EducationalOrganization",
+      "name": "SMK Negeri 2 Pinrang",
+      "alternateName": "Smakda"
+    }
+    <?php
+      $sameas = [];
+      if (!empty($settings['social_instagram']['value'])) $sameas[] = '"https://instagram.com/' . htmlspecialchars($settings['social_instagram']['value']) . '"';
+      if (!empty($settings['social_tiktok']['value']))    $sameas[] = '"https://tiktok.com/@' . htmlspecialchars($settings['social_tiktok']['value']) . '"';
+      if (!empty($settings['social_youtube']['value']))   $sameas[] = '"' . htmlspecialchars($settings['social_youtube']['value']) . '"';
+    ?>
+    <?php if (!empty($sameas)): ?>
+    ,"sameAs": [<?= implode(',', $sameas) ?>]
+    <?php endif; ?>
+  }
+  </script>
+
   <style>
     html {
       font-size: clamp(15px, 0.4vw + 12px, 19px);
