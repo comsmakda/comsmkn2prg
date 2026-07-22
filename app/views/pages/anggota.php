@@ -1,5 +1,35 @@
 <?php // app/views/pages/anggota.php ?>
 
+<?php
+/* ── Page title & meta description (dipakai <title> di layout) ── */
+$page_title       = "Daftar Anggota | " . ($settings['org_name']['value'] ?? APP_NAME);
+$page_description = "Kenali struktur kepengurusan serta seluruh anggota aktif Community Programmer (COM) SMKN 2 Pinrang, dari pembina hingga seluruh anggota.";
+
+/* ── Open Graph meta tags (inject ke <head> via layout) ── */
+$og_title       = $page_title;
+$og_description = $page_description;
+$og_url         = BASE_URL . "/anggota";
+$og_image       = !empty($settings['org_logo']['value'])
+                  ? UPLOAD_URL . '/' . $settings['org_logo']['value']
+                  : BASE_URL . "/assets/img/logo-com.png";
+
+if (!isset($extra_head)) $extra_head = '';
+$extra_head .= '
+<meta property="og:type"         content="website">
+<meta property="og:url"          content="' . htmlspecialchars($og_url) . '">
+<meta property="og:title"        content="' . htmlspecialchars($og_title) . '">
+<meta property="og:description"  content="' . htmlspecialchars($og_description) . '">
+<meta property="og:image"        content="' . htmlspecialchars($og_image) . '">
+<meta property="og:locale"       content="id_ID">
+<meta property="og:site_name"    content="' . htmlspecialchars($settings['org_name']['value'] ?? APP_NAME) . '">
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="' . htmlspecialchars($og_title) . '">
+<meta name="twitter:description" content="' . htmlspecialchars($og_description) . '">
+<meta name="twitter:image"       content="' . htmlspecialchars($og_image) . '">
+<meta name="description"         content="' . htmlspecialchars($og_description) . '">
+';
+?>
+
 <style>
   .angp {
     max-width: var(--container-w, 75rem);

@@ -3,9 +3,13 @@
 <?php
 $old = $old ?? [];
 
+/* ── Page title (dipakai <title> di layout, tampil di tab & hasil Google) ── */
+$page_title       = "Penerimaan Anggota Baru (PAB) | " . ($settings['org_name']['value'] ?? APP_NAME);
+$page_description = "Pendaftaran anggota baru COM SMKN 2 Pinrang. Belajar coding bareng — dari dasar sampai proyek nyata, dibimbing kakak kelas dan mentor.";
+
 /* ── Open Graph meta tags (inject ke <head> via layout) ── */
 $og_title       = "Daftar Sekarang! PAB " . ($settings['org_name']['value'] ?? APP_NAME) . " — Komunitas Programmer SMKN 2 Pinrang";
-$og_description = "Bergabunglah bersama komunitas programmer SMKN 2 Pinrang! Daftarkan diri kamu sekarang dan jadilah bagian dari generasi teknologi berikutnya. 💻🚀";
+$og_description = $page_description;
 $og_url         = BASE_URL . "/pab";
 $og_image       = BASE_URL . "/assets/img/logo-com.png";
 

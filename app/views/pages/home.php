@@ -58,8 +58,8 @@ $beritaList = isset($beritaList) && is_array($beritaList) ? $beritaList : [];
 ?>
 
 <!-- ══ SEO: PRIMARY META ══ -->
-<title>COM SMKN 2 Pinrang – Community Programmer SMK Negeri 2 Pinrang</title>
-<meta name="description" content="COM (Community Programmer) SMKN 2 Pinrang – Organisasi siswa bidang IT Software, IT Network, Multimedia, Desain Grafis, IoT, dan Robotik di SMK Negeri 2 Pinrang, Sulawesi Selatan. Daftar PAB sekarang!">
+<title>Website Resmi COM SMKN 2 Pinrang – Community Programmer SMK Negeri 2 Pinrang</title>
+<meta name="description" content="Website resmi COM (Community Programmer) SMKN 2 Pinrang – Organisasi siswa bidang IT Software, IT Network, Multimedia, Desain Grafis, IoT, dan Robotik di SMK Negeri 2 Pinrang, Sulawesi Selatan. Daftar PAB sekarang!">
 <meta name="keywords" content="COM SMKN 2 Pinrang, Community Programmer SMKN 2 Pinrang, SMK Negeri 2 Pinrang, SMKN 2 Pinrang, SMK 2 Pinrang, organisasi programmer Pinrang, IT SMK Pinrang, komunitas coding Pinrang, PAB COM Pinrang">
 <meta name="author" content="COM SMKN 2 Pinrang">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
@@ -70,7 +70,7 @@ $beritaList = isset($beritaList) && is_array($beritaList) ? $beritaList : [];
 <!-- ══ SEO: OPEN GRAPH ══ -->
 <meta property="og:type"        content="website">
 <meta property="og:url"         content="<?= htmlspecialchars($og_url) ?>">
-<meta property="og:title"       content="COM SMKN 2 Pinrang – Community Programmer">
+<meta property="og:title"       content="Website Resmi COM SMKN 2 Pinrang – Community Programmer">
 <meta property="og:description" content="<?= $og_description ?>">
 <meta property="og:image"       content="<?= htmlspecialchars($og_image) ?>">
 <meta property="og:image:width"  content="1200">
@@ -81,7 +81,7 @@ $beritaList = isset($beritaList) && is_array($beritaList) ? $beritaList : [];
 
 <!-- ══ SEO: TWITTER CARD ══ -->
 <meta name="twitter:card"        content="summary_large_image">
-<meta name="twitter:title"       content="COM SMKN 2 Pinrang – Community Programmer">
+<meta name="twitter:title"       content="Website Resmi COM SMKN 2 Pinrang – Community Programmer">
 <meta name="twitter:description" content="<?= $og_description ?>">
 <meta name="twitter:image"       content="<?= htmlspecialchars($og_image) ?>">
 

@@ -1,6 +1,34 @@
 <?php
 // app/views/pages/galeri.php
 // Variabel: $albums, $page, $pages, $total
+
+/* ── Page title & meta description (dipakai <title> di layout) ── */
+$page_title       = "Galeri Foto | " . ($settings['org_name']['value'] ?? APP_NAME);
+$page_description = "Dokumentasi momen dan kegiatan " . ($settings['org_name']['value'] ?? 'COM SMKN 2 Pinrang') . " — lihat album foto kegiatan, prestasi, dan program komunitas.";
+
+/* ── Open Graph meta tags (inject ke <head> via layout) ── */
+$og_title       = $page_title;
+$og_description = $page_description;
+$og_url         = BASE_URL . "/galeri";
+$og_image       = !empty($albums[0]['cover'])
+                  ? UPLOAD_URL . '/' . $albums[0]['cover']
+                  : (!empty($albums[0]['first_foto']) ? UPLOAD_URL . '/' . $albums[0]['first_foto'] : BASE_URL . "/assets/img/logo-com.png");
+
+if (!isset($extra_head)) $extra_head = '';
+$extra_head .= '
+<meta property="og:type"         content="website">
+<meta property="og:url"          content="' . htmlspecialchars($og_url) . '">
+<meta property="og:title"        content="' . htmlspecialchars($og_title) . '">
+<meta property="og:description"  content="' . htmlspecialchars($og_description) . '">
+<meta property="og:image"        content="' . htmlspecialchars($og_image) . '">
+<meta property="og:locale"       content="id_ID">
+<meta property="og:site_name"    content="' . htmlspecialchars($settings['org_name']['value'] ?? APP_NAME) . '">
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="' . htmlspecialchars($og_title) . '">
+<meta name="twitter:description" content="' . htmlspecialchars($og_description) . '">
+<meta name="twitter:image"       content="' . htmlspecialchars($og_image) . '">
+<meta name="description"         content="' . htmlspecialchars($og_description) . '">
+';
 ?>
 <!-- Font & icon set mengikuti design system (idempotent bila sudah di-load di layout utama) -->
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
