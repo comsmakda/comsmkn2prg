@@ -43,7 +43,6 @@ $router->post('/admin/jadwal-pertemuan/libur/:id/delete',   [AdminController::cl
 // PAB
 $router->get('/pab',            [PabController::class, 'index']);
 $router->post('/pab/register',  [PabController::class, 'register']);
-$router->post('/admin/pab/{id}/delete', 'AdminController@pabDelete');
 
 // ── Public: Berita ────────────────────────────────────────────
 $router->get('/berita',                         [BeritaController::class, 'index']);
@@ -79,6 +78,7 @@ $router->post('/admin/berhenti-admin',                  [AdminController::class,
 $router->get('/admin/pab',                              [AdminController::class, 'pab']);
 $router->post('/admin/pab/:id/approve',                 [AdminController::class, 'pabApprove']);
 $router->post('/admin/pab/:id/reject',                  [AdminController::class, 'pabReject']);
+$router->post('/admin/pab/:id/delete',                  [AdminController::class, 'pabDelete']);
 $router->post('/admin/pab/toggle',                      [AdminController::class, 'pabToggle']);
 
 // CMS
