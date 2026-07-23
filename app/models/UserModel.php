@@ -244,7 +244,11 @@ class UserModel extends Model
         }
     }
 
-    /** Anggota aktif untuk keperluan absensi/filter */
+    /**
+     * Anggota aktif untuk keperluan tabel admin/absensi/filter.
+     * Pencarian ('search') mencakup nama, NIA, NISN, dan No HP —
+     * supaya admin bisa cari anggota pakai NISN juga, bukan cuma nama/NIA.
+     */
     public function getAnggotaAktif(array $filter = []): array
     {
         $where  = ["role = 'anggota'", "status = 'aktif'"];
@@ -259,7 +263,9 @@ class UserModel extends Model
             $params[] = $filter['jabatan'];
         }
         if (!empty($filter['search'])) {
-            $where[]  = "(nama_lengkap LIKE ? OR nia LIKE ?)";
+            $where[]  = "(nama_lengkap LIKE ? OR nia LIKE ? OR nisn LIKE ? OR no_hp LIKE ?)";
+            $params[] = '%' . $filter['search'] . '%';
+            $params[] = '%' . $filter['search'] . '%';
             $params[] = '%' . $filter['search'] . '%';
             $params[] = '%' . $filter['search'] . '%';
         }
@@ -271,9 +277,13 @@ class UserModel extends Model
     /**
      * Ambil SEMUA anggota aktif sesuai filter TANPA pagination — dipakai
      * untuk export (CSV/Excel), supaya export tidak cuma ngambil 1 halaman
-     * tabel saja seperti yang ditampilkan di UI. Sama pola-nya dengan
-     * getAnggotaAktif(), tapi tambah filter 'sumber' (pab/manual) karena
-     * itu juga ada di filter bar halaman anggota.
+     * tabel saja seperti yang ditampilkan di UI.
+     *
+     * Kolom 'sumber' sudah tidak ditampilkan/difilter lagi di UI anggota
+     * (diganti NISN), jadi tidak lagi dimasukkan ke SELECT export.
+     * Filter 'sumber' di bawah dibiarkan ada (tidak dihapus paksa) supaya
+     * tetap kompatibel jika suatu saat dipanggil dari tempat lain, tapi
+     * AdminController::anggotaExport() saat ini tidak mengirim filter itu lagi.
      */
     public function getAnggotaForExport(array $filter = []): array
     {
@@ -300,7 +310,7 @@ class UserModel extends Model
             $params[] = '%' . $filter['search'] . '%';
         }
 
-        $sql = "SELECT nia, nisn, nama_lengkap, kelas, no_hp, email, sumber, jabatan, status, tahun_daftar
+        $sql = "SELECT nia, nisn, nama_lengkap, kelas, no_hp, email, jabatan, status, tahun_daftar
                 FROM users WHERE " . implode(' AND ', $where) . " ORDER BY nama_lengkap ASC";
 
         return $this->fetchAll($sql, $params);
@@ -359,13 +369,28 @@ class UserModel extends Model
 
     /**
      * Cek apakah NISN sudah dipakai user lain — dipakai saat IMPORT anggota
-     * manual maupun approve PAB, supaya baris duplikat otomatis dilewati/ditolak.
+     * manual maupun approve PAB, atau saat TAMBAH anggota baru,
+     * supaya baris/entri duplikat otomatis dilewati/ditolak.
      */
     public function existsByNisn(string $nisn): bool
     {
         return (bool) $this->fetch(
             "SELECT id FROM users WHERE nisn = ? LIMIT 1",
             [$nisn]
+        );
+    }
+
+    /**
+     * Cek apakah NISN sudah dipakai user LAIN (bukan dirinya sendiri) —
+     * dipakai saat UPDATE profil anggota (form edit) supaya anggota
+     * tidak salah dianggap "duplikat dengan dirinya sendiri" ketika
+     * NISN yang dikirim di form memang sudah menjadi miliknya dari awal.
+     */
+    public function existsByNisnExcept(string $nisn, int $exceptId): bool
+    {
+        return (bool) $this->fetch(
+            "SELECT id FROM users WHERE nisn = ? AND id != ? LIMIT 1",
+            [$nisn, $exceptId]
         );
     }
 

@@ -3,6 +3,7 @@
 <style>
 .imp-root {
   --font-ui: var(--ff, 'Plus Jakarta Sans', sans-serif);
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   --bg-surface:  var(--c-white, #ffffff);
   --bg-elevated: #f8fafc;
   --bd-subtle:   var(--c-border, #e6ebf1);
@@ -94,6 +95,7 @@
   border-radius: var(--r-sm); background: var(--bg-surface); border: 1px solid var(--bd-subtle); color: var(--tx-secondary);
 }
 .imp-col-chip--opt { color: var(--tx-muted); font-weight: 600; }
+.imp-col-chip--nisn { font-family: var(--font-mono); color: var(--ac); border-color: var(--bd-accent); background: var(--ac-dim); }
 
 /* ── Daftar key jabatan valid (referensi cepat) ── */
 .imp-jabatan-box {
@@ -114,7 +116,7 @@
   color: var(--tx-secondary); white-space: nowrap;
 }
 .imp-jabatan-chip code {
-  font-family: monospace; font-weight: 700; color: var(--ac); margin-right: 4px;
+  font-family: var(--font-mono); font-weight: 700; color: var(--ac); margin-right: 4px;
 }
 
 .imp-notice {
@@ -125,6 +127,7 @@
 }
 .imp-notice i { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
 .imp-notice strong { font-weight: 800; }
+.imp-notice code { font-family: var(--font-mono); background: rgba(0,0,0,.05); padding: 1px 5px; border-radius: 4px; }
 
 .btn-template {
   display: inline-flex; align-items: center; gap: 7px;
@@ -243,15 +246,16 @@
         <div class="imp-cols__list">
           <span class="imp-col-chip">1. Nama Lengkap</span>
           <span class="imp-col-chip">2. Kelas</span>
-          <span class="imp-col-chip">3. No HP</span>
-          <span class="imp-col-chip imp-col-chip--opt">4. Email (opsional)</span>
-          <span class="imp-col-chip imp-col-chip--opt">5. Tahun Daftar (opsional)</span>
-          <span class="imp-col-chip imp-col-chip--opt">6. Jabatan (opsional)</span>
+          <span class="imp-col-chip imp-col-chip--nisn">3. NISN (opsional)</span>
+          <span class="imp-col-chip imp-col-chip--opt">4. No HP (opsional)</span>
+          <span class="imp-col-chip imp-col-chip--opt">5. Email (opsional)</span>
+          <span class="imp-col-chip imp-col-chip--opt">6. Tahun Daftar (opsional)</span>
+          <span class="imp-col-chip imp-col-chip--opt">7. Jabatan (opsional)</span>
         </div>
       </div>
 
       <div class="imp-jabatan-box">
-        <div class="imp-jabatan-box__label">Key Jabatan yang Valid (kolom 6)</div>
+        <div class="imp-jabatan-box__label">Key Jabatan yang Valid (kolom 7)</div>
         <div class="imp-jabatan-list">
           <?php foreach ($jabatanList as $key => $label): ?>
             <span class="imp-jabatan-chip"><code><?= htmlspecialchars($key) ?></code><?= htmlspecialchars($label) ?></span>
@@ -265,10 +269,12 @@
           <strong>Password tidak diimpor.</strong> Semua anggota baru dari import akan
           diberi password default <strong>comsmakda</strong>. NIA digenerate otomatis
           mengikuti kolom <strong>Tahun Daftar</strong> di tiap baris — kosongkan kolom itu
-          kalau mau pakai tahun berjalan. Kolom <strong>Jabatan</strong> juga opsional —
-          isi dengan salah satu key di atas (misalnya <code>bendahara</code>), atau kosongkan
-          untuk otomatis jadi <strong>Anggota</strong>. Baris dengan email/No HP yang sudah
-          terdaftar akan otomatis dilewati.
+          kalau mau pakai tahun berjalan. Kolom <strong>NISN</strong> opsional, tapi jika diisi
+          harus <strong>10 digit angka</strong> dan belum dipakai anggota lain — baris dengan
+          NISN tidak valid atau duplikat otomatis dilewati. Kolom <strong>Jabatan</strong>
+          juga opsional — isi dengan salah satu key di atas (misalnya <code>bendahara</code>),
+          atau kosongkan untuk otomatis jadi <strong>Anggota</strong>. Baris dengan email/No HP
+          yang sudah terdaftar juga akan otomatis dilewati.
         </div>
       </div>
 

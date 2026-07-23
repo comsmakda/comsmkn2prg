@@ -36,6 +36,8 @@
   --green-d: var(--c-green-bg,   #f0fdf4);
   --red:     var(--c-red-text,   #b91c1c);
   --red-d:   var(--c-red-bg,     #fef2f2);
+  --slate:   #64748b;
+  --slate-d: #f1f5f9;
 
   --r-xs: 6px;
   --r-sm: var(--radius-sm, 9px);
@@ -248,7 +250,7 @@
 .stat-pill--blue   .stat-pill__ico { background: var(--blue-d);   color: var(--blue); }
 .stat-pill--green  .stat-pill__ico { background: var(--green-d);  color: var(--green); }
 .stat-pill--amber  .stat-pill__ico { background: var(--amber-d);  color: var(--amber); }
-.stat-pill--purple .stat-pill__ico { background: var(--purple-d); color: var(--purple); }
+.stat-pill--slate  .stat-pill__ico { background: var(--slate-d);  color: var(--slate); }
 
 .stat-pill__body {}
 .stat-pill__val {
@@ -305,7 +307,7 @@
   -webkit-appearance: none;
 }
 .fi input { width: 230px; }
-.fi select { width: 165px; }
+.fi select { width: 190px; }
 .fi input:focus,
 .fi select:focus {
   border-color: var(--c-primary-lt, #06b6d4);
@@ -542,16 +544,59 @@
   vertical-align: middle;
 }
 
-/* ─── Cell types ─────────────────────── */
+/* ─── ID cells: NIA vs NISN — sengaja dibuat kontras jelas ───
+   NIA  = chip solid berwarna aksen, tebal, terlihat seperti "identitas resmi".
+   NISN = teks polos monospace abu-abu + label kecil di atasnya,
+          supaya sekilas mata langsung tahu ini bukan NIA. */
+.id-stack { display: flex; flex-direction: column; gap: 6px; }
+
 .cell-nia {
-  font-size: 11.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: var(--ac);
+  padding: 3px 9px;
+  border-radius: var(--r-xs);
+  width: fit-content;
+}
+.cell-nia i { font-size: 11px; opacity: .85; }
+.cell-empty-nia {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--tx-muted);
+  background: var(--bg-overlay);
+  padding: 3px 9px;
+  border-radius: var(--r-xs);
+  width: fit-content;
+}
+
+.cell-nisn-wrap { display: flex; flex-direction: column; gap: 1px; }
+.cell-nisn-lbl {
+  font-size: 8.5px;
   font-weight: 700;
-  color: var(--ac);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tx-muted);
+}
+.cell-nisn {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tx-secondary);
   letter-spacing: 0.02em;
 }
-.cell-empty-nia {
+.cell-nisn--empty {
+  font-family: var(--font-ui);
   font-size: 11.5px;
+  font-weight: 500;
   color: var(--tx-muted);
+  font-style: italic;
 }
 
 .cell-name-wrap {}
@@ -596,21 +641,6 @@
   object-fit: cover;
   display: block;
 }
-
-/* Source chip */
-.src-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  padding: 3px 8px;
-  border-radius: var(--r-xs);
-  text-transform: uppercase;
-}
-.src-chip--pab    { background: var(--blue-d);   color: var(--blue);   border: 1px solid rgba(14,116,144,0.22); }
-.src-chip--manual { background: var(--purple-d); color: var(--purple); border: 1px solid rgba(11,90,112,0.22); }
 
 /* Jabatan chip */
 .jbt-chip {
@@ -872,7 +902,6 @@
       $exportQuery = http_build_query(array_filter([
         'search'  => $filter['search']  ?? '',
         'kelas'   => $filter['kelas']   ?? '',
-        'sumber'  => $filter['sumber']  ?? '',
         'jabatan' => $filter['jabatan'] ?? '',
       ]));
     ?>
@@ -908,10 +937,10 @@
      STATS STRIP
 ────────────────────────────────── -->
 <?php
-  $totalAktif   = $stats['total_aktif']   ?? 0;
-  $totalPending = $stats['total_pending'] ?? 0;
-  $totalPab     = $stats['total_pab']     ?? 0;
-  $totalManual  = $stats['total_manual']  ?? 0;
+  $totalAktif     = $stats['total_aktif']      ?? 0;
+  $totalPending   = $stats['total_pending']    ?? 0;
+  $totalAdaNisn   = $stats['total_ada_nisn']   ?? 0;
+  $totalTanpaNisn = $stats['total_tanpa_nisn'] ?? 0;
 ?>
 <div class="stats-strip">
 
@@ -932,18 +961,18 @@
   </div>
 
   <div class="stat-pill stat-pill--green">
-    <div class="stat-pill__ico"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
+    <div class="stat-pill__ico"><i class="ti ti-id-badge-2" aria-hidden="true"></i></div>
     <div class="stat-pill__body">
-      <div class="stat-pill__val"><?= number_format($totalPab) ?></div>
-      <div class="stat-pill__lbl">Via PAB</div>
+      <div class="stat-pill__val"><?= number_format($totalAdaNisn) ?></div>
+      <div class="stat-pill__lbl">Punya NISN</div>
     </div>
   </div>
 
-  <div class="stat-pill stat-pill--purple">
-    <div class="stat-pill__ico"><i class="ti ti-file-text" aria-hidden="true"></i></div>
+  <div class="stat-pill stat-pill--slate">
+    <div class="stat-pill__ico"><i class="ti ti-help-hexagon" aria-hidden="true"></i></div>
     <div class="stat-pill__body">
-      <div class="stat-pill__val"><?= number_format($totalManual) ?></div>
-      <div class="stat-pill__lbl">Input Manual</div>
+      <div class="stat-pill__val"><?= number_format($totalTanpaNisn) ?></div>
+      <div class="stat-pill__lbl">Belum Ada NISN</div>
     </div>
   </div>
 
@@ -972,6 +1001,9 @@
         <div class="pending-item__meta">
           <?php if (!empty($p['kelas'])): ?>
             <span><i class="ti ti-school" aria-hidden="true"></i> <?= htmlspecialchars($p['kelas']) ?></span>
+          <?php endif; ?>
+          <?php if (!empty($p['nisn'])): ?>
+            <span><i class="ti ti-id-badge-2" aria-hidden="true"></i> NISN: <?= htmlspecialchars($p['nisn']) ?></span>
           <?php endif; ?>
           <?php if (!empty($p['no_hp'])): ?>
             <span><i class="ti ti-phone" aria-hidden="true"></i> <?= htmlspecialchars($p['no_hp']) ?></span>
@@ -1008,7 +1040,7 @@
     <span class="fi__icon"><i class="ti ti-search" aria-hidden="true"></i></span>
     <input type="text" name="search"
            value="<?= htmlspecialchars($filter['search'] ?? '') ?>"
-           placeholder="Cari nama, NIA, No HP…"
+           placeholder="Cari nama, NIA, NISN, No HP…"
            autocomplete="off">
   </div>
 
@@ -1023,16 +1055,6 @@
           <?= htmlspecialchars($k['kelas']) ?>
         </option>
       <?php endforeach; ?>
-    </select>
-  </div>
-
-  <!-- Sumber -->
-  <div class="fi fi--select">
-    <span class="fi__icon"><i class="ti ti-tag" aria-hidden="true"></i></span>
-    <select name="sumber">
-      <option value="">Semua Sumber</option>
-      <option value="pab"    <?= ($filter['sumber'] ?? '') === 'pab'    ? 'selected' : '' ?>>PAB</option>
-      <option value="manual" <?= ($filter['sumber'] ?? '') === 'manual' ? 'selected' : '' ?>>Manual</option>
     </select>
   </div>
 
@@ -1055,7 +1077,7 @@
     Filter
   </button>
 
-  <?php if (!empty($filter['search']) || !empty($filter['kelas']) || !empty($filter['sumber']) || !empty($filter['jabatan'])): ?>
+  <?php if (!empty($filter['search']) || !empty($filter['kelas']) || !empty($filter['jabatan'])): ?>
     <a href="<?= BASE_URL ?>/admin/anggota" class="filter-reset">✕ Reset</a>
   <?php endif; ?>
 </form>
@@ -1075,10 +1097,9 @@
     <table class="mtbl">
       <thead>
         <tr>
-          <th style="width:120px;">NIA</th>
+          <th style="width:150px;">NIA / NISN</th>
           <th>Nama Lengkap</th>
           <th style="width:100px;">No HP</th>
-          <th style="width:90px;">Sumber</th>
           <th style="width:170px;">Jabatan</th>
           <th style="width:80px;">Status</th>
           <th style="width:50px;">Foto</th>
@@ -1088,7 +1109,7 @@
       <tbody>
         <?php if (empty($list)): ?>
         <tr>
-          <td colspan="8">
+          <td colspan="7">
             <div class="tbl-empty">
               <i class="ti ti-users-group tbl-empty__ico" aria-hidden="true"></i>
               <div class="tbl-empty__title">Tidak ada anggota ditemukan</div>
@@ -1099,13 +1120,24 @@
         <?php else: ?>
         <?php foreach ($list as $m): ?>
         <tr>
-          <!-- NIA -->
+          <!-- NIA / NISN -->
           <td>
-            <?php if (!empty($m['nia'])): ?>
-              <span class="cell-nia"><?= htmlspecialchars($m['nia']) ?></span>
-            <?php else: ?>
-              <span class="cell-empty-nia">—</span>
-            <?php endif; ?>
+            <div class="id-stack">
+              <?php if (!empty($m['nia'])): ?>
+                <span class="cell-nia"><i class="ti ti-id-badge" aria-hidden="true"></i> <?= htmlspecialchars($m['nia']) ?></span>
+              <?php else: ?>
+                <span class="cell-empty-nia">Belum ada NIA</span>
+              <?php endif; ?>
+
+              <div class="cell-nisn-wrap">
+                <span class="cell-nisn-lbl">NISN</span>
+                <?php if (!empty($m['nisn'])): ?>
+                  <span class="cell-nisn"><?= htmlspecialchars($m['nisn']) ?></span>
+                <?php else: ?>
+                  <span class="cell-nisn cell-nisn--empty">— belum diisi</span>
+                <?php endif; ?>
+              </div>
+            </div>
           </td>
 
           <!-- Nama + Kelas inline -->
@@ -1118,15 +1150,6 @@
 
           <!-- No HP -->
           <td><span class="cell-mono"><?= htmlspecialchars($m['no_hp'] ?? '—') ?></span></td>
-
-          <!-- Sumber -->
-          <td>
-            <?php if (($m['sumber'] ?? '') === 'pab'): ?>
-              <span class="src-chip src-chip--pab">PAB</span>
-            <?php else: ?>
-              <span class="src-chip src-chip--manual">Manual</span>
-            <?php endif; ?>
-          </td>
 
           <!-- Jabatan -->
           <td>
@@ -1205,7 +1228,6 @@
     $pagiFilterQuery = http_build_query(array_filter([
       'search'  => $filter['search']  ?? '',
       'kelas'   => $filter['kelas']   ?? '',
-      'sumber'  => $filter['sumber']  ?? '',
       'jabatan' => $filter['jabatan'] ?? '',
     ]));
   ?>

@@ -28,16 +28,16 @@ class AdminController extends Controller
         $this->view('admin/dashboard', compact('stats', 'flash'), 'admin');
     }
 
-    // ================================================================
+// ================================================================
     //  ANGGOTA
     // ================================================================
     public function anggota(): void
     {
         $this->requireAdmin();
         $filter    = [
-            'kelas'  => $_GET['kelas']  ?? '',
-            'search' => $_GET['search'] ?? '',
-            'sumber' => $_GET['sumber'] ?? '',
+            'kelas'   => $_GET['kelas']   ?? '',
+            'search'  => $_GET['search']  ?? '',
+            'jabatan' => $_GET['jabatan'] ?? '',
         ];
         $um        = new UserModel();
         $list      = $um->getAnggotaAktif($filter);
@@ -46,10 +46,10 @@ class AdminController extends Controller
 
         $db = Database::getInstance();
         $stats = [
-            'total_aktif'   => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif'")->fetchColumn(),
-            'total_pending' => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='pending'")->fetchColumn(),
-            'total_pab'     => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND sumber='pab'")->fetchColumn(),
-            'total_manual'  => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND sumber='manual'")->fetchColumn(),
+            'total_aktif'      => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif'")->fetchColumn(),
+            'total_pending'    => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='pending'")->fetchColumn(),
+            'total_ada_nisn'   => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND nisn IS NOT NULL AND nisn != ''")->fetchColumn(),
+            'total_tanpa_nisn' => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND (nisn IS NULL OR nisn = '')")->fetchColumn(),
         ];
 
         $flash     = $this->getFlash();
@@ -72,6 +72,8 @@ class AdminController extends Controller
         $this->requireAdmin();
         $this->verifyCsrf();
 
+        $um       = new UserModel();
+
         $nama     = htmlspecialchars(trim($_POST['nama_lengkap'] ?? ''), ENT_QUOTES);
         $kelas    = htmlspecialchars(trim($_POST['kelas'] ?? ''), ENT_QUOTES);
         $no_hp    = preg_replace('/\D/', '', $_POST['no_hp'] ?? '');
@@ -82,10 +84,19 @@ class AdminController extends Controller
             ? $_POST['jabatan']
             : 'anggota';
 
+        $nisnRaw = trim($_POST['nisn'] ?? '');
+        $nisn    = $nisnRaw !== '' ? preg_replace('/\D/', '', $nisnRaw) : null;
+
         $errors = [];
         if (strlen($nama) < 3)     $errors[] = 'Nama minimal 3 karakter.';
         if (empty($kelas))          $errors[] = 'Kelas wajib diisi.';
         if (strlen($password) < 6)  $errors[] = 'Password minimal 6 karakter.';
+        if ($nisn !== null && strlen($nisn) !== 10) {
+            $errors[] = 'NISN harus 10 digit angka.';
+        }
+        if ($nisn !== null && $um->existsByNisn($nisn)) {
+            $errors[] = "NISN {$nisn} sudah terdaftar pada anggota lain.";
+        }
 
         if ($errors) {
             $this->flash('error', implode('<br>', $errors));
@@ -101,8 +112,8 @@ class AdminController extends Controller
             }
         }
 
-        $um     = new UserModel();
         $userId = $um->createAnggota([
+            'nisn'          => $nisn,
             'nama_lengkap'  => $nama,
             'kelas'         => $kelas,
             'no_hp'         => $no_hp,
@@ -155,10 +166,28 @@ class AdminController extends Controller
     {
         $this->requireAdmin();
         $this->verifyCsrf();
+
+        $um = new UserModel();
+
+        $nisnRaw = trim($_POST['nisn'] ?? '');
+        $nisn    = $nisnRaw !== '' ? preg_replace('/\D/', '', $nisnRaw) : null;
+
+        if ($nisn !== null) {
+            if (strlen($nisn) !== 10) {
+                $this->flash('error', 'NISN harus 10 digit angka.');
+                $this->redirect("/admin/anggota/{$id}/edit");
+            }
+            if ($um->existsByNisnExcept($nisn, (int)$id)) {
+                $this->flash('error', "NISN {$nisn} sudah terdaftar pada anggota lain.");
+                $this->redirect("/admin/anggota/{$id}/edit");
+            }
+        }
+
         $d = [
             'nama_lengkap' => htmlspecialchars(trim($_POST['nama_lengkap'] ?? ''), ENT_QUOTES),
             'kelas'        => htmlspecialchars(trim($_POST['kelas'] ?? ''), ENT_QUOTES),
             'no_hp'        => preg_replace('/\D/', '', $_POST['no_hp'] ?? ''),
+            'nisn'         => $nisn,
             'jabatan'      => array_key_exists($_POST['jabatan'] ?? '', UserModel::JABATAN_LIST)
                                 ? $_POST['jabatan']
                                 : 'anggota',
@@ -171,63 +200,8 @@ class AdminController extends Controller
                 $this->redirect("/admin/anggota/{$id}/edit");
             }
         }
-        (new UserModel())->updateProfile((int)$id, $d);
+        $um->updateProfile((int)$id, $d);
         $this->flash('success', 'Data anggota diperbarui.');
-        $this->redirect('/admin/anggota');
-    }
-
-    public function anggotaDelete(string $id): void
-    {
-        $this->requireAdmin();
-        $this->verifyCsrf();
-
-        $um   = new UserModel();
-        $user = $um->find((int)$id);
-
-        if (!$user) {
-            $this->flash('error', 'Anggota tidak ditemukan.');
-            $this->redirect('/admin/anggota');
-        }
-
-        // Best-effort: hapus dari mesin fingerprint dulu (kalau anggota punya NIA)
-        if (!empty($user['nia'])) {
-            try {
-                (new FingerprintModel())->deleteUser($user['nia']);
-            } catch (\Throwable $e) {
-                error_log('Gagal hapus dari fingerprint saat hardDelete: ' . $e->getMessage());
-            }
-        }
-
-        // Hapus foto fisik anggota
-        if (!empty($user['foto'])) {
-            $fotoPath = ROOT . '/public/uploads/' . $user['foto'];
-            if (file_exists($fotoPath)) @unlink($fotoPath);
-        }
-
-        if ($um->hardDelete((int)$id)) {
-            $this->flash('success', 'Anggota berhasil dihapus permanen dari database.');
-        } else {
-            $this->flash('error', 'Gagal menghapus anggota. Cek log server.');
-        }
-
-        $this->redirect('/admin/anggota');
-    }
-
-    public function anggotaResetPassword(string $id): void
-    {
-        $this->requireAdmin();
-        $this->verifyCsrf();
-
-        $anggota = (new UserModel())->find((int)$id);
-        if (!$anggota) {
-            $this->flash('error', 'Data anggota tidak ditemukan.');
-            $this->redirect('/admin/anggota');
-        }
-
-        $newHash = password_hash('comsmakda', PASSWORD_BCRYPT, ['cost' => 12]);
-        (new UserModel())->updatePassword((int)$id, $newHash);
-
-        $this->flash('success', 'Password <strong>' . htmlspecialchars($anggota['nama_lengkap']) . '</strong> berhasil direset ke <strong>comsmakda</strong>.');
         $this->redirect('/admin/anggota');
     }
 
@@ -1490,7 +1464,7 @@ public function pab(): void
         $this->redirect('/admin/galeri/' . $albumId . '/foto');
     }
 
-    // ================================================================
+// ================================================================
     //  ANGGOTA — EXPORT
     // ================================================================
     public function anggotaExport(): void
@@ -1499,24 +1473,25 @@ public function pab(): void
 
         $format = ($_GET['format'] ?? 'csv') === 'xlsx' ? 'xlsx' : 'csv';
         $filter = [
-            'kelas'  => $_GET['kelas']  ?? '',
-            'search' => $_GET['search'] ?? '',
-            'sumber' => $_GET['sumber'] ?? '',
+            'kelas'   => $_GET['kelas']   ?? '',
+            'search'  => $_GET['search']  ?? '',
+            'jabatan' => $_GET['jabatan'] ?? '',
         ];
 
         $um   = new UserModel();
         $rows = $um->getAnggotaForExport($filter);
 
-        $headers = ['NIA', 'Nama Lengkap', 'Kelas', 'No HP', 'Email', 'Sumber', 'Status', 'Tahun Daftar'];
+        $headers = ['NIA', 'NISN', 'Nama Lengkap', 'Kelas', 'No HP', 'Email', 'Jabatan', 'Status', 'Tahun Daftar'];
         $data = [];
         foreach ($rows as $r) {
             $data[] = [
                 $r['nia']          ?? '',
+                $r['nisn']         ?? '',
                 $r['nama_lengkap'] ?? '',
                 $r['kelas']        ?? '',
                 $r['no_hp']        ?? '',
                 $r['email']        ?? '',
-                $r['sumber']       ?? '',
+                UserModel::jabatanLabel($r['jabatan'] ?? null),
                 $r['status']       ?? '',
                 $r['tahun_daftar'] ?? '',
             ];
@@ -1526,7 +1501,6 @@ public function pab(): void
 
         if ($format === 'xlsx') {
             $content = Xlsx::write($headers, $data);
-
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment; filename="' . $filename . '.xlsx"');
             header('Content-Length: ' . strlen($content));
@@ -1535,13 +1509,12 @@ public function pab(): void
             exit;
         }
 
-        // default: CSV
         header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
         header('Cache-Control: max-age=0');
 
         $out = fopen('php://output', 'w');
-        fputs($out, "\xEF\xBB\xBF"); // BOM supaya Excel baca UTF-8 (é, ñ, dll) dgn benar
+        fputs($out, "\xEF\xBB\xBF");
         fputcsv($out, $headers);
         foreach ($data as $row) {
             fputcsv($out, $row);
@@ -1553,26 +1526,12 @@ public function pab(): void
     // ================================================================
     //  ANGGOTA — IMPORT
     // ================================================================
-    public function anggotaImport(): void
-    {
-        $this->requireAdmin();
-        $flash = $this->getFlash();
-        $csrf  = $this->csrfToken();
-
-        $importErrors = $_SESSION['import_errors'] ?? [];
-        unset($_SESSION['import_errors']);
-
-        $jabatanList = UserModel::JABATAN_LIST;
-
-        $this->view('admin/anggota_import', compact('flash', 'csrf', 'importErrors', 'jabatanList'), 'admin');
-    }
-
     public function anggotaImportTemplate(): void
     {
         $this->requireAdmin();
 
-        $headers = ['Nama Lengkap', 'Kelas', 'No HP', 'Email', 'Tahun Daftar', 'Jabatan'];
-        $example = ['Contoh Nama Siswa', 'XII RPL 1', '081234567890', 'contoh@email.com', date('Y'), 'anggota'];
+        $headers = ['Nama Lengkap', 'Kelas', 'NISN', 'No HP', 'Email', 'Tahun Daftar', 'Jabatan'];
+        $example = ['Contoh Nama Siswa', 'XII RPL 1', '0012345678', '081234567890', 'contoh@email.com', date('Y'), 'anggota'];
 
         header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="template_import_anggota.csv"');
@@ -1602,7 +1561,6 @@ public function pab(): void
         }
 
         $rows = [];
-
         if ($ext === 'csv') {
             $handle = fopen($_FILES['file']['tmp_name'], 'r');
             if ($handle === false) {
@@ -1610,12 +1568,8 @@ public function pab(): void
                 $this->redirect('/admin/anggota/import');
             }
             $first = fread($handle, 3);
-            if ($first !== "\xEF\xBB\xBF") {
-                rewind($handle);
-            }
-            while (($r = fgetcsv($handle)) !== false) {
-                $rows[] = $r;
-            }
+            if ($first !== "\xEF\xBB\xBF") rewind($handle);
+            while (($r = fgetcsv($handle)) !== false) $rows[] = $r;
             fclose($handle);
         } else {
             try {
@@ -1640,25 +1594,30 @@ public function pab(): void
         $dilewati = 0;
         $errors   = [];
 
+        // Urutan kolom template: Nama Lengkap, Kelas, NISN, No HP, Email, Tahun Daftar, Jabatan
         foreach ($rows as $i => $row) {
             $lineNum = $i + 2;
 
             $nama  = trim((string)($row[0] ?? ''));
             $kelas = trim((string)($row[1] ?? ''));
-            $noHp  = preg_replace('/\D/', '', (string)($row[2] ?? ''));
-            $email = trim((string)($row[3] ?? ''));
+
+            $nisnRaw = trim((string)($row[2] ?? ''));
+            $nisn    = $nisnRaw !== '' ? preg_replace('/\D/', '', $nisnRaw) : null;
+
+            $noHp  = preg_replace('/\D/', '', (string)($row[3] ?? ''));
+            $email = trim((string)($row[4] ?? ''));
             $email = filter_var($email, FILTER_VALIDATE_EMAIL) ?: null;
 
-            $tahunRaw = trim((string)($row[4] ?? ''));
+            $tahunRaw = trim((string)($row[5] ?? ''));
             $tahunMax = (int)date('Y') + 1;
             $tahun = (ctype_digit($tahunRaw) && (int)$tahunRaw >= 2000 && (int)$tahunRaw <= $tahunMax)
                 ? (int)$tahunRaw
                 : (int)date('Y');
 
-            $jabatanRaw = trim((string)($row[5] ?? ''));
+            $jabatanRaw = trim((string)($row[6] ?? ''));
             $jabatan    = array_key_exists($jabatanRaw, UserModel::JABATAN_LIST) ? $jabatanRaw : 'anggota';
 
-            if ($nama === '' && $kelas === '' && $noHp === '' && !$email) {
+            if ($nama === '' && $kelas === '' && $noHp === '' && !$email && !$nisn) {
                 continue;
             }
 
@@ -1668,13 +1627,23 @@ public function pab(): void
                 continue;
             }
 
-            if (($email && $um->existsByEmail($email)) || ($noHp && $um->existsByPhone($noHp))) {
-                $errors[] = "Baris {$lineNum}: {$nama} — email/No HP sudah terdaftar, dilewati.";
+            if ($nisn !== null && strlen($nisn) !== 10) {
+                $errors[] = "Baris {$lineNum}: {$nama} — NISN tidak valid (harus 10 digit), dilewati.";
+                $dilewati++;
+                continue;
+            }
+
+            if (($email && $um->existsByEmail($email))
+                || ($noHp && $um->existsByPhone($noHp))
+                || ($nisn && $um->existsByNisn($nisn))
+            ) {
+                $errors[] = "Baris {$lineNum}: {$nama} — email/No HP/NISN sudah terdaftar, dilewati.";
                 $dilewati++;
                 continue;
             }
 
             $userId = $um->createAnggota([
+                'nisn'          => $nisn,
                 'nama_lengkap'  => htmlspecialchars($nama, ENT_QUOTES),
                 'kelas'         => htmlspecialchars($kelas, ENT_QUOTES),
                 'no_hp'         => $noHp,
@@ -1691,7 +1660,7 @@ public function pab(): void
         }
 
         $msg = "{$sukses} anggota berhasil diimpor";
-        $msg .= $dilewati > 0 ? ", {$dilewati} baris dilewati (kosong/duplikat)." : '.';
+        $msg .= $dilewati > 0 ? ", {$dilewati} baris dilewati (kosong/duplikat/NISN tidak valid)." : '.';
         $msg .= ' Password default: <strong>comsmakda</strong> (wajib diganti anggota setelah login).';
 
         $this->flash($dilewati > 0 && $sukses === 0 ? 'error' : ($dilewati > 0 ? 'warning' : 'success'), $msg);
@@ -1702,7 +1671,6 @@ public function pab(): void
 
         $this->redirect($sukses > 0 || $dilewati > 0 ? '/admin/anggota' : '/admin/anggota/import');
     }
-
     // ================================================================
     //  ANGGOTA — RESET SEQUENCE NIA
     // ================================================================
