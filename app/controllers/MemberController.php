@@ -32,8 +32,29 @@ class MemberController extends Controller
         $this->requireAnggota();
         $this->verifyCsrf();
 
+        $userId = (int)$_SESSION['user_id'];
+        $um     = new UserModel();
+
+        // NISN: opsional untuk data lama yang belum lengkap, tapi kalau diisi
+        // wajib 10 digit & tidak boleh bentrok dengan anggota lain.
+        $nisnInput = preg_replace('/\D/', '', $_POST['nisn'] ?? '');
+
+        if ($nisnInput !== '' && strlen($nisnInput) !== 10) {
+            $this->flash('error', 'NISN harus terdiri dari 10 digit angka.');
+            $this->redirect('/member/profile');
+        }
+
+        if ($nisnInput !== '') {
+            $existing = $um->findByNisn($nisnInput);
+            if ($existing && (int)$existing['id'] !== $userId) {
+                $this->flash('error', 'NISN tersebut sudah terdaftar untuk akun lain.');
+                $this->redirect('/member/profile');
+            }
+        }
+
         $d = [
             'nama_lengkap' => htmlspecialchars(trim($_POST['nama_lengkap'] ?? ''), ENT_QUOTES),
+            'nisn'         => $nisnInput !== '' ? $nisnInput : '', // '' -> disimpan sbg NULL oleh updateProfile()
             'kelas'        => htmlspecialchars(trim($_POST['kelas'] ?? ''), ENT_QUOTES),
             'no_hp'        => preg_replace('/\D/', '', $_POST['no_hp'] ?? ''),
             'foto'         => null,
@@ -48,7 +69,17 @@ class MemberController extends Controller
             }
         }
 
-        (new UserModel())->updateProfile((int)$_SESSION['user_id'], $d);
+        try {
+            $um->updateProfile($userId, $d);
+        } catch (PDOException $e) {
+            // Jaring pengaman terakhir kalau ada race condition (dua orang simpan NISN sama nyaris bersamaan)
+            if ((int)$e->getCode() === 23000 || $e->getCode() === '23000') {
+                $this->flash('error', 'NISN tersebut sudah terdaftar untuk akun lain.');
+                $this->redirect('/member/profile');
+            }
+            throw $e;
+        }
+
         $_SESSION['user_name'] = $d['nama_lengkap'];
         $this->flash('success', 'Profil berhasil diperbarui.');
         $this->redirect('/member/profile');
@@ -97,9 +128,6 @@ class MemberController extends Controller
         $fpModel = new FingerprintModel();
         $riwayat = $fpModel->getRiwayatAbsensiAnggota($userId, $tanggalMulai, $tanggalAkhir);
 
-        // Key lengkap disiapkan di awal (termasuk 'libur' & 'belum_mulai') supaya
-        // tidak ada warning "Undefined array key" saat increment, dan supaya
-        // status baru di masa depan tetap aman lewat fallback isset() di bawah.
         $stats = [
             'hadir'       => 0,
             'terlambat'   => 0,
@@ -110,7 +138,7 @@ class MemberController extends Controller
         foreach ($riwayat as $r) {
             $status = $r['status'] ?? 'alpa';
             if (!isset($stats[$status])) {
-                $stats[$status] = 0; // jaga-jaga kalau ada status baru di masa depan
+                $stats[$status] = 0;
             }
             $stats[$status]++;
         }
@@ -133,7 +161,6 @@ class MemberController extends Controller
             $this->redirect('/member/dashboard');
         }
 
-        // Render halaman cetak
         $this->view('/member/surat_pernyataan', compact('user', 'settings'), 'member');
     }
-}   
+}

@@ -92,11 +92,23 @@ class UserModel extends Model
         );
     }
 
+    /**
+     * Cari user berdasarkan NISN — dipakai untuk cek duplikasi saat
+     * pendaftaran PAB (mencegah satu NISN terdaftar dua kali sebagai anggota).
+     */
+    public function findByNisn(string $nisn): array|false
+    {
+        return $this->fetch(
+            "SELECT * FROM users WHERE nisn = ? LIMIT 1",
+            [$nisn]
+        );
+    }
+
     public function find(int $id): array|false
     {
         return $this->fetch(
-            "SELECT id, nama_lengkap, email, no_hp, foto, role, jabatan, status, is_super_admin,
-                    password_hash, nia, kelas, sumber, tahun_daftar, created_at
+            "SELECT id, nia, nisn, nama_lengkap, email, no_hp, foto, role, jabatan, status, is_super_admin,
+                    password_hash, kelas, sumber, tahun_daftar, created_at
              FROM users WHERE id = ? LIMIT 1",
             [$id]
         );
@@ -110,9 +122,10 @@ class UserModel extends Model
 
         $this->execute(
             "INSERT INTO users
-               (nama_lengkap, kelas, no_hp, email, password_hash, foto, role, jabatan, status, sumber, tahun_daftar)
-             VALUES (?, ?, ?, ?, ?, ?, 'anggota', ?, 'pending', ?, ?)",
+               (nisn, nama_lengkap, kelas, no_hp, email, password_hash, foto, role, jabatan, status, sumber, tahun_daftar)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 'anggota', ?, 'pending', ?, ?)",
             [
+                $d['nisn'] ?? null,
                 $d['nama_lengkap'],
                 $d['kelas'],
                 $d['no_hp'],
@@ -147,13 +160,15 @@ class UserModel extends Model
     }
 
     /**
-     * Update profil — support anggota (nama, kelas, no_hp, foto, jabatan)
+     * Update profil — support anggota (nama, kelas, no_hp, foto, jabatan, nisn)
      * maupun admin (+ email).
      * Hanya key yang ada di $d yang di-update.
+     * 'nisn' sengaja dimasukkan ke sini supaya admin bisa backfill NISN
+     * anggota lama lewat form edit profil, tanpa perlu endpoint terpisah.
      */
     public function updateProfile(int $id, array $d): void
     {
-        $allowed = ['nama_lengkap', 'kelas', 'no_hp', 'email', 'foto', 'jabatan'];
+        $allowed = ['nama_lengkap', 'kelas', 'no_hp', 'email', 'foto', 'jabatan', 'nisn'];
         $fields  = [];
         $params  = [];
 
@@ -167,6 +182,10 @@ class UserModel extends Model
                     // pastikan hanya value valid yang masuk
                     $fields[]  = "jabatan = ?";
                     $params[]  = array_key_exists($d['jabatan'], self::JABATAN_LIST) ? $d['jabatan'] : 'anggota';
+                } elseif ($col === 'nisn') {
+                    // simpan NULL kalau dikirim string kosong, bukan '' (biar tidak bentrok unique index)
+                    $fields[]  = "nisn = ?";
+                    $params[]  = ($d['nisn'] === '' || $d['nisn'] === null) ? null : $d['nisn'];
                 } else {
                     $fields[]  = "{$col} = ?";
                     $params[]  = $d[$col];
@@ -274,13 +293,14 @@ class UserModel extends Model
             $params[] = $filter['jabatan'];
         }
         if (!empty($filter['search'])) {
-            $where[]  = "(nama_lengkap LIKE ? OR nia LIKE ? OR no_hp LIKE ?)";
+            $where[]  = "(nama_lengkap LIKE ? OR nia LIKE ? OR no_hp LIKE ? OR nisn LIKE ?)";
+            $params[] = '%' . $filter['search'] . '%';
             $params[] = '%' . $filter['search'] . '%';
             $params[] = '%' . $filter['search'] . '%';
             $params[] = '%' . $filter['search'] . '%';
         }
 
-        $sql = "SELECT nia, nama_lengkap, kelas, no_hp, email, sumber, jabatan, status, tahun_daftar
+        $sql = "SELECT nia, nisn, nama_lengkap, kelas, no_hp, email, sumber, jabatan, status, tahun_daftar
                 FROM users WHERE " . implode(' AND ', $where) . " ORDER BY nama_lengkap ASC";
 
         return $this->fetchAll($sql, $params);
@@ -334,6 +354,18 @@ class UserModel extends Model
         return (bool) $this->fetch(
             "SELECT id FROM users WHERE no_hp = ? LIMIT 1",
             [$noHp]
+        );
+    }
+
+    /**
+     * Cek apakah NISN sudah dipakai user lain — dipakai saat IMPORT anggota
+     * manual maupun approve PAB, supaya baris duplikat otomatis dilewati/ditolak.
+     */
+    public function existsByNisn(string $nisn): bool
+    {
+        return (bool) $this->fetch(
+            "SELECT id FROM users WHERE nisn = ? LIMIT 1",
+            [$nisn]
         );
     }
 

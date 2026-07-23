@@ -38,7 +38,6 @@ $rawMsg    = $flash['msg'] ?? [];
 if (is_array($rawMsg)) {
     $flashMsgs = $rawMsg;
 } else {
-    // Coba decode JSON (format baru dari flashMessages()); kalau gagal, anggap string biasa
     $decoded = json_decode((string) $rawMsg, true);
     $flashMsgs = is_array($decoded) ? $decoded : array_filter([trim(strip_tags((string) $rawMsg))]);
 }
@@ -49,8 +48,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 <style>
 /* ═══════════════════════════════════════════
    PAB PAGE — mengikuti Design System
-   (token asli didefinisikan global di layout;
-    fallback disertakan bila halaman ini dirender berdiri sendiri)
 ═══════════════════════════════════════════ */
 .pab-wrap {
   --tx-primary:   var(--c-ink,    #0f172a);
@@ -112,7 +109,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
   z-index: 0;
 }
 
-/* ── Shell: two-column balance on desktop, single column on mobile ── */
 .pab-shell {
   position: relative;
   z-index: 1;
@@ -125,7 +121,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
   align-items: start;
 }
 
-/* ── Side panel (branding / info) ── */
 .pab-side {
   position: sticky;
   top: 2.5rem;
@@ -183,11 +178,8 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
   border-radius: 99px; padding: 5px 13px;
 }
 
-/* Benefit list — memberi konteks singkat kenapa bergabung */
 .pab-benefits { display: flex; flex-direction: column; gap: .8rem; }
-.pab-benefit {
-  display: flex; align-items: flex-start; gap: 11px;
-}
+.pab-benefit { display: flex; align-items: flex-start; gap: 11px; }
 .pab-benefit-icon {
   width: 30px; height: 30px; border-radius: 9px;
   background: var(--bg-surface);
@@ -199,7 +191,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 .pab-benefit-text { font-size: .81rem; color: var(--tx-secondary); line-height: 1.55; padding-top: 4px; }
 .pab-benefit-text strong { color: var(--tx-primary); font-weight: 700; }
 
-/* ── Persyaratan (info card) — tinggal di side panel ── */
 .pab-req {
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
@@ -229,10 +220,8 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 }
 .pab-back a:hover { color: var(--ac); }
 
-/* ── Main column ── */
 .pab-main { min-width: 0; }
 
-/* ── Card ── */
 .pab-card {
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
@@ -258,7 +247,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 .pab-card-head span { font-size: .69rem; color: var(--tx-muted); letter-spacing: .03em; }
 .pab-card-body { padding: 2rem; }
 
-/* ── Closed state ── */
 .pab-closed { text-align: center; padding: 3.5rem 2rem; }
 .pab-closed-icon {
   width: 64px; height: 64px;
@@ -271,7 +259,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 .pab-closed h2 { font-size: 1.2rem; font-weight: 800; color: var(--tx-primary); margin-bottom: .5rem; }
 .pab-closed p { font-size: .84rem; color: var(--tx-secondary); line-height: 1.75; max-width: 380px; margin: 0 auto; }
 
-/* ── Step indicator ── */
 .pab-steps { display: flex; align-items: center; gap: 0; margin-bottom: 1.9rem; }
 .pab-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; position: relative; }
 .pab-step::after { content: ''; position: absolute; top: 14px; left: 50%; width: 100%; height: 1px; background: var(--bd-subtle); }
@@ -289,7 +276,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 .pab-step.active .pab-step-label { color: var(--ac); }
 .pab-step.done  .pab-step-label  { color: var(--green); }
 
-/* ── Form fields ── */
 .pab-form { display: flex; flex-direction: column; gap: 1.15rem; }
 .pab-field { display: flex; flex-direction: column; gap: .45rem; }
 .pab-label { font-size: .78rem; font-weight: 700; color: var(--tx-primary); letter-spacing: -.01em; }
@@ -324,7 +310,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 }
 .pab-divider::before, .pab-divider::after { content: ''; flex: 1; height: 1px; background: var(--bd-subtle); }
 
-/* ── Dropzone ── */
 .pab-dropzone {
   width: 100%;
   border: 1.5px dashed var(--bd-subtle);
@@ -373,7 +358,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 }
 .pab-file-error.show { display: flex; }
 
-/* ── Submit button ── */
 .pab-submit {
   width: 100%; padding: 13px;
   background: var(--ac); color: #fff;
@@ -394,12 +378,7 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
   margin-top: .4rem;
 }
 
-/* ── Modal alert (gaya SweetAlert) ── */
 .pab-modal-overlay {
-  /* Variabel mandiri — modal ini berada di luar .pab-wrap secara DOM,
-     jadi ia tidak bisa mewarisi custom properties dari .pab-wrap.
-     Tanpa blok ini semua var(--xxx) di bawah akan gagal resolve,
-     ikon jadi transparan dan tombol jadi putih-di-atas-putih (invisible). */
   --tx-primary:   var(--c-ink,        #0f172a);
   --tx-secondary: var(--c-muted,      #64748b);
   --tx-muted:     var(--c-muted2,     #94a3b8);
@@ -422,7 +401,7 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 }
 .pab-modal-overlay.show { display: flex; opacity: 1; }
 .pab-modal {
-  position: relative; /* penting: agar tombol close ✕ menempel benar di dalam kartu */
+  position: relative;
   background: #fff;
   border-radius: 20px;
   padding: 2rem 1.85rem 1.75rem;
@@ -466,7 +445,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 .pab-modal-btn.is-success { background: var(--green); }
 .pab-modal-btn.is-success:hover { background: #16a34a; }
 
-/* ── Responsive ── */
 @media (max-width: 900px) {
   .pab-shell { grid-template-columns: 1fr; max-width: 560px; gap: 2.25rem; }
   .pab-side { position: static; text-align: center; align-items: center; max-height: none; overflow: visible; }
@@ -541,7 +519,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
         </span>
       <?php endif; ?>
 
-      <!-- Kenapa gabung -->
       <div class="pab-benefits">
         <div class="pab-benefit">
           <div class="pab-benefit-icon">
@@ -573,6 +550,10 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
         <div class="pab-req-list">
           <div class="pab-req-item">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>NISN (Nomor Induk Siswa Nasional) 10 digit — satu NISN hanya bisa daftar sekali.</span>
+          </div>
+          <div class="pab-req-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
             <span>Nama lengkap, kelas, dan nomor HP aktif yang bisa dihubungi.</span>
           </div>
           <div class="pab-req-item">
@@ -599,11 +580,9 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
     <!-- ── Main column: card ── -->
     <div class="pab-main">
 
-      <!-- ── Card ── -->
       <div class="pab-card">
 
         <?php if (!$isOpen): ?>
-          <!-- Closed state -->
           <div class="pab-closed">
             <div class="pab-closed-icon">
               <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -613,7 +592,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
           </div>
 
         <?php else: ?>
-          <!-- Card header -->
           <div class="pab-card-head">
             <div class="pab-card-head-left">
               <div class="pab-card-head-icon">
@@ -626,10 +604,8 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
             </div>
           </div>
 
-          <!-- Card body -->
           <div class="pab-card-body">
 
-            <!-- Step indicator -->
             <div class="pab-steps" aria-label="Langkah pendaftaran">
               <div class="pab-step active">
                 <div class="pab-step-dot">1</div>
@@ -648,6 +624,17 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
             <form method="POST" action="<?= BASE_URL ?>/pab/register"
                   enctype="multipart/form-data" class="pab-form" id="pab-form" novalidate>
               <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
+
+              <!-- NISN -->
+              <div class="pab-field">
+                <label class="pab-label" for="pab-nisn">NISN <span>*</span></label>
+                <input id="pab-nisn" type="text" name="nisn" required
+                       class="pab-input" placeholder="10 digit NISN"
+                       value="<?= htmlspecialchars($old['nisn'] ?? '') ?>"
+                       inputmode="numeric" pattern="[0-9]{10}" maxlength="10"
+                       autocomplete="off">
+                <span class="pab-hint">NISN dipakai untuk mencegah data ganda — pastikan diisi sesuai kartu pelajar/rapor.</span>
+              </div>
 
               <!-- Nama -->
               <div class="pab-field">
@@ -677,10 +664,8 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
               </div>
               <span class="pab-hint">Pastikan nomor HP aktif — panitia akan menghubungi lewat WhatsApp.</span>
 
-              <!-- Divider -->
               <div class="pab-divider">Akun Portal</div>
 
-              <!-- Password -->
               <div class="pab-field">
                 <label class="pab-label" for="pab-pass">Password <span>*</span></label>
                 <div style="position:relative">
@@ -696,7 +681,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
                 <span class="pab-pass-hint">Password ini digunakan untuk login ke portal komunitas — jangan lupa dicatat.</span>
               </div>
 
-              <!-- Konfirmasi Password -->
               <div class="pab-field">
                 <label class="pab-label" for="pab-pass2">Konfirmasi Password <span>*</span></label>
                 <div style="position:relative">
@@ -709,10 +693,8 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
                 <span class="pab-hint" id="pass-match-text"></span>
               </div>
 
-              <!-- Divider -->
               <div class="pab-divider">Pas Foto</div>
 
-              <!-- Dropzone foto -->
               <div class="pab-field">
                 <label class="pab-label">Pas Foto <span>*</span></label>
                 <div class="pab-dropzone" id="pab-dropzone" role="button" tabindex="0"
@@ -742,7 +724,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
                 <?php endif; ?>
               </div>
 
-              <!-- Submit -->
               <button type="submit" class="pab-submit" id="pab-submit">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                 Kirim Pendaftaran
@@ -753,16 +734,16 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
               </p>
 
             </form>
-          </div><!-- .pab-card-body -->
+          </div>
         <?php endif; ?>
-      </div><!-- .pab-card -->
+      </div>
 
-    </div><!-- .pab-main -->
+    </div>
 
-  </div><!-- .pab-shell -->
-</div><!-- .pab-wrap -->
+  </div>
+</div>
 
-<!-- ── Modal alert (gaya SweetAlert), dipopulate lewat JS dari data flash ── -->
+<!-- ── Modal alert (gaya SweetAlert) ── -->
 <div class="pab-modal-overlay" id="pab-modal-overlay">
   <div class="pab-modal" role="alertdialog" aria-modal="true" aria-labelledby="pab-modal-title">
     <button type="button" class="pab-modal-close" id="pab-modal-close" aria-label="Tutup">
@@ -785,7 +766,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
 (function () {
   'use strict';
 
-  /* ── Modal alert ── */
   (function initFlashModal() {
     var data = window.__pabFlash;
     if (!data || !data.messages || !data.messages.length) return;
@@ -847,7 +827,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
     requestAnimationFrame(function () { overlay.classList.add('show'); });
   })();
 
-  /* ── Toggle password visibility ── */
   var passInput  = document.getElementById('pab-pass');
   var toggleBtn  = document.getElementById('toggle-pass');
   var eyeIcon    = document.getElementById('eye-icon');
@@ -862,7 +841,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
     });
   }
 
-  /* ── Password match indicator ── */
   var pass2Input   = document.getElementById('pab-pass2');
   var matchIcon    = document.getElementById('pass-match-icon');
   var matchText    = document.getElementById('pass-match-text');
@@ -887,7 +865,6 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
     if (passInput) passInput.addEventListener('input', checkMatch);
   }
 
-  /* ── Dropzone / file upload ── */
   var dropzone   = document.getElementById('pab-dropzone');
   var fileInput  = document.getElementById('pab-foto');
   var preview    = document.getElementById('pab-preview');
@@ -973,14 +950,14 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
     });
   }
 
-  /* ── Step indicator update on input ── */
+  var nisnEl  = document.getElementById('pab-nisn');
   var namaEl  = document.getElementById('pab-nama');
   var kelasEl = document.getElementById('pab-kelas');
   var hpEl    = document.getElementById('pab-hp');
   var steps   = document.querySelectorAll('.pab-step');
 
   function updateSteps() {
-    var step1done = (namaEl && namaEl.value.trim()) && (kelasEl && kelasEl.value.trim()) && (hpEl && hpEl.value.trim());
+    var step1done = (nisnEl && nisnEl.value.trim().length === 10) && (namaEl && namaEl.value.trim()) && (kelasEl && kelasEl.value.trim()) && (hpEl && hpEl.value.trim());
     var step2done = (passInput && passInput.value.length >= 6) && (pass2Input && passInput.value === pass2Input.value);
     var step3done = preview && preview.classList.contains('show');
     if (steps[0]) { steps[0].className = 'pab-step ' + (step1done ? 'done' : 'active'); steps[0].querySelector('.pab-step-dot').textContent = step1done ? '✓' : '1'; }
@@ -989,11 +966,10 @@ $flashMsgs = array_values(array_filter(array_map('trim', $flashMsgs)));
   }
   updateSteps();
 
-  [namaEl, kelasEl, hpEl, passInput, pass2Input].forEach(function (el) {
+  [nisnEl, namaEl, kelasEl, hpEl, passInput, pass2Input].forEach(function (el) {
     if (el) el.addEventListener('input', updateSteps);
   });
 
-  /* ── Submit loading state ── */
   var form      = document.getElementById('pab-form');
   var submitBtn = document.getElementById('pab-submit');
   if (form && submitBtn) {

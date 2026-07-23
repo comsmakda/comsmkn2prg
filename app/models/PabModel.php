@@ -9,9 +9,10 @@ class PabModel extends Model
     {
         $this->execute(
             "INSERT INTO pab_registrations
-               (nama_lengkap, kelas, no_hp, password_hash, foto)
-             VALUES (?, ?, ?, ?, ?)",
+               (nisn, nama_lengkap, kelas, no_hp, password_hash, foto)
+             VALUES (?, ?, ?, ?, ?, ?)",
             [
+                $d['nisn'],
                 $d['nama_lengkap'],
                 $d['kelas'],
                 $d['no_hp'],
@@ -20,6 +21,43 @@ class PabModel extends Model
             ]
         );
         return (int)$this->lastId();
+    }
+
+    /**
+     * Cari pendaftaran berdasarkan NISN (untuk cek duplikasi sebelum insert).
+     */
+    public function findByNisn(string $nisn): ?array
+    {
+        $rows = $this->fetchAll(
+            "SELECT * FROM pab_registrations WHERE nisn = ? LIMIT 1",
+            [$nisn]
+        );
+        return $rows[0] ?? null;
+    }
+
+    /**
+     * Dipakai saat siswa yang sebelumnya ditolak ('rejected') daftar ulang
+     * dengan NISN yang sama — menimpa baris lama alih-alih insert baru,
+     * supaya unique key nisn tidak bentrok.
+     */
+    public function resubmit(int $id, array $d): void
+    {
+        $this->execute(
+            "UPDATE pab_registrations
+             SET nisn=?, nama_lengkap=?, kelas=?, no_hp=?, password_hash=?, foto=?,
+                 status='pending', catatan_admin=NULL, user_id=NULL,
+                 updated_at=CURRENT_TIMESTAMP
+             WHERE id=?",
+            [
+                $d['nisn'],
+                $d['nama_lengkap'],
+                $d['kelas'],
+                $d['no_hp'],
+                $d['password_hash'],
+                $d['foto'] ?? null,
+                $id,
+            ]
+        );
     }
 
     public function getPending(): array
@@ -49,6 +87,7 @@ class PabModel extends Model
 
         $userModel = new UserModel();
         $userId    = $userModel->createAnggota([
+            'nisn'          => $reg['nisn'],
             'nama_lengkap'  => $reg['nama_lengkap'],
             'kelas'         => $reg['kelas'],
             'no_hp'         => $reg['no_hp'],

@@ -159,6 +159,12 @@
 
   .form-field input::placeholder { color: var(--c-muted2); }
 
+  .form-hint {
+    font-size: 11px;
+    color    : var(--c-muted2);
+    line-height: 1.5;
+  }
+
   /* File input */
   .file-field {
     display      : flex;
@@ -313,6 +319,19 @@
           <input type="text" id="nama_lengkap" name="nama_lengkap" required
                  placeholder="Nama lengkap"
                  value="<?= htmlspecialchars($user['nama_lengkap']) ?>">
+        </div>
+
+        <div class="form-field">
+          <label for="nisn">NISN</label>
+          <input type="text" id="nisn" name="nisn"
+                 placeholder="10 digit NISN"
+                 inputmode="numeric" pattern="[0-9]{10}" maxlength="10"
+                 value="<?= htmlspecialchars($user['nisn'] ?? '') ?>">
+          <span class="form-hint">
+            <?= empty($user['nisn'])
+                ? 'Belum diisi — lengkapi NISN kamu (Nomor Induk Siswa Nasional, 10 digit) sesuai kartu pelajar/rapor.'
+                : 'NISN sudah tersimpan. Hubungi admin jika perlu perbaikan.' ?>
+          </span>
         </div>
 
         <div class="form-field">
