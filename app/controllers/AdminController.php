@@ -16,25 +16,25 @@ class AdminController extends Controller
         $this->requireAdmin();
         $db    = Database::getInstance();
         $stats = [
-            'total_anggota'  => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif'")->fetchColumn(),
-            'pending_pab'    => (int)$db->query("SELECT COUNT(*) FROM pab_registrations WHERE status='pending'")->fetchColumn(),
-            'pending_manual' => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='pending'")->fetchColumn(),
-            'total_sesi'     => (int)$db->query("SELECT COUNT(*) FROM attendance_sessions")->fetchColumn(),
-            'total_berita'   => (int)$db->query("SELECT COUNT(*) FROM berita WHERE status='published'")->fetchColumn(),
+            'total_anggota'    => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif'")->fetchColumn(),
+            'pending_pab'      => (int)$db->query("SELECT COUNT(*) FROM pab_registrations WHERE status='pending'")->fetchColumn(),
+            'pending_manual'   => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='pending'")->fetchColumn(),
+            'total_sesi'       => (int)$db->query("SELECT COUNT(*) FROM attendance_sessions")->fetchColumn(),
+            'total_berita'     => (int)$db->query("SELECT COUNT(*) FROM berita WHERE status='published'")->fetchColumn(),
             'pending_komentar' => (int)$db->query("SELECT COUNT(*) FROM berita_komentar WHERE status='pending'")->fetchColumn(),
-            'total_album'    => (int)$db->query("SELECT COUNT(*) FROM galeri_album WHERE status='published'")->fetchColumn(),
+            'total_album'      => (int)$db->query("SELECT COUNT(*) FROM galeri_album WHERE status='published'")->fetchColumn(),
         ];
         $flash = $this->getFlash();
         $this->view('admin/dashboard', compact('stats', 'flash'), 'admin');
     }
 
-// ================================================================
+    // ================================================================
     //  ANGGOTA
     // ================================================================
     public function anggota(): void
     {
         $this->requireAdmin();
-        $filter    = [
+        $filter = [
             'kelas'   => $_GET['kelas']   ?? '',
             'search'  => $_GET['search']  ?? '',
             'jabatan' => $_GET['jabatan'] ?? '',
@@ -44,7 +44,7 @@ class AdminController extends Controller
         $pending   = $um->getPendingAnggota();
         $kelasList = $um->getKelasList();
 
-        $db = Database::getInstance();
+        $db    = Database::getInstance();
         $stats = [
             'total_aktif'      => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif'")->fetchColumn(),
             'total_pending'    => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='pending'")->fetchColumn(),
@@ -52,8 +52,8 @@ class AdminController extends Controller
             'total_tanpa_nisn' => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND (nisn IS NULL OR nisn = '')")->fetchColumn(),
         ];
 
-        $flash     = $this->getFlash();
-        $csrf      = $this->csrfToken();
+        $flash = $this->getFlash();
+        $csrf  = $this->csrfToken();
         $this->view('admin/anggota', compact('list', 'pending', 'kelasList', 'filter', 'stats', 'flash', 'csrf'), 'admin');
     }
 
@@ -72,7 +72,7 @@ class AdminController extends Controller
         $this->requireAdmin();
         $this->verifyCsrf();
 
-        $um       = new UserModel();
+        $um = new UserModel();
 
         $nama     = htmlspecialchars(trim($_POST['nama_lengkap'] ?? ''), ENT_QUOTES);
         $kelas    = htmlspecialchars(trim($_POST['kelas'] ?? ''), ENT_QUOTES);
@@ -89,8 +89,8 @@ class AdminController extends Controller
 
         $errors = [];
         if (strlen($nama) < 3)     $errors[] = 'Nama minimal 3 karakter.';
-        if (empty($kelas))          $errors[] = 'Kelas wajib diisi.';
-        if (strlen($password) < 6)  $errors[] = 'Password minimal 6 karakter.';
+        if (empty($kelas))         $errors[] = 'Kelas wajib diisi.';
+        if (strlen($password) < 6) $errors[] = 'Password minimal 6 karakter.';
         if ($nisn !== null && strlen($nisn) !== 10) {
             $errors[] = 'NISN harus 10 digit angka.';
         }
@@ -105,8 +105,9 @@ class AdminController extends Controller
 
         $foto = null;
         if (!empty($_FILES['foto']['name'])) {
-            try   { $foto = FileUploader::uploadFoto($_FILES['foto'], 'manual'); }
-            catch (RuntimeException $e) {
+            try {
+                $foto = FileUploader::uploadFoto($_FILES['foto'], 'manual');
+            } catch (RuntimeException $e) {
                 $this->flash('error', $e->getMessage());
                 $this->redirect('/admin/anggota/tambah');
             }
@@ -194,8 +195,9 @@ class AdminController extends Controller
             'foto'         => null,
         ];
         if (!empty($_FILES['foto']['name'])) {
-            try   { $d['foto'] = FileUploader::uploadFoto($_FILES['foto'], 'edit'); }
-            catch (RuntimeException $e) {
+            try {
+                $d['foto'] = FileUploader::uploadFoto($_FILES['foto'], 'edit');
+            } catch (RuntimeException $e) {
                 $this->flash('error', $e->getMessage());
                 $this->redirect("/admin/anggota/{$id}/edit");
             }
@@ -208,7 +210,7 @@ class AdminController extends Controller
     // ================================================================
     //  PAB
     // ================================================================
-public function pab(): void
+    public function pab(): void
     {
         $this->requireAdmin();
         $pm = new PabModel();
@@ -601,9 +603,9 @@ public function pab(): void
         $tanggalAkhir = $_GET['tanggal_akhir'] ?? date('Y-m-d');
         $kelas        = $_GET['kelas'] ?? '';
         $filter       = ['kelas' => $kelas];
-        $rekap = (new FingerprintModel())->getRekapHarian($tanggalMulai, $tanggalAkhir, $filter);
-        $headers = ['Nama', 'NIA', 'Kelas', 'Tanggal', 'Jam Masuk', 'Jam Pulang', 'Status'];
-        $data = [];
+        $rekap        = (new FingerprintModel())->getRekapHarian($tanggalMulai, $tanggalAkhir, $filter);
+        $headers      = ['Nama', 'NIA', 'Kelas', 'Tanggal', 'Jam Masuk', 'Jam Pulang', 'Status'];
+        $data         = [];
         foreach ($rekap as $r) {
             $data[] = [
                 $r['nama_lengkap'] ?? '',
@@ -616,7 +618,7 @@ public function pab(): void
             ];
         }
         $filename = 'rekap_absensi_' . $tanggalMulai . '_sd_' . $tanggalAkhir;
-        $content = Xlsx::write($headers, $data);
+        $content  = Xlsx::write($headers, $data);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $filename . '.xlsx"');
         header('Content-Length: ' . strlen($content));
@@ -670,66 +672,66 @@ public function pab(): void
     }
 
     public function jadwalPertemuanLiburStore(): void
-{
-    $this->requireAdmin();
-    $this->verifyCsrf();
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
 
-    $tglMulai   = $_POST['tanggal_mulai'] ?? '';
-    $tglAkhir   = trim($_POST['tanggal_akhir'] ?? '') ?: $tglMulai;
-    $keterangan = htmlspecialchars(trim($_POST['keterangan'] ?? ''), ENT_QUOTES);
+        $tglMulai   = $_POST['tanggal_mulai'] ?? '';
+        $tglAkhir   = trim($_POST['tanggal_akhir'] ?? '') ?: $tglMulai;
+        $keterangan = htmlspecialchars(trim($_POST['keterangan'] ?? ''), ENT_QUOTES);
 
-    $dMulai = DateTime::createFromFormat('Y-m-d', $tglMulai);
-    $dAkhir = DateTime::createFromFormat('Y-m-d', $tglAkhir);
+        $dMulai = DateTime::createFromFormat('Y-m-d', $tglMulai);
+        $dAkhir = DateTime::createFromFormat('Y-m-d', $tglAkhir);
 
-    if (!$tglMulai || !$dMulai || !$dAkhir) {
-        $this->flash('error', 'Tanggal tidak valid.');
+        if (!$tglMulai || !$dMulai || !$dAkhir) {
+            $this->flash('error', 'Tanggal tidak valid.');
+            $this->redirect('/admin/jadwal-pertemuan');
+        }
+
+        if ($dAkhir < $dMulai) {
+            $this->flash('error', 'Tanggal akhir tidak boleh sebelum tanggal mulai.');
+            $this->redirect('/admin/jadwal-pertemuan');
+        }
+
+        // Batas wajar supaya tidak disalahgunakan untuk generate ribuan baris sekaligus
+        $maxHari     = 366;
+        $selisihHari = (int)$dMulai->diff($dAkhir)->format('%a') + 1;
+        if ($selisihHari > $maxHari) {
+            $this->flash('error', "Rentang tanggal terlalu panjang (maksimal {$maxHari} hari).");
+            $this->redirect('/admin/jadwal-pertemuan');
+        }
+
+        $jpm = new JadwalPertemuanModel();
+
+        $sukses   = 0;
+        $dilewati = 0;
+
+        $periode = new DatePeriod($dMulai, new DateInterval('P1D'), (clone $dAkhir)->modify('+1 day'));
+        foreach ($periode as $tgl) {
+            $ok = $jpm->tambahLibur($tgl->format('Y-m-d'), $keterangan ?: null);
+            $ok ? $sukses++ : $dilewati++;
+        }
+
+        if ($sukses > 0 && $dilewati === 0) {
+            $msg = $sukses === 1
+                ? 'Tanggal libur berhasil ditambahkan. Anggota tidak akan dihitung alpa pada tanggal tsb.'
+                : "{$sukses} tanggal libur berhasil ditambahkan.";
+            $this->flash('success', $msg);
+        } elseif ($sukses > 0 && $dilewati > 0) {
+            $this->flash('warning', "{$sukses} tanggal ditambahkan, {$dilewati} tanggal dilewati (sudah ada di daftar libur).");
+        } else {
+            $this->flash('warning', 'Semua tanggal pada rentang ini sudah ada di daftar libur.');
+        }
+
         $this->redirect('/admin/jadwal-pertemuan');
     }
-
-    if ($dAkhir < $dMulai) {
-        $this->flash('error', 'Tanggal akhir tidak boleh sebelum tanggal mulai.');
-        $this->redirect('/admin/jadwal-pertemuan');
-    }
-
-    // Batas wajar supaya tidak disalahgunakan untuk generate ribuan baris sekaligus
-    $maxHari = 366;
-    $selisihHari = (int)$dMulai->diff($dAkhir)->format('%a') + 1;
-    if ($selisihHari > $maxHari) {
-        $this->flash('error', "Rentang tanggal terlalu panjang (maksimal {$maxHari} hari).");
-        $this->redirect('/admin/jadwal-pertemuan');
-    }
-
-    $jpm = new JadwalPertemuanModel();
-
-    $sukses  = 0;
-    $dilewati = 0;
-
-    $periode = new DatePeriod($dMulai, new DateInterval('P1D'), (clone $dAkhir)->modify('+1 day'));
-    foreach ($periode as $tgl) {
-        $ok = $jpm->tambahLibur($tgl->format('Y-m-d'), $keterangan ?: null);
-        $ok ? $sukses++ : $dilewati++;
-    }
-
-    if ($sukses > 0 && $dilewati === 0) {
-        $msg = $sukses === 1
-            ? 'Tanggal libur berhasil ditambahkan. Anggota tidak akan dihitung alpa pada tanggal tsb.'
-            : "{$sukses} tanggal libur berhasil ditambahkan.";
-        $this->flash('success', $msg);
-    } elseif ($sukses > 0 && $dilewati > 0) {
-        $this->flash('warning', "{$sukses} tanggal ditambahkan, {$dilewati} tanggal dilewati (sudah ada di daftar libur).");
-    } else {
-        $this->flash('warning', 'Semua tanggal pada rentang ini sudah ada di daftar libur.');
-    }
-
-    $this->redirect('/admin/jadwal-pertemuan');
-}
 
     public function jadwalPertemuanLiburDelete(string $id): void
     {
         $this->requireAdmin();
         $this->verifyCsrf();
 
-        (new JadwalPertemuanModel())->hapusLibur((int) $id);
+        (new JadwalPertemuanModel())->hapusLibur((int)$id);
         $this->flash('success', 'Tanggal libur berhasil dihapus.');
         $this->redirect('/admin/jadwal-pertemuan');
     }
@@ -747,8 +749,8 @@ public function pab(): void
             $this->redirect('/admin/dashboard');
         }
         $isSuperAdmin = (bool)($admin['is_super_admin'] ?? false);
-        $flash = $this->getFlash();
-        $csrf  = $this->csrfToken();
+        $flash        = $this->getFlash();
+        $csrf         = $this->csrfToken();
         $this->view('admin/profil', compact('admin', 'flash', 'csrf', 'isSuperAdmin'), 'admin');
     }
 
@@ -772,7 +774,7 @@ public function pab(): void
 
         $errors = [];
         if (strlen($nama) < 3) $errors[] = 'Nama minimal 3 karakter.';
-        if (!$email)            $errors[] = 'Email tidak valid.';
+        if (!$email)           $errors[] = 'Email tidak valid.';
 
         if ($errors) {
             $this->flash('error', implode('<br>', $errors));
@@ -863,8 +865,8 @@ public function pab(): void
         $this->requireSuperAdmin();
         $this->verifyCsrf();
 
-        $id = (int)($_POST['user_id'] ?? 0);
-        $um = new UserModel();
+        $id     = (int)($_POST['user_id'] ?? 0);
+        $um     = new UserModel();
         $target = $um->find($id);
 
         if (!$target || $target['role'] !== 'anggota' || $target['status'] !== 'aktif') {
@@ -949,8 +951,9 @@ public function pab(): void
 
         $foto = null;
         if (!empty($_FILES['foto']['name'])) {
-            try   { $foto = FileUploader::uploadFoto($_FILES['foto'], 'riwayat'); }
-            catch (RuntimeException $e) {
+            try {
+                $foto = FileUploader::uploadFoto($_FILES['foto'], 'riwayat');
+            } catch (RuntimeException $e) {
                 $this->flash('error', 'Upload foto gagal: ' . $e->getMessage());
                 $this->redirect('/admin/riwayat#form-tambah');
             }
@@ -1244,14 +1247,14 @@ public function pab(): void
     public function galeri(): void
     {
         $this->requireAdmin();
-        $gm    = new GaleriModel();
-        $page  = max(1, (int)($_GET['page'] ?? 1));
-        $limit = 15;
-        $total = $gm->countAllAlbums();
-        $pages = max(1, (int)ceil($total / $limit));
+        $gm     = new GaleriModel();
+        $page   = max(1, (int)($_GET['page'] ?? 1));
+        $limit  = 15;
+        $total  = $gm->countAllAlbums();
+        $pages  = max(1, (int)ceil($total / $limit));
         $albums = $gm->getAllAlbums($page, $limit);
-        $flash = $this->getFlash();
-        $csrf  = $this->csrfToken();
+        $flash  = $this->getFlash();
+        $csrf   = $this->csrfToken();
         $this->view('admin/galeri', compact('albums', 'page', 'pages', 'total', 'flash', 'csrf'), 'admin');
     }
 
@@ -1464,7 +1467,7 @@ public function pab(): void
         $this->redirect('/admin/galeri/' . $albumId . '/foto');
     }
 
-// ================================================================
+    // ================================================================
     //  ANGGOTA — EXPORT
     // ================================================================
     public function anggotaExport(): void
@@ -1482,7 +1485,7 @@ public function pab(): void
         $rows = $um->getAnggotaForExport($filter);
 
         $headers = ['NIA', 'NISN', 'Nama Lengkap', 'Kelas', 'No HP', 'Email', 'Jabatan', 'Status', 'Tahun Daftar'];
-        $data = [];
+        $data    = [];
         foreach ($rows as $r) {
             $data[] = [
                 $r['nia']          ?? '',
@@ -1526,6 +1529,27 @@ public function pab(): void
     // ================================================================
     //  ANGGOTA — IMPORT
     // ================================================================
+
+    /**
+     * Menampilkan form upload untuk import anggota massal (CSV/Excel).
+     * Ini adalah "pintu masuk" GET untuk /admin/anggota/import — sebelumnya
+     * belum ada, sehingga hanya method download-template & proses-submit
+     * (POST) saja yang terdaftar, dan request GET ke rute ini gagal dengan
+     * "Call to undefined method AdminController::anggotaImport()".
+     */
+    public function anggotaImport(): void
+    {
+        $this->requireAdmin();
+
+        $jabatanList  = UserModel::JABATAN_LIST;
+        $flash        = $this->getFlash();
+        $csrf         = $this->csrfToken();
+        $importErrors = $_SESSION['import_errors'] ?? [];
+        unset($_SESSION['import_errors']);
+
+        $this->view('admin/anggota_import', compact('jabatanList', 'flash', 'csrf', 'importErrors'), 'admin');
+    }
+
     public function anggotaImportTemplate(): void
     {
         $this->requireAdmin();
@@ -1610,7 +1634,7 @@ public function pab(): void
 
             $tahunRaw = trim((string)($row[5] ?? ''));
             $tahunMax = (int)date('Y') + 1;
-            $tahun = (ctype_digit($tahunRaw) && (int)$tahunRaw >= 2000 && (int)$tahunRaw <= $tahunMax)
+            $tahun    = (ctype_digit($tahunRaw) && (int)$tahunRaw >= 2000 && (int)$tahunRaw <= $tahunMax)
                 ? (int)$tahunRaw
                 : (int)date('Y');
 
@@ -1659,7 +1683,7 @@ public function pab(): void
             $sukses++;
         }
 
-        $msg = "{$sukses} anggota berhasil diimpor";
+        $msg  = "{$sukses} anggota berhasil diimpor";
         $msg .= $dilewati > 0 ? ", {$dilewati} baris dilewati (kosong/duplikat/NISN tidak valid)." : '.';
         $msg .= ' Password default: <strong>comsmakda</strong> (wajib diganti anggota setelah login).';
 
@@ -1671,6 +1695,7 @@ public function pab(): void
 
         $this->redirect($sukses > 0 || $dilewati > 0 ? '/admin/anggota' : '/admin/anggota/import');
     }
+
     // ================================================================
     //  ANGGOTA — RESET SEQUENCE NIA
     // ================================================================
