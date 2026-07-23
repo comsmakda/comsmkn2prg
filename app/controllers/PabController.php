@@ -60,8 +60,24 @@ class PabController extends Controller
         }
 
         $pm = new PabModel();
+        $um = new UserModel();
 
-        // ── Cek duplikasi NISN ──
+        // ── Cek duplikasi NISN ke tabel users ──
+        // Menangani kasus: NISN sudah diisi/di-backfill lewat edit profil anggota
+        // (member/profile), atau anggota lama yang sudah aktif tapi belum pernah
+        // melalui alur PAB sama sekali. Tanpa cek ini, NISN yang sudah tercatat
+        // di `users` masih bisa lolos daftar PAB karena PabModel::findByNisn()
+        // hanya melihat tabel pab_registrations.
+        $existingUser = $um->findByNisn($nisn);
+        if ($existingUser) {
+            $_SESSION['old_input'] = $oldInput;
+            $this->flashMessages('error', [
+                'NISN ' . $nisn . ' sudah terdaftar sebagai anggota. Data tidak boleh ganda.'
+            ]);
+            $this->redirect('/pab');
+        }
+
+        // ── Cek duplikasi NISN ke tabel pab_registrations ──
         $existing = $pm->findByNisn($nisn);
         if ($existing && in_array($existing['status'], ['pending', 'approved'], true)) {
             $_SESSION['old_input'] = $oldInput;

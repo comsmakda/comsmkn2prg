@@ -86,7 +86,21 @@ class PabModel extends Model
         if ($reg['status'] !== 'pending') throw new RuntimeException('Pendaftar sudah diproses.');
 
         $userModel = new UserModel();
-        $userId    = $userModel->createAnggota([
+
+        // ── Jaring pengaman: pastikan NISN belum dipakai user lain ──
+        // Bisa terjadi kalau, sejak siswa ini daftar PAB, NISN yang sama
+        // sempat masuk ke tabel users lewat jalur lain (misal siswa lain
+        // mengisi NISN yang sama via edit profil, atau ada dua pendaftaran
+        // PAB dengan NISN sama yang lolos race condition saat submit).
+        // Tanpa cek ini, insert di bawah akan gagal dengan PDOException
+        // mentah (unique key uniq_users_nisn) yang tidak tertangani.
+        if (!empty($reg['nisn']) && $userModel->existsByNisn($reg['nisn'])) {
+            throw new RuntimeException(
+                'NISN ' . $reg['nisn'] . ' sudah dipakai akun lain. Tidak bisa diapprove — periksa data terlebih dahulu.'
+            );
+        }
+
+        $userId = $userModel->createAnggota([
             'nisn'          => $reg['nisn'],
             'nama_lengkap'  => $reg['nama_lengkap'],
             'kelas'         => $reg['kelas'],
