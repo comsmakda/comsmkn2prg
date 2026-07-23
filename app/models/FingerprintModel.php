@@ -8,6 +8,13 @@
  *
  * Semua komunikasi HTTP memakai cURL native (tanpa library eksternal),
  * konfigurasi (URL agent, API key, dsb) diambil dari SettingModel — bukan hardcode.
+ *
+ * CATATAN PENTING (fitur rekap permanen):
+ * Tabel fp_rekap_harian dipakai sebagai "arsip" yang independen dari tabel users.
+ * Setiap baris menyimpan nia/nama_lengkap/kelas secara denormalized (bukan cuma
+ * user_id) supaya data rekap TETAP ADA walau anggotanya sudah dihapus dari users.
+ * Baris dengan sumber='manual' (izin/sakit/hadir yang diedit admin) SELALU
+ * menang dibanding hasil hitung otomatis dari fp_scan_logs.
  */
 class FingerprintModel
 {
@@ -17,6 +24,9 @@ class FingerprintModel
 
     /** @var int Timeout koneksi ke Sync Agent (detik) */
     private const HTTP_TIMEOUT = 10;
+
+    /** Status yang boleh diinput manual oleh admin lewat tombol Edit */
+    public const STATUS_MANUAL_ALLOWED = ['hadir', 'terlambat', 'izin', 'sakit', 'alpa'];
 
     public function __construct()
     {
@@ -50,9 +60,7 @@ class FingerprintModel
      * Tanggal mulai efektif absensi (fp_tanggal_mulai_absensi).
      * Sebelum tanggal ini (atau kalau belum pernah diisi di halaman Setting),
      * sistem TIDAK BOLEH menghasilkan status 'alpa' — walaupun tanggalnya
-     * cocok hari jadwal pertemuan. Ini untuk menghindari organisasi yang
-     * baru dibuat (jadwal sudah dikonfigurasi duluan) langsung dianggap
-     * "alpa" padahal pertemuan pertamanya sendiri belum pernah terjadi.
+     * cocok hari jadwal pertemuan.
      *
      * @return string|null null artinya belum diatur -> anggap "belum mulai"
      *                      untuk SEMUA tanggal (tidak pernah ada alpa).
@@ -65,7 +73,6 @@ class FingerprintModel
             return null;
         }
 
-        // Validasi format tanggal, biar setting yang salah isi tidak bikin crash
         $d = DateTime::createFromFormat('Y-m-d', $val);
         if (!$d || $d->format('Y-m-d') !== $val) {
             return null;
@@ -74,11 +81,6 @@ class FingerprintModel
         return $val;
     }
 
-    /**
-     * True kalau $tanggal sudah berada pada/​setelah tanggal mulai efektif absensi.
-     * Kalau tanggal mulai belum diatur sama sekali, selalu false (belum ada yang
-     * boleh dianggap alpa sampai admin mengisi setting ini).
-     */
     private function isSudahMelewatiTanggalMulai(string $tanggal, ?string $tanggalMulaiAbsensi): bool
     {
         if ($tanggalMulaiAbsensi === null) {
@@ -92,8 +94,6 @@ class FingerprintModel
     // =====================================================================
 
     /**
-     * Kirim request HTTP ke Sync Agent.
-     *
      * @return array{success:bool, status:int, data:array|null, error:string|null}
      */
     private function request(string $method, string $path, ?array $body = null): array
@@ -182,10 +182,6 @@ class FingerprintModel
     // PUSH / DELETE ANGGOTA KE MESIN
     // =====================================================================
 
-    /**
-     * Push satu anggota (berdasarkan users.id) ke mesin fingerprint.
-     * Update fp_status/fp_synced_at/fp_last_error sesuai hasil.
-     */
     public function pushUser(int $userId): bool
     {
         $stmt = $this->db->prepare(
@@ -229,8 +225,6 @@ class FingerprintModel
     }
 
     /**
-     * Push banyak anggota sekaligus.
-     *
      * @return array{sukses:int, gagal:int, detail:array<int,array{user_id:int, nia:string, sukses:bool, pesan:?string}>}
      */
     public function pushBulk(array $userIds): array
@@ -263,10 +257,6 @@ class FingerprintModel
         return $summary;
     }
 
-    /**
-     * Hapus anggota dari mesin fingerprint berdasarkan NIA.
-     * Dipanggil saat anggota dinonaktifkan atau dihapus manual dari halaman fingerprint.
-     */
     public function deleteUser(string $nia): bool
     {
         $result = $this->request('DELETE', '/users/' . rawurlencode($nia));
@@ -338,9 +328,6 @@ class FingerprintModel
     // =====================================================================
 
     /**
-     * Tarik seluruh log scan dari mesin (via Sync Agent) dan simpan ke fp_scan_logs.
-     * Aman dipanggil berulang kali karena memakai INSERT IGNORE + UNIQUE KEY.
-     *
      * @return array{success:bool, jumlah_baru:int, error:?string}
      */
     public function pullAndSaveLogs(): array
@@ -395,79 +382,93 @@ class FingerprintModel
     }
 
     // =====================================================================
-    // REKAP HARIAN
+    // REKAP HARIAN (dengan override manual + arsip anggota terhapus)
     // =====================================================================
 
     /**
-     * Rekap presensi harian dari fp_scan_logs untuk rentang tanggal tertentu.
+     * Rekap presensi harian untuk rentang tanggal tertentu.
      *
-     * Aturan status per tanggal:
-     * - Bukan hari pertemuan (nonaktif di jadwal / libur manual)  -> 'libur'
-     * - Hari pertemuan, TAPI sebelum tanggal mulai efektif absensi
-     *   (fp_tanggal_mulai_absensi belum diisi, atau tanggal < nilainya)
-     *   dan anggota tidak scan                                    -> 'belum_mulai'
-     * - Hari pertemuan, sudah lewat tanggal mulai efektif, tidak scan -> 'alpa'
-     * - Ada scan (kapan pun, termasuk sebelum tanggal mulai resmi)     -> 'hadir' / 'terlambat'
+     * Prioritas per (nia, tanggal):
+     * 1. Kalau ada baris tersimpan di fp_rekap_harian (manual ATAU arsip otomatis)
+     *    -> pakai itu apa adanya (jam_masuk, jam_pulang, status, keterangan).
+     * 2. Kalau tidak, dan tanggal itu bukan hari pertemuan -> 'libur'.
+     * 3. Kalau hari pertemuan tapi sebelum tanggal mulai efektif absensi & tidak
+     *    ada scan -> 'belum_mulai'.
+     * 4. Kalau hari pertemuan, sudah lewat tanggal mulai efektif, tidak ada scan
+     *    -> 'alpa'.
+     * 5. Ada scan -> 'hadir' / 'terlambat'.
+     *
+     * Anggota yang SUDAH DIHAPUS dari tabel users tetap muncul di rekap ini kalau
+     * mereka punya baris arsip di fp_rekap_harian dalam rentang tanggal yang diminta
+     * (ditandai is_arsip = true, tidak bisa diedit lagi lewat sini).
      *
      * @param array{kelas?:string} $filter
-     * @return array<int, array{
-     *   user_id:int, nama_lengkap:string, nia:string, kelas:string,
-     *   tanggal:string, jam_masuk:?string, jam_pulang:?string, status:string
-     * }>
      */
     public function getRekapHarian(string $tanggalMulai, string $tanggalAkhir, array $filter = []): array
     {
         $batasTerlambat = $this->getBatasTerlambat();
         $tanggalMulaiAbsensi = $this->getTanggalMulaiAbsensi();
+        $kelasFilter = $filter['kelas'] ?? '';
 
-        $params = [
-            'tgl_mulai' => $tanggalMulai,
-            'tgl_akhir' => $tanggalAkhir,
-        ];
-
+        // 1) Anggota AKTIF saat ini
         $kelasSql = '';
-        if (!empty($filter['kelas'])) {
+        $paramsUsers = [];
+        if ($kelasFilter !== '') {
             $kelasSql = ' AND u.kelas = :kelas';
-            $params['kelas'] = $filter['kelas'];
+            $paramsUsers['kelas'] = $kelasFilter;
         }
-
-        // Ambil semua anggota aktif yang relevan
         $stmtUsers = $this->db->prepare(
             "SELECT id, nia, nama_lengkap, kelas
-             FROM users
+             FROM users u
              WHERE role = 'anggota' AND status = 'aktif' {$kelasSql}
              ORDER BY kelas, nama_lengkap"
         );
-        $stmtUsers->execute($this->onlyKeys($params, ['kelas']));
+        $stmtUsers->execute($paramsUsers);
         $users = $stmtUsers->fetchAll(PDO::FETCH_ASSOC);
 
-        if (empty($users)) {
-            return [];
-        }
+        $niaAktifSet = array_flip(array_column($users, 'nia'));
 
-        // Ambil rekap scan per user per tanggal dalam rentang
-        $stmtScan = $this->db->prepare(
-            "SELECT
-                user_id,
-                DATE(waktu_scan) AS tanggal,
-                MIN(waktu_scan) AS scan_pertama,
-                MAX(waktu_scan) AS scan_terakhir
-             FROM fp_scan_logs
-             WHERE user_id IS NOT NULL
-               AND DATE(waktu_scan) BETWEEN :tgl_mulai AND :tgl_akhir
-             GROUP BY user_id, DATE(waktu_scan)"
-        );
-        $stmtScan->execute([
-            'tgl_mulai' => $tanggalMulai,
-            'tgl_akhir' => $tanggalAkhir,
-        ]);
-
+        // 2) Scan logs dalam rentang (untuk anggota aktif)
         $scanMap = [];
-        foreach ($stmtScan->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $scanMap[$row['user_id']][$row['tanggal']] = $row;
+        if (!empty($users)) {
+            $stmtScan = $this->db->prepare(
+                "SELECT
+                    user_id,
+                    DATE(waktu_scan) AS tanggal,
+                    MIN(waktu_scan) AS scan_pertama,
+                    MAX(waktu_scan) AS scan_terakhir
+                 FROM fp_scan_logs
+                 WHERE user_id IS NOT NULL
+                   AND DATE(waktu_scan) BETWEEN :tgl_mulai AND :tgl_akhir
+                 GROUP BY user_id, DATE(waktu_scan)"
+            );
+            $stmtScan->execute([
+                'tgl_mulai' => $tanggalMulai,
+                'tgl_akhir' => $tanggalAkhir,
+            ]);
+            foreach ($stmtScan->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $scanMap[$row['user_id']][$row['tanggal']] = $row;
+            }
         }
 
-        // Bangun daftar tanggal dalam rentang
+        // 3) Baris tersimpan (manual + arsip) dalam rentang tanggal, keyed by nia+tanggal
+        $persistedSql = "SELECT nia, nama_lengkap, kelas, tanggal, jam_masuk, jam_pulang, status, keterangan, sumber
+                          FROM fp_rekap_harian
+                          WHERE tanggal BETWEEN :tgl_mulai AND :tgl_akhir";
+        $paramsPersisted = ['tgl_mulai' => $tanggalMulai, 'tgl_akhir' => $tanggalAkhir];
+        if ($kelasFilter !== '') {
+            $persistedSql .= ' AND kelas = :kelas';
+            $paramsPersisted['kelas'] = $kelasFilter;
+        }
+        $stmtPersisted = $this->db->prepare($persistedSql);
+        $stmtPersisted->execute($paramsPersisted);
+
+        $persistedMap = [];
+        foreach ($stmtPersisted->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $persistedMap[$row['nia']][$row['tanggal']] = $row;
+        }
+
+        // 4) Daftar tanggal dalam rentang + precompute hari pertemuan
         $tanggalList = [];
         $cursor = new DateTime($tanggalMulai);
         $end = new DateTime($tanggalAkhir);
@@ -476,17 +477,36 @@ class FingerprintModel
             $cursor->modify('+1 day');
         }
 
-        // Precompute status hari pertemuan (hindari query berulang per user x tanggal)
         $isPertemuanMap = [];
         foreach ($tanggalList as $tgl) {
             $isPertemuanMap[$tgl] = $this->jadwalModel->isHariPertemuan($tgl);
         }
 
         $rekap = [];
+
+        // 5) Anggota AKTIF
         foreach ($users as $user) {
             foreach ($tanggalList as $tanggal) {
 
-                // Bukan hari pertemuan (hari nonaktif di jadwal ATAU ditandai libur manual)
+                $persisted = $persistedMap[$user['nia']][$tanggal] ?? null;
+
+                if ($persisted) {
+                    $rekap[] = [
+                        'user_id'      => (int) $user['id'],
+                        'nama_lengkap' => $persisted['nama_lengkap'],
+                        'nia'          => $user['nia'],
+                        'kelas'        => $persisted['kelas'],
+                        'tanggal'      => $tanggal,
+                        'jam_masuk'    => $persisted['jam_masuk'] ? substr($persisted['jam_masuk'], 0, 5) : null,
+                        'jam_pulang'   => $persisted['jam_pulang'] ? substr($persisted['jam_pulang'], 0, 5) : null,
+                        'status'       => $persisted['status'],
+                        'keterangan'   => $persisted['keterangan'],
+                        'sumber'       => $persisted['sumber'],
+                        'is_arsip'     => false,
+                    ];
+                    continue;
+                }
+
                 if (!$isPertemuanMap[$tanggal]) {
                     $rekap[] = [
                         'user_id'      => (int) $user['id'],
@@ -497,22 +517,22 @@ class FingerprintModel
                         'jam_masuk'    => null,
                         'jam_pulang'   => null,
                         'status'       => 'libur',
+                        'keterangan'   => null,
+                        'sumber'       => 'otomatis',
+                        'is_arsip'     => false,
                     ];
                     continue;
                 }
 
                 $scan = $scanMap[$user['id']][$tanggal] ?? null;
-
                 $jamMasuk = null;
                 $jamPulang = null;
 
                 if ($scan) {
-                    // Ada scan -> selalu hadir/terlambat, tidak peduli tanggal mulai efektif
-                    $jamMasuk = date('H:i:s', strtotime($scan['scan_pertama']));
-                    $jamPulang = date('H:i:s', strtotime($scan['scan_terakhir']));
-                    $status = ($jamMasuk > $batasTerlambat) ? 'terlambat' : 'hadir';
+                    $jamMasuk = date('H:i', strtotime($scan['scan_pertama']));
+                    $jamPulang = date('H:i', strtotime($scan['scan_terakhir']));
+                    $status = ($jamMasuk . ':00' > $batasTerlambat) ? 'terlambat' : 'hadir';
                 } elseif (!$this->isSudahMelewatiTanggalMulai($tanggal, $tanggalMulaiAbsensi)) {
-                    // Belum ada pertemuan resmi sampai tanggal ini -> jangan tandai alpa
                     $status = 'belum_mulai';
                 } else {
                     $status = 'alpa';
@@ -527,24 +547,57 @@ class FingerprintModel
                     'jam_masuk'    => $jamMasuk,
                     'jam_pulang'   => $jamPulang,
                     'status'       => $status,
+                    'keterangan'   => null,
+                    'sumber'       => 'otomatis',
+                    'is_arsip'     => false,
                 ];
             }
         }
+
+        // 6) Anggota yang SUDAH DIHAPUS dari users tapi punya arsip di fp_rekap_harian
+        foreach ($persistedMap as $nia => $tanggalRows) {
+            if (isset($niaAktifSet[$nia])) {
+                continue; // masih anggota aktif, sudah ditangani di atas
+            }
+            foreach ($tanggalRows as $tanggal => $row) {
+                $rekap[] = [
+                    'user_id'      => null,
+                    'nama_lengkap' => $row['nama_lengkap'],
+                    'nia'          => $nia,
+                    'kelas'        => $row['kelas'],
+                    'tanggal'      => $tanggal,
+                    'jam_masuk'    => $row['jam_masuk'] ? substr($row['jam_masuk'], 0, 5) : null,
+                    'jam_pulang'   => $row['jam_pulang'] ? substr($row['jam_pulang'], 0, 5) : null,
+                    'status'       => $row['status'],
+                    'keterangan'   => $row['keterangan'],
+                    'sumber'       => $row['sumber'],
+                    'is_arsip'     => true,
+                ];
+            }
+        }
+
+        // Urutkan supaya rapi: kelas -> nama -> tanggal
+        usort($rekap, function ($a, $b) {
+            return [$a['kelas'], $a['nama_lengkap'], $a['tanggal']]
+                <=> [$b['kelas'], $b['nama_lengkap'], $b['tanggal']];
+        });
 
         return $rekap;
     }
 
     /**
      * Riwayat absensi milik SATU anggota (dipakai halaman member/absensi).
-     * Beda dengan getRekapHarian() yang untuk semua anggota (dipakai admin).
-     *
-     * Aturan status sama persis dengan getRekapHarian() — lihat dokumentasi
-     * di sana untuk penjelasan 'libur' vs 'belum_mulai' vs 'alpa'.
-     *
-     * @return array<int, array{tanggal:string, jam_masuk:?string, jam_pulang:?string, status:string}>
+     * Ikut menghormati baris manual di fp_rekap_harian.
      */
     public function getRiwayatAbsensiAnggota(int $userId, string $tanggalMulai, string $tanggalAkhir): array
     {
+        $stmtUser = $this->db->prepare('SELECT nia FROM users WHERE id = ? LIMIT 1');
+        $stmtUser->execute([$userId]);
+        $nia = $stmtUser->fetchColumn();
+        if ($nia === false) {
+            return [];
+        }
+
         $batasTerlambat = $this->getBatasTerlambat();
         $tanggalMulaiAbsensi = $this->getTanggalMulaiAbsensi();
 
@@ -569,6 +622,21 @@ class FingerprintModel
             $scanMap[$row['tanggal']] = $row;
         }
 
+        $stmtPersisted = $this->db->prepare(
+            "SELECT tanggal, jam_masuk, jam_pulang, status, keterangan, sumber
+             FROM fp_rekap_harian
+             WHERE nia = :nia AND tanggal BETWEEN :tgl_mulai AND :tgl_akhir"
+        );
+        $stmtPersisted->execute([
+            'nia'       => $nia,
+            'tgl_mulai' => $tanggalMulai,
+            'tgl_akhir' => $tanggalAkhir,
+        ]);
+        $persistedMap = [];
+        foreach ($stmtPersisted->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $persistedMap[$row['tanggal']] = $row;
+        }
+
         $tanggalList = [];
         $cursor = new DateTime($tanggalMulai);
         $end    = new DateTime($tanggalAkhir);
@@ -580,29 +648,38 @@ class FingerprintModel
         $rekap = [];
         foreach ($tanggalList as $tanggal) {
 
-            // Bukan hari pertemuan -> tandai libur, bukan alpa
+            $persisted = $persistedMap[$tanggal] ?? null;
+            if ($persisted) {
+                $rekap[] = [
+                    'tanggal'    => $tanggal,
+                    'jam_masuk'  => $persisted['jam_masuk'] ? substr($persisted['jam_masuk'], 0, 5) : null,
+                    'jam_pulang' => $persisted['jam_pulang'] ? substr($persisted['jam_pulang'], 0, 5) : null,
+                    'status'     => $persisted['status'],
+                    'keterangan' => $persisted['keterangan'],
+                ];
+                continue;
+            }
+
             if (!$this->jadwalModel->isHariPertemuan($tanggal)) {
                 $rekap[] = [
                     'tanggal'    => $tanggal,
                     'jam_masuk'  => null,
                     'jam_pulang' => null,
                     'status'     => 'libur',
+                    'keterangan' => null,
                 ];
                 continue;
             }
 
             $scan = $scanMap[$tanggal] ?? null;
-
             $jamMasuk  = null;
             $jamPulang = null;
 
             if ($scan) {
-                // Ada scan -> selalu hadir/terlambat, tidak peduli tanggal mulai efektif
                 $jamMasuk  = date('H:i:s', strtotime($scan['scan_pertama']));
                 $jamPulang = date('H:i:s', strtotime($scan['scan_terakhir']));
                 $status    = ($jamMasuk > $batasTerlambat) ? 'terlambat' : 'hadir';
             } elseif (!$this->isSudahMelewatiTanggalMulai($tanggal, $tanggalMulaiAbsensi)) {
-                // Belum ada pertemuan resmi sampai tanggal ini -> jangan tandai alpa
                 $status = 'belum_mulai';
             } else {
                 $status = 'alpa';
@@ -613,37 +690,218 @@ class FingerprintModel
                 'jam_masuk'  => $jamMasuk,
                 'jam_pulang' => $jamPulang,
                 'status'     => $status,
+                'keterangan' => null,
             ];
         }
 
-        // Terbaru di atas
         return array_reverse($rekap);
     }
 
+    // =====================================================================
+    // EDIT MANUAL (izin / sakit / hadir manual) — dipakai tombol "Edit" di rekap
+    // =====================================================================
+
     /**
-     * Simpan/update satu baris fp_rekap_harian (opsional dipakai oleh job terjadwal
-     * agar rekap tersimpan permanen, bukan cuma dihitung on-the-fly saat halaman dibuka).
+     * Simpan/timpa satu baris rekap secara manual untuk SATU anggota AKTIF.
+     * Dipakai untuk kasus: siswa izin/sakit, atau lupa absen tapi sebenarnya hadir.
      */
-    public function simpanRekapHarian(int $userId, string $tanggal, ?string $jamMasuk, ?string $jamPulang, string $status): void
-    {
-        $stmt = $this->db->prepare(
-            'INSERT INTO fp_rekap_harian (user_id, tanggal, jam_masuk, jam_pulang, status)
-             VALUES (?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE
-                jam_masuk = VALUES(jam_masuk),
-                jam_pulang = VALUES(jam_pulang),
-                status = VALUES(status)'
+    public function setManualEntry(
+        int $userId,
+        string $tanggal,
+        string $status,
+        ?string $jamMasuk,
+        ?string $jamPulang,
+        ?string $keterangan
+    ): bool {
+        if (!in_array($status, self::STATUS_MANUAL_ALLOWED, true)) {
+            return false;
+        }
+
+        $d = DateTime::createFromFormat('Y-m-d', $tanggal);
+        if (!$d || $d->format('Y-m-d') !== $tanggal) {
+            return false;
+        }
+
+        $stmt = $this->db->prepare('SELECT nia, nama_lengkap, kelas FROM users WHERE id = ? LIMIT 1');
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$user) {
+            return false;
+        }
+
+        // Jam masuk/pulang cuma relevan kalau statusnya hadir/terlambat
+        if (!in_array($status, ['hadir', 'terlambat'], true)) {
+            $jamMasuk = null;
+            $jamPulang = null;
+        }
+
+        $this->upsertRekap(
+            $user['nia'],
+            $user['nama_lengkap'],
+            $user['kelas'],
+            $tanggal,
+            $jamMasuk,
+            $jamPulang,
+            $status,
+            $keterangan,
+            'manual'
         );
-        $stmt->execute([$userId, $tanggal, $jamMasuk, $jamPulang, $status]);
+
+        return true;
+    }
+
+    /**
+     * Batalkan override manual pada satu tanggal (kembalikan ke hitungan otomatis).
+     */
+    public function hapusManualEntry(int $userId, string $tanggal): bool
+    {
+        $stmt = $this->db->prepare('SELECT nia FROM users WHERE id = ? LIMIT 1');
+        $stmt->execute([$userId]);
+        $nia = $stmt->fetchColumn();
+        if ($nia === false) {
+            return false;
+        }
+
+        $del = $this->db->prepare(
+            "DELETE FROM fp_rekap_harian WHERE nia = ? AND tanggal = ? AND sumber = 'manual'"
+        );
+        $del->execute([$nia, $tanggal]);
+
+        return $del->rowCount() > 0;
+    }
+
+    /**
+     * Ambil satu baris manual (untuk mengisi form edit dengan data sebelumnya).
+     */
+    public function getManualEntry(int $userId, string $tanggal): ?array
+    {
+        $stmt = $this->db->prepare('SELECT nia FROM users WHERE id = ? LIMIT 1');
+        $stmt->execute([$userId]);
+        $nia = $stmt->fetchColumn();
+        if ($nia === false) {
+            return null;
+        }
+
+        $stmt = $this->db->prepare(
+            "SELECT tanggal, jam_masuk, jam_pulang, status, keterangan, sumber
+             FROM fp_rekap_harian WHERE nia = ? AND tanggal = ? LIMIT 1"
+        );
+        $stmt->execute([$nia, $tanggal]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    private function upsertRekap(
+        string $nia,
+        string $namaLengkap,
+        ?string $kelas,
+        string $tanggal,
+        ?string $jamMasuk,
+        ?string $jamPulang,
+        string $status,
+        ?string $keterangan,
+        string $sumber
+    ): void {
+        $stmt = $this->db->prepare(
+            'INSERT INTO fp_rekap_harian (nia, nama_lengkap, kelas, tanggal, jam_masuk, jam_pulang, status, keterangan, sumber)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE
+                nama_lengkap = VALUES(nama_lengkap),
+                kelas        = VALUES(kelas),
+                jam_masuk    = VALUES(jam_masuk),
+                jam_pulang   = VALUES(jam_pulang),
+                status       = VALUES(status),
+                keterangan   = VALUES(keterangan),
+                sumber       = VALUES(sumber)'
+        );
+        $stmt->execute([$nia, $namaLengkap, $kelas, $tanggal, $jamMasuk, $jamPulang, $status, $keterangan, $sumber]);
+    }
+
+    private function getPersistedEntry(string $nia, string $tanggal): ?array
+    {
+        $stmt = $this->db->prepare('SELECT * FROM fp_rekap_harian WHERE nia = ? AND tanggal = ? LIMIT 1');
+        $stmt->execute([$nia, $tanggal]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    // =====================================================================
+    // ARSIP SEBELUM HAPUS ANGGOTA — WAJIB DIPANGGIL SEBELUM DELETE users
+    // =====================================================================
+
+    /**
+     * Bekukan seluruh riwayat kehadiran seorang anggota ke fp_rekap_harian
+     * SEBELUM baris users-nya benar-benar dihapus, supaya rekap untuk LPJ
+     * tetap tersedia selamanya walau akunnya sudah tidak ada.
+     *
+     * PENTING: panggil method ini di controller/model yang menghapus anggota,
+     * TEPAT SEBELUM query DELETE FROM users dijalankan. Baris dengan sumber
+     * 'manual' yang sudah ada (izin/sakit yang pernah diinput admin) tidak
+     * akan ditimpa.
+     */
+    public function arsipkanSebelumHapus(int $userId): void
+    {
+        $stmt = $this->db->prepare('SELECT nia, nama_lengkap, kelas FROM users WHERE id = ? LIMIT 1');
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$user) {
+            return;
+        }
+
+        $tanggalMulai = $this->getTanggalMulaiAbsensi();
+        if ($tanggalMulai === null) {
+            $stmtMin = $this->db->prepare(
+                'SELECT MIN(DATE(waktu_scan)) FROM fp_scan_logs WHERE user_id = ?'
+            );
+            $stmtMin->execute([$userId]);
+            $tanggalMulai = $stmtMin->fetchColumn() ?: null;
+        }
+
+        if (!$tanggalMulai) {
+            // Tidak ada riwayat sama sekali (siswa belum pernah absen) -> tidak perlu diarsipkan
+            return;
+        }
+
+        $tanggalAkhir = date('Y-m-d');
+        if ($tanggalMulai > $tanggalAkhir) {
+            return;
+        }
+
+        $riwayat = $this->getRiwayatAbsensiAnggota($userId, $tanggalMulai, $tanggalAkhir);
+
+        foreach ($riwayat as $r) {
+            // Cukup arsipkan hari-hari yang benar-benar berarti untuk LPJ.
+            // 'libur' dan 'belum_mulai' tidak perlu disimpan permanen.
+            if (!in_array($r['status'], ['hadir', 'terlambat', 'alpa', 'izin', 'sakit'], true)) {
+                continue;
+            }
+
+            $existing = $this->getPersistedEntry($user['nia'], $r['tanggal']);
+            if ($existing && $existing['sumber'] === 'manual') {
+                continue; // jangan timpa yang sudah diedit manual sebelumnya
+            }
+
+            $jamMasuk = $r['jam_masuk'] ? substr($r['jam_masuk'], 0, 5) : null;
+            $jamPulang = $r['jam_pulang'] ? substr($r['jam_pulang'], 0, 5) : null;
+
+            $this->upsertRekap(
+                $user['nia'],
+                $user['nama_lengkap'],
+                $user['kelas'],
+                $r['tanggal'],
+                $jamMasuk,
+                $jamPulang,
+                $r['status'],
+                $r['keterangan'] ?? null,
+                'otomatis'
+            );
+        }
     }
 
     // =====================================================================
     // HELPER LIST ANGGOTA (untuk halaman /admin/fingerprint)
     // =====================================================================
 
-    /**
-     * Daftar anggota aktif beserta status sinkronisasi ke mesin.
-     */
     public function getAnggotaAktifDenganStatus(): array
     {
         $stmt = $this->db->query(
@@ -662,17 +920,5 @@ class FingerprintModel
              WHERE role = 'anggota' AND status = 'aktif' AND fp_status IN ('belum_sync', 'gagal')"
         );
         return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
-    }
-
-    private function onlyKeys(array $arr, array $optionalKeys): array
-    {
-        // Selalu sertakan tgl_mulai/tgl_akhir, plus optional keys jika ada di $arr
-        $out = [];
-        foreach ($optionalKeys as $k) {
-            if (array_key_exists($k, $arr)) {
-                $out[$k] = $arr[$k];
-            }
-        }
-        return $out;
     }
 }
