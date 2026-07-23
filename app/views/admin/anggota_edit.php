@@ -40,6 +40,7 @@
   --r-xl: var(--radius-lg, 22px);
 
   --font-ui: var(--ff, 'Plus Jakarta Sans', sans-serif);
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 
   --ease:   cubic-bezier(0.22, 1, 0.36, 1);
   --t-fast: 120ms;
@@ -223,6 +224,11 @@
   font-weight: 400;
   color: var(--tx-muted);
 }
+.field__hint {
+  font-size: 10.5px;
+  color: var(--tx-muted);
+  font-weight: 500;
+}
 
 /* Input base (icon SELALU di kanan) */
 .finput {
@@ -245,6 +251,10 @@
   border-color: var(--ac-lt);
   background: #fff;
   box-shadow: 0 0 0 3px rgba(6,182,212,.12);
+}
+.finput--mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.03em;
 }
 
 .finput-wrap { position: relative; }
@@ -508,6 +518,43 @@
   font-weight: 500;
 }
 
+/* Kartu NISN — sengaja dibedakan visual dari kartu NIA:
+   NIA pakai warna aksen tebal, NISN pakai abu-abu monospace polos
+   supaya admin tidak tertukar sekilas pandang. */
+.side-nisn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 16px;
+}
+.side-nisn__icon {
+  width: 38px; height: 38px;
+  border-radius: var(--r-sm);
+  background: var(--bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tx-muted);
+  flex-shrink: 0;
+}
+.side-nisn__icon i { font-size: 17px; }
+.side-nisn__val {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--tx-secondary);
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.side-nisn__val--empty { color: var(--tx-muted); font-family: var(--font-ui); font-weight: 600; font-style: italic; }
+.side-nisn__lbl {
+  font-size: 10.5px;
+  color: var(--tx-muted);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
 /* Kartu info ringkas */
 .side-info__list {
   display: flex;
@@ -604,7 +651,7 @@
   ?>
   <div class="flash flash--<?= htmlspecialchars($flash['type']) ?>">
     <i class="ti <?= $flashIcons[$flash['type']] ?? $flashIcons['info'] ?>" aria-hidden="true"></i>
-    <span><?= htmlspecialchars($flash['msg']) ?></span>
+    <span><?= $flash['msg'] ?></span>
   </div>
   <?php endif; ?>
 
@@ -671,18 +718,34 @@
               </div>
             </div>
 
-            <!-- Jabatan -->
-            <div class="field">
-              <label class="field__label" for="f-jabatan">Jabatan</label>
-              <div class="finput-wrap finput-wrap--select">
-                <select id="f-jabatan" name="jabatan" class="finput">
-                  <?php $currentJabatan = $anggota['jabatan'] ?? 'anggota'; ?>
-                  <?php foreach (UserModel::JABATAN_LIST as $jKey => $jLabel): ?>
-                    <option value="<?= htmlspecialchars($jKey) ?>" <?= $currentJabatan === $jKey ? 'selected' : '' ?>>
-                      <?= htmlspecialchars($jLabel) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
+            <!-- NISN + Jabatan -->
+            <div class="form-row">
+              <div class="field">
+                <label class="field__label" for="f-nisn">NISN <span class="field__label-optional">— opsional</span></label>
+                <div class="finput-wrap">
+                  <input type="text" id="f-nisn" name="nisn"
+                         class="finput finput--mono"
+                         placeholder="10 digit angka"
+                         inputmode="numeric" maxlength="10" pattern="\d{10}"
+                         value="<?= htmlspecialchars($anggota['nisn'] ?? '') ?>">
+                  <span class="finput-ico">
+                    <i class="ti ti-id-badge-2" aria-hidden="true"></i>
+                  </span>
+                </div>
+                <span class="field__hint">Beda dengan NIA — kosongkan jika belum ada datanya.</span>
+              </div>
+              <div class="field">
+                <label class="field__label" for="f-jabatan">Jabatan</label>
+                <div class="finput-wrap finput-wrap--select">
+                  <select id="f-jabatan" name="jabatan" class="finput">
+                    <?php $currentJabatan = $anggota['jabatan'] ?? 'anggota'; ?>
+                    <?php foreach (UserModel::JABATAN_LIST as $jKey => $jLabel): ?>
+                      <option value="<?= htmlspecialchars($jKey) ?>" <?= $currentJabatan === $jKey ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($jLabel) ?>
+                      </option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -804,6 +867,21 @@
         </div>
         <?php endif; ?>
 
+        <!-- Kartu NISN — visual sengaja dibedakan dari NIA di atas -->
+        <div class="edit-panel side-nisn">
+          <div class="side-nisn__icon">
+            <i class="ti ti-school" aria-hidden="true"></i>
+          </div>
+          <div>
+            <?php if (!empty($anggota['nisn'])): ?>
+              <div class="side-nisn__val"><?= htmlspecialchars($anggota['nisn']) ?></div>
+            <?php else: ?>
+              <div class="side-nisn__val side-nisn__val--empty">Belum diisi</div>
+            <?php endif; ?>
+            <div class="side-nisn__lbl">Nomor Induk Siswa Nasional</div>
+          </div>
+        </div>
+
         <!-- Kartu info ringkas -->
         <div class="edit-panel">
           <div class="edit-panel__head">
@@ -844,6 +922,14 @@
 <script>
 (function () {
   'use strict';
+
+  /* ── NISN: hanya digit, batasi 10 karakter ── */
+  var nisnInput = document.getElementById('f-nisn');
+  if (nisnInput) {
+    nisnInput.addEventListener('input', function () {
+      nisnInput.value = nisnInput.value.replace(/\D/g, '').slice(0, 10);
+    });
+  }
 
   /* ── Foto: preview on select ── */
   var fileInput  = document.getElementById('foto-input');
