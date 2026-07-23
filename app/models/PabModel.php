@@ -36,6 +36,22 @@ class PabModel extends Model
     }
 
     /**
+     * Sama seperti findByNisn(), tapi ikut join ke users untuk ambil NIA
+     * (dipakai halaman cek status — supaya anggota yang sudah approved
+     * bisa langsung lihat NIA-nya tanpa query terpisah).
+     */
+    public function findByNisnWithNia(string $nisn): ?array
+    {
+        $rows = $this->fetchAll(
+            "SELECT p.*, u.nia FROM pab_registrations p
+             LEFT JOIN users u ON u.id = p.user_id
+             WHERE p.nisn = ? LIMIT 1",
+            [$nisn]
+        );
+        return $rows[0] ?? null;
+    }
+
+    /**
      * Dipakai saat siswa yang sebelumnya ditolak ('rejected') daftar ulang
      * dengan NISN yang sama — menimpa baris lama alih-alih insert baru,
      * supaya unique key nisn tidak bentrok.

@@ -127,6 +127,38 @@ class PabController extends Controller
     }
 
     /**
+     * Halaman cek status pendaftaran PAB berdasarkan NISN.
+     * Publik, tanpa login — jadi hanya field yang aman ditampilkan
+     * (nama, kelas, status, catatan admin, NIA jika approved).
+     * no_hp dan password_hash sengaja TIDAK diikutkan ke view.
+     */
+    public function cekStatus(): void
+    {
+        $nisnRaw = isset($_GET['nisn']) ? trim($_GET['nisn']) : '';
+        $nisn    = preg_replace('/\D/', '', $nisnRaw);
+
+        $result   = null;
+        $errorMsg = null;
+
+        if ($nisnRaw !== '') {
+            if (strlen($nisn) !== 10) {
+                $errorMsg = 'NISN harus terdiri dari 10 digit angka.';
+            } else {
+                $pm  = new PabModel();
+                $reg = $pm->findByNisnWithNia($nisn);
+
+                if (!$reg) {
+                    $errorMsg = 'NISN tidak ditemukan. Pastikan kamu sudah mendaftar lewat halaman PAB.';
+                } else {
+                    $result = $reg;
+                }
+            }
+        }
+
+        $this->view('pages/pab_status', compact('nisn', 'nisnRaw', 'result', 'errorMsg'), 'main');
+    }
+
+    /**
      * Helper: kirim beberapa pesan sekaligus ke flash() milik Controller dasar,
      * yang hanya menerima string. Di-encode jadi JSON supaya bisa dibaca
      * kembali sebagai array di view (lihat $flashMsgs di pab.php).

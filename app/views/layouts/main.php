@@ -589,6 +589,10 @@
     </div>
     <div class="nav-actions">
       <?php if (empty($_SESSION['user_id'])): ?>
+        <a href="<?= BASE_URL ?>/pab/cek-status" class="nav-btn-ghost">
+          <i class="ti ti-search"></i>
+          <span>Cek Status</span>
+        </a>
         <a href="<?= BASE_URL ?>/pab" class="nav-btn-ghost">
           <i class="ti ti-user-plus"></i>
           <span>Daftar PAB</span>
@@ -639,6 +643,12 @@
     </div>
   </div>
   <a href="<?= BASE_URL ?>/#contact" class="mob-link">Kontak <i class="ti ti-chevron-right"></i></a>
+  <?php if (empty($_SESSION['user_id'])): ?>
+  <a href="<?= BASE_URL ?>/pab/cek-status" class="mob-link">
+    Cek Status Pendaftaran
+    <i class="ti ti-chevron-right"></i>
+  </a>
+  <?php endif; ?>
   <div class="mob-sep"></div>
   <div class="mob-actions">
     <?php if (empty($_SESSION['user_id'])): ?>
@@ -718,6 +728,7 @@
         <div class="fc-head"><h4>Anggota</h4><div class="fc-line"></div></div>
         <ul class="fc-ul">
           <li><a href="<?= BASE_URL ?>/pab">Pendaftaran PAB</a></li>
+          <li><a href="<?= BASE_URL ?>/pab/cek-status">Cek Status Pendaftaran</a></li>
           <li><a href="<?= BASE_URL ?>/login">Login Portal</a></li>
           <?php if (!empty($_SESSION['user_id'])): ?>
           <li><a href="<?= BASE_URL ?>/member/dashboard">Dashboard</a></li>
