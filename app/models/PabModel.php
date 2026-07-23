@@ -67,12 +67,66 @@ class PabModel extends Model
         );
     }
 
-    public function getAll(): array
+    /**
+     * Daftar semua pendaftar PAB, dengan dukungan filter opsional:
+     *   - status : 'pending' | 'approved' | 'rejected'
+     *   - kelas  : exact match kelas
+     *   - search : cocok ke nama_lengkap ATAU nisn (LIKE)
+     */
+    public function getAll(array $filter = []): array
     {
-        return $this->fetchAll(
-            "SELECT p.*, u.nia FROM pab_registrations p
-             LEFT JOIN users u ON u.id = p.user_id
-             ORDER BY p.created_at DESC"
+        $sql    = "SELECT p.*, u.nia FROM pab_registrations p
+                   LEFT JOIN users u ON u.id = p.user_id
+                   WHERE 1=1";
+        $params = [];
+
+        $status = trim($filter['status'] ?? '');
+        if ($status !== '' && in_array($status, ['pending', 'approved', 'rejected'], true)) {
+            $sql .= " AND p.status = ?";
+            $params[] = $status;
+        }
+
+        $kelas = trim($filter['kelas'] ?? '');
+        if ($kelas !== '') {
+            $sql .= " AND p.kelas = ?";
+            $params[] = $kelas;
+        }
+
+        $search = trim($filter['search'] ?? '');
+        if ($search !== '') {
+            $sql .= " AND (p.nama_lengkap LIKE ? OR p.nisn LIKE ?)";
+            $like = '%' . $search . '%';
+            $params[] = $like;
+            $params[] = $like;
+        }
+
+        $sql .= " ORDER BY p.created_at DESC";
+
+        return $this->fetchAll($sql, $params);
+    }
+
+    /**
+     * Daftar kelas unik dari pendaftar PAB, dipakai untuk dropdown filter.
+     */
+    public function getKelasList(): array
+    {
+        $rows = $this->fetchAll(
+            "SELECT DISTINCT kelas FROM pab_registrations WHERE kelas IS NOT NULL AND kelas <> '' ORDER BY kelas ASC"
+        );
+        return array_column($rows, 'kelas');
+    }
+
+    /**
+     * Hapus baris pendaftaran PAB secara permanen.
+     * Tidak menghapus akun users terkait (kalau sudah approved) — hanya
+     * menghapus record pendaftarannya saja. Penghapusan file foto fisik
+     * ditangani di controller agar model tetap bebas dari filesystem I/O.
+     */
+    public function delete(int $id): bool
+    {
+        return (bool)$this->execute(
+            "DELETE FROM pab_registrations WHERE id = ?",
+            [$id]
         );
     }
 
@@ -86,21 +140,7 @@ class PabModel extends Model
         if ($reg['status'] !== 'pending') throw new RuntimeException('Pendaftar sudah diproses.');
 
         $userModel = new UserModel();
-
-        // ── Jaring pengaman: pastikan NISN belum dipakai user lain ──
-        // Bisa terjadi kalau, sejak siswa ini daftar PAB, NISN yang sama
-        // sempat masuk ke tabel users lewat jalur lain (misal siswa lain
-        // mengisi NISN yang sama via edit profil, atau ada dua pendaftaran
-        // PAB dengan NISN sama yang lolos race condition saat submit).
-        // Tanpa cek ini, insert di bawah akan gagal dengan PDOException
-        // mentah (unique key uniq_users_nisn) yang tidak tertangani.
-        if (!empty($reg['nisn']) && $userModel->existsByNisn($reg['nisn'])) {
-            throw new RuntimeException(
-                'NISN ' . $reg['nisn'] . ' sudah dipakai akun lain. Tidak bisa diapprove — periksa data terlebih dahulu.'
-            );
-        }
-
-        $userId = $userModel->createAnggota([
+        $userId    = $userModel->createAnggota([
             'nisn'          => $reg['nisn'],
             'nama_lengkap'  => $reg['nama_lengkap'],
             'kelas'         => $reg['kelas'],

@@ -98,7 +98,7 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
   padding: 13px 18px;
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
@@ -194,6 +194,82 @@
   transform: translateY(-1px);
 }
 .pab-toggle:active { transform: translateY(0); }
+
+/* ── Filter bar ── */
+.pab-filterbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 15px 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--bd-subtle);
+  border-radius: var(--r-xl);
+}
+.pab-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 150px;
+}
+.pab-filter-field--grow { flex: 1; min-width: 200px; }
+.pab-filter-lbl {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--tx-muted);
+}
+.pab-filter-input,
+.pab-filter-select {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  color: var(--tx-primary);
+  background: var(--bg-elevated);
+  border: 1.5px solid var(--bd-subtle);
+  border-radius: var(--r-sm);
+  padding: 8px 11px;
+  outline: none;
+  width: 100%;
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease), box-shadow var(--t-base) var(--ease);
+}
+.pab-filter-input::placeholder { color: var(--tx-muted); }
+.pab-filter-input:focus,
+.pab-filter-select:focus {
+  border-color: var(--c-primary-lt, #06b6d4);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(6,182,212,.12);
+}
+.pab-filter-actions {
+  display: flex;
+  gap: 8px;
+}
+.pab-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 15px;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  white-space: nowrap;
+}
+.pab-filter-btn--apply {
+  background: var(--ac);
+  color: #fff;
+}
+.pab-filter-btn--apply:hover { box-shadow: 0 6px 16px var(--ac-glow); transform: translateY(-1px); }
+.pab-filter-btn--reset {
+  background: var(--bg-elevated);
+  color: var(--tx-secondary);
+  border: 1px solid var(--bd-subtle);
+}
+.pab-filter-btn--reset:hover { border-color: var(--bd-accent); color: var(--tx-primary); background: #fff; }
 
 /* ── Panel / table wrapper ── */
 .pab-panel {
@@ -296,6 +372,15 @@
   font-weight: 500;
 }
 
+/* NISN */
+.pab-nisn {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--tx-secondary);
+  letter-spacing: 0.02em;
+}
+
 /* Date */
 .pab-date {
   font-size: 11.5px;
@@ -363,6 +448,12 @@
   border: 1px solid var(--red-bd);
 }
 .pab-btn--reject:hover { background: var(--red); color: #fff; transform: translateY(-1px); }
+.pab-btn--delete {
+  background: var(--bg-elevated);
+  color: var(--tx-secondary);
+  border: 1px solid var(--bd-subtle);
+}
+.pab-btn--delete:hover { background: var(--red); color: #fff; border-color: var(--red); transform: translateY(-1px); }
 .pab-btn:active { transform: translateY(0); }
 
 /* Empty state */
@@ -386,7 +477,7 @@
 .pab-empty__title { font-size: 13.5px; font-weight: 700; color: var(--tx-secondary); margin-bottom: 4px; }
 .pab-empty__sub   { font-size: 12px; color: var(--tx-muted); }
 
-/* ── Modal ── */
+/* ── Modal (shared style for reject & delete) ── */
 .pab-modal-overlay {
   display: none;
   position: fixed;
@@ -433,6 +524,15 @@
 .pab-modal__head-title  { font-size: 13.5px; font-weight: 800; color: var(--tx-primary); }
 .pab-modal__head-sub    { font-size: 11.5px; color: var(--tx-muted); margin-top: 1px; }
 .pab-modal__body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.pab-modal__body-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tx-primary);
+  padding: 10px 13px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--bd-subtle);
+  border-radius: var(--r-md);
+}
 
 /* Textarea */
 .pab-textarea {
@@ -525,11 +625,58 @@
     </form>
   </div>
 
+  <!-- Filter bar -->
+  <form method="GET" action="<?= BASE_URL ?>/admin/pab" class="pab-filterbar">
+    <div class="pab-filter-field pab-filter-field--grow">
+      <label class="pab-filter-lbl" for="pab-f-search">Cari Nama / NISN</label>
+      <input type="text" id="pab-f-search" name="search" class="pab-filter-input"
+             placeholder="Ketik nama atau NISN…"
+             value="<?= htmlspecialchars($filter['search'] ?? '') ?>">
+    </div>
+
+    <div class="pab-filter-field">
+      <label class="pab-filter-lbl" for="pab-f-status">Status</label>
+      <select id="pab-f-status" name="status" class="pab-filter-select">
+        <option value="">Semua Status</option>
+        <?php
+          $statusOpts = ['pending' => 'Pending', 'approved' => 'Disetujui', 'rejected' => 'Ditolak'];
+          foreach ($statusOpts as $val => $lbl):
+        ?>
+          <option value="<?= $val ?>" <?= ($filter['status'] ?? '') === $val ? 'selected' : '' ?>>
+            <?= $lbl ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <div class="pab-filter-field">
+      <label class="pab-filter-lbl" for="pab-f-kelas">Kelas</label>
+      <select id="pab-f-kelas" name="kelas" class="pab-filter-select">
+        <option value="">Semua Kelas</option>
+        <?php foreach ($kelasList as $k): ?>
+          <option value="<?= htmlspecialchars($k) ?>" <?= ($filter['kelas'] ?? '') === $k ? 'selected' : '' ?>>
+            <?= htmlspecialchars($k) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <div class="pab-filter-actions">
+      <button type="submit" class="pab-filter-btn pab-filter-btn--apply">
+        <i class="ti ti-filter" aria-hidden="true"></i>
+        Terapkan
+      </button>
+      <a href="<?= BASE_URL ?>/admin/pab" class="pab-filter-btn pab-filter-btn--reset">
+        Reset
+      </a>
+    </div>
+  </form>
+
   <!-- Table panel -->
   <div class="pab-panel">
     <div class="pab-panel__head">
       <span class="pab-panel__head-title">Daftar Pendaftar</span>
-      <span class="pab-panel__head-count"><?= count($list) ?> total</span>
+      <span class="pab-panel__head-count"><?= count($list) ?> hasil</span>
     </div>
 
     <div class="pab-table-wrap">
@@ -537,6 +684,7 @@
         <thead>
           <tr>
             <th>Pendaftar</th>
+            <th>NISN</th>
             <th>No HP</th>
             <th>Tgl Daftar</th>
             <th>Status</th>
@@ -547,13 +695,13 @@
         <tbody>
           <?php if (empty($list)): ?>
           <tr>
-            <td colspan="6" style="padding:0;border:none;">
+            <td colspan="7" style="padding:0;border:none;">
               <div class="pab-empty">
                 <div class="pab-empty__ico">
                   <i class="ti ti-user-search" aria-hidden="true"></i>
                 </div>
                 <div class="pab-empty__title">Belum ada pendaftar</div>
-                <div class="pab-empty__sub">Data pendaftar PAB akan muncul di sini</div>
+                <div class="pab-empty__sub">Tidak ada data yang cocok dengan filter saat ini</div>
               </div>
             </td>
           </tr>
@@ -579,6 +727,15 @@
                   <div class="pab-kelas"><?= htmlspecialchars($r['kelas']) ?></div>
                 </div>
               </div>
+            </td>
+
+            <!-- NISN -->
+            <td>
+              <?php if (!empty($r['nisn'])): ?>
+                <span class="pab-nisn"><?= htmlspecialchars($r['nisn']) ?></span>
+              <?php else: ?>
+                <span style="color:var(--tx-muted);">—</span>
+              <?php endif; ?>
             </td>
 
             <!-- No HP -->
@@ -624,28 +781,37 @@
 
             <!-- Aksi -->
             <td>
-              <?php if ($r['status'] === 'pending'): ?>
               <div class="pab-actions">
-                <!-- Approve -->
-                <form method="POST"
-                      action="<?= BASE_URL ?>/admin/pab/<?= (int)$r['id'] ?>/approve"
-                      onsubmit="return confirm('Setujui pendaftar ini dan generate NIA?')">
-                  <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
-                  <button type="submit" class="pab-btn pab-btn--approve">
-                    <i class="ti ti-check" aria-hidden="true"></i>
-                    Setujui
+                <?php if ($r['status'] === 'pending'): ?>
+                  <!-- Approve -->
+                  <form method="POST"
+                        action="<?= BASE_URL ?>/admin/pab/<?= (int)$r['id'] ?>/approve"
+                        onsubmit="return confirm('Setujui pendaftar ini dan generate NIA?')">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
+                    <button type="submit" class="pab-btn pab-btn--approve">
+                      <i class="ti ti-check" aria-hidden="true"></i>
+                      Setujui
+                    </button>
+                  </form>
+                  <!-- Reject -->
+                  <button type="button" class="pab-btn pab-btn--reject"
+                          onclick="openReject(<?= (int)$r['id'] ?>)">
+                    <i class="ti ti-x" aria-hidden="true"></i>
+                    Tolak
                   </button>
-                </form>
-                <!-- Reject -->
-                <button type="button" class="pab-btn pab-btn--reject"
-                        onclick="openReject(<?= (int)$r['id'] ?>)">
-                  <i class="ti ti-x" aria-hidden="true"></i>
-                  Tolak
-                </button>
+                <?php endif; ?>
+
+                <?php if ($r['status'] !== 'approved'): ?>
+                  <!-- Delete (hanya untuk pending/rejected — yang approved dikelola lewat halaman Anggota) -->
+                  <button type="button" class="pab-btn pab-btn--delete"
+                          onclick="openDelete(<?= (int)$r['id'] ?>, '<?= htmlspecialchars(addslashes($r['nama_lengkap'])) ?>')">
+                    <i class="ti ti-trash" aria-hidden="true"></i>
+                    Hapus
+                  </button>
+                <?php else: ?>
+                  <span style="color:var(--tx-muted);font-size:11.5px;">—</span>
+                <?php endif; ?>
               </div>
-              <?php else: ?>
-                <span style="color:var(--tx-muted);font-size:11.5px;">—</span>
-              <?php endif; ?>
             </td>
           </tr>
           <?php endforeach; ?>
@@ -692,31 +858,82 @@
   </div>
 </div>
 
+<!-- ── Modal Hapus ── -->
+<div id="deleteModal" class="pab-modal-overlay">
+  <div class="pab-modal">
+    <div class="pab-modal__head">
+      <div class="pab-modal__head-ico">
+        <i class="ti ti-trash" aria-hidden="true"></i>
+      </div>
+      <div>
+        <div class="pab-modal__head-title">Hapus Data Pendaftar</div>
+        <div class="pab-modal__head-sub">Tindakan ini tidak bisa dibatalkan</div>
+      </div>
+    </div>
+
+    <form method="POST" id="deleteForm">
+      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
+      <div class="pab-modal__body">
+        <p style="font-size:12.5px;color:var(--tx-secondary);">
+          Anda akan menghapus data pendaftaran PAB atas nama:
+        </p>
+        <div class="pab-modal__body-name" id="delete-nama">—</div>
+      </div>
+      <div class="pab-modal__foot">
+        <button type="button" class="pab-btn pab-btn--cancel" onclick="closeDelete()">
+          Batal
+        </button>
+        <button type="submit" class="pab-btn pab-btn--delete" style="border-color:var(--red-bd);">
+          <i class="ti ti-trash" aria-hidden="true"></i>
+          Ya, Hapus
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
 (function () {
   'use strict';
 
-  var overlay = document.getElementById('rejectModal');
+  var rejectOverlay = document.getElementById('rejectModal');
+  var deleteOverlay = document.getElementById('deleteModal');
 
   window.openReject = function (id) {
     document.getElementById('rejectForm').action =
       '<?= BASE_URL ?>/admin/pab/' + id + '/reject';
-    overlay.classList.add('open');
+    rejectOverlay.classList.add('open');
     document.getElementById('reject-catatan').focus();
   };
 
   window.closeReject = function () {
-    overlay.classList.remove('open');
+    rejectOverlay.classList.remove('open');
+  };
+
+  window.openDelete = function (id, nama) {
+    document.getElementById('deleteForm').action =
+      '<?= BASE_URL ?>/admin/pab/' + id + '/delete';
+    document.getElementById('delete-nama').textContent = nama;
+    deleteOverlay.classList.add('open');
+  };
+
+  window.closeDelete = function () {
+    deleteOverlay.classList.remove('open');
   };
 
   /* Close on backdrop click */
-  overlay.addEventListener('click', function (e) {
-    if (e.target === overlay) closeReject();
+  [rejectOverlay, deleteOverlay].forEach(function (ov) {
+    ov.addEventListener('click', function (e) {
+      if (e.target === ov) { ov.classList.remove('open'); }
+    });
   });
 
   /* Close on Escape */
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeReject();
+    if (e.key === 'Escape') {
+      rejectOverlay.classList.remove('open');
+      deleteOverlay.classList.remove('open');
+    }
   });
 }());
 </script>

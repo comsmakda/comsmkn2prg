@@ -234,16 +234,25 @@ class AdminController extends Controller
     // ================================================================
     //  PAB
     // ================================================================
-    public function pab(): void
+public function pab(): void
     {
         $this->requireAdmin();
-        $pm      = new PabModel();
-        $sm      = new SettingModel();
-        $list    = $pm->getAll();
-        $pabOpen = $sm->isPabOpen();
-        $flash   = $this->getFlash();
-        $csrf    = $this->csrfToken();
-        $this->view('admin/pab', compact('list', 'pabOpen', 'flash', 'csrf'), 'admin');
+        $pm = new PabModel();
+        $sm = new SettingModel();
+
+        $filter = [
+            'status' => $_GET['status'] ?? '',
+            'kelas'  => $_GET['kelas']  ?? '',
+            'search' => trim($_GET['search'] ?? ''),
+        ];
+
+        $list      = $pm->getAll($filter);
+        $kelasList = $pm->getKelasList();
+        $pabOpen   = $sm->isPabOpen();
+        $flash     = $this->getFlash();
+        $csrf      = $this->csrfToken();
+
+        $this->view('admin/pab', compact('list', 'pabOpen', 'flash', 'csrf', 'filter', 'kelasList'), 'admin');
     }
 
     public function pabApprove(string $id): void
@@ -265,6 +274,42 @@ class AdminController extends Controller
         $catatan = htmlspecialchars(trim($_POST['catatan'] ?? ''), ENT_QUOTES);
         (new PabModel())->reject((int)$id, $catatan);
         $this->flash('success', 'Pendaftar ditolak.');
+        $this->redirect('/admin/pab');
+    }
+
+    public function pabDelete(string $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $pm  = new PabModel();
+        $reg = $pm->find((int)$id);
+
+        if (!$reg) {
+            $this->flash('error', 'Data pendaftar tidak ditemukan.');
+            $this->redirect('/admin/pab');
+        }
+
+        // Tidak boleh menghapus data yang statusnya sudah approved,
+        // karena sudah terhubung dengan akun anggota aktif (users).
+        // Kelola anggota tsb lewat halaman Anggota, bukan dari sini.
+        if ($reg['status'] === 'approved') {
+            $this->flash('error', 'Pendaftar yang sudah disetujui tidak bisa dihapus dari sini. Kelola akunnya lewat halaman Anggota.');
+            $this->redirect('/admin/pab');
+        }
+
+        // Hapus foto fisik kalau ada
+        if (!empty($reg['foto'])) {
+            $fotoPath = ROOT . '/public/uploads/' . $reg['foto'];
+            if (file_exists($fotoPath)) @unlink($fotoPath);
+        }
+
+        if ($pm->delete((int)$id)) {
+            $this->flash('success', 'Data pendaftar PAB berhasil dihapus.');
+        } else {
+            $this->flash('error', 'Gagal menghapus data pendaftar.');
+        }
+
         $this->redirect('/admin/pab');
     }
 
