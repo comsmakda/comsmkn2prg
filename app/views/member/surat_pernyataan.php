@@ -91,6 +91,17 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 
 /* ═══════════════════════════════════════════════════════════
    SURAT A4
+   ─────────────────────────────────────────────────────────
+   STANDAR YANG DIPAKAI (surat resmi/dinas Indonesia):
+     - Font   : Times New Roman, 12pt, line-height 1.5
+     - Margin : atas 3cm, kanan 3cm, bawah 3cm, kiri 4cm
+                (kiri lebih lebar untuk ruang penjilidan/arsip)
+   Nilai margin ini SAMA PERSIS dipakai di 3 tempat supaya semua
+   keluaran konsisten satu sama lain:
+     1. #surat-preview padding di bawah (tampilan layar, dalam px
+        yang setara dengan mm di atas pada lebar 794px = 210mm)
+     2. @media print padding (dalam mm, lihat blok @media print)
+     3. PDF_MARGIN_MM di <script> (dipakai oleh downloadPDF())
 ═══════════════════════════════════════════════════════════ */
 #surat-preview {
   width: 794px;
@@ -98,10 +109,11 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   margin: 0 auto;
   background: #ffffff;
   box-shadow: 0 4px 20px rgba(15,23,42,.12), 0 1px 4px rgba(15,23,42,.08);
-  padding: 30px 46px 46px 46px;
+  /* 3cm 3cm 3cm 4cm ≈ 113px 113px 113px 151px pada skala 794px = 210mm */
+  padding: 113px 113px 113px 151px;
   font-family: 'Times New Roman', Times, Georgia, serif;
   font-size: 12pt;
-  line-height: 1.6;
+  line-height: 1.5;
   color: #000;
   position: relative;
   box-sizing: border-box;
@@ -199,17 +211,19 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 
 /* ── NOMOR SURAT & PERIHAL ───────────────────────────────
    Ditumpuk rata kiri (format surat resmi baku), bukan
-   space-between, supaya tetap rapi walau teks Perihal panjang. */
+   space-between, supaya tetap rapi walau teks Perihal panjang.
+   Font disamakan dengan badan surat: Times New Roman 12pt. */
 .info-surat {
-  font-family: Arial, sans-serif;
-  font-size: 9.5pt;
-  color: #222;
-  margin: 10px 0 0 0;
+  font-family: 'Times New Roman', Times, Georgia, serif;
+  font-size: 12pt;
+  line-height: 1.5;
+  color: #000;
+  margin: 12px 0 0 0;
 }
 .info-surat table { border-collapse: collapse; }
 .info-surat td { padding: 1.5px 0; vertical-align: top; }
-.info-surat td.label { width: 58px; white-space: nowrap; }
-.info-surat td.colon { width: 12px; }
+.info-surat td.label { width: 70px; white-space: nowrap; }
+.info-surat td.colon { width: 14px; }
 
 /* ── JUDUL SURAT ────────────────────────────────────────── */
 .surat-judul {
@@ -217,19 +231,19 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   margin: 18px 0 4px;
 }
 .surat-judul h2 {
-  font-family: Arial Black, 'Arial Bold', Arial, sans-serif;
+  font-family: 'Times New Roman', Times, Georgia, serif;
   font-size: 13pt;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   text-decoration: underline;
   text-underline-offset: 4px;
   color: #000;
   margin: 0;
 }
 .surat-judul .sub {
-  font-family: Arial, sans-serif;
-  font-size: 9.5pt;
+  font-family: 'Times New Roman', Times, Georgia, serif;
+  font-size: 11pt;
   color: #444;
   margin-top: 3px;
 }
@@ -241,10 +255,10 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   hyphens: auto;
 }
 .surat-body p {
-  font-size: 11.5pt;
+  font-size: 12pt;
   margin-bottom: 8px;
   text-align: justify;
-  line-height: 1.75;
+  line-height: 1.5;
   orphans: 3;
   widows: 3;
 }
@@ -279,7 +293,8 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   flex: 1 1 auto;
   max-width: 480px;
   border-collapse: collapse;
-  font-size: 11.5pt;
+  font-size: 12pt;
+  line-height: 1.5;
 }
 .id-foto {
   flex-shrink: 0;
@@ -291,7 +306,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   vertical-align: top;
   line-height: 1.5;
 }
-.id-table td:first-child { width: 165px; font-weight: normal; }
+.id-table td:first-child { width: 175px; font-weight: normal; }
 .id-table td:nth-child(2) { width: 18px; padding: 3.5px 6px; text-align: center; }
 
 .id-foto img {
@@ -322,7 +337,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
-  font-size: 11pt;
+  font-size: 12pt;
   margin: 6px 0 4px;
   break-inside: avoid;
   page-break-inside: avoid;
@@ -342,7 +357,8 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 .jadwal-table td {
   padding: 6px 12px;
   border: 1px solid #c0c0c0;
-  font-size: 11pt;
+  font-size: 12pt;
+  line-height: 1.4;
   vertical-align: middle;
   color: #111;
   break-inside: avoid;
@@ -364,14 +380,14 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   margin: 6px 0 10px;
   padding-left: 0;
   list-style: none;
-  font-size: 11.5pt;
+  font-size: 12pt;
 }
 .pernyataan-list li {
   display: flex;
   gap: 10px;
   margin-bottom: 7px;
   text-align: justify;
-  line-height: 1.7;
+  line-height: 1.5;
   break-inside: avoid;
   page-break-inside: avoid;
 }
@@ -379,7 +395,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   flex-shrink: 0;
   width: 22px;
   font-weight: 700;
-  font-family: Arial, sans-serif;
+  font-family: 'Times New Roman', Times, Georgia, serif;
 }
 
 /* ── TANDA TANGAN ───────────────────────────────────────── */
@@ -388,20 +404,20 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   margin-top: 26px;
-  font-family: Arial, sans-serif;
-  font-size: 10.5pt;
+  font-family: 'Times New Roman', Times, Georgia, serif;
+  font-size: 12pt;
   break-inside: avoid;
   page-break-inside: avoid;
 }
 .ttd-col { text-align: center; }
-.ttd-col p { margin: 0; line-height: 1.6; }
+.ttd-col p { margin: 0; line-height: 1.5; }
 /* Area judul (di atas garis tanda tangan) disamakan tingginya di kedua
    kolom — kolom kanan punya 2 baris teks ("Pinrang, tanggal" +
    "Yang Membuat Pernyataan,") sedangkan kolom kiri cuma 1 baris
    ("Orang Tua/Wali,"), jadi tanpa ini garis tanda tangannya jadi
    tidak sejajar/tidak balance. */
 .ttd-heading {
-  min-height: calc(1.6em * 2);
+  min-height: calc(1.5em * 2);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -413,7 +429,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   border-top: 1px solid #000;
   padding-top: 4px;
   font-weight: 700;
-  font-size: 10.5pt;
+  font-size: 12pt;
   text-align: center;
 }
 .ttd-sub {
@@ -422,6 +438,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   color: #555;
   margin-top: 2px;
   font-style: italic;
+  font-family: Arial, sans-serif;
 }
 
 /* ── FOOTER DOKUMEN ─────────────────────────────────────── */
@@ -520,10 +537,10 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
    kertas (210mm untuk A4 / 215mm untuk F4), @page margin dibuat 0,
    dan margin surat yang sesungguhnya dipindahkan ke padding elemen
    ini sendiri memakai satuan mm yang sama dengan PDF_MARGIN_MM di
-   skrip (format surat dinas resmi: atas 2cm, kanan 2cm, bawah 2cm,
-   kiri 3cm — kiri lebih lebar untuk ruang penjilidan/arsip). Dengan
-   begitu tidak ada lagi penyusutan otomatis, dan hasil Cetak maupun
-   Unduh PDF punya margin yang identik.
+   skrip (format surat resmi Indonesia: atas 3cm, kanan 3cm, bawah
+   3cm, kiri 4cm — kiri lebih lebar untuk ruang penjilidan/arsip).
+   Dengan begitu tidak ada lagi penyusutan otomatis, dan hasil Cetak
+   maupun Unduh PDF punya margin serta ukuran font yang identik.
 ═══════════════════════════════════════════════════════════ */
 @media print {
   @page {
@@ -543,7 +560,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
     width: 210mm !important;
     min-height: auto !important;
     margin: 0 !important;
-    padding: 20mm 20mm 20mm 30mm !important;
+    padding: 30mm 30mm 30mm 40mm !important;
     box-shadow: none !important;
     box-sizing: border-box !important;
   }
@@ -951,13 +968,13 @@ document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') closeSpAlert();
 });
 
-// Margin surat resmi/dinas standar (atas 2cm, kanan 2cm, bawah 2cm,
-// kiri 3cm — kiri sedikit lebih lebar untuk ruang penjilidan/lubang
+// Margin surat resmi standar Indonesia (atas 3cm, kanan 3cm, bawah 3cm,
+// kiri 4cm — kiri sedikit lebih lebar untuk ruang penjilidan/lubang
 // arsip). Dipakai SAMA PERSIS di Cetak (lewat padding #surat-preview,
 // karena @page margin sengaja dibuat 0 — lihat catatan di blok CSS
-// @media print) maupun di Unduh PDF (lewat offset gambar di jsPDF),
-// supaya kedua keluaran konsisten satu sama lain.
-var PDF_MARGIN_MM = { top: 20, right: 20, bottom: 20, left: 30 };
+// @media print) maupun di Unduh PDF (lewat downloadPDF()), supaya
+// kedua keluaran konsisten satu sama lain DAN dengan tampilan layar.
+var PDF_MARGIN_MM = { top: 30, right: 30, bottom: 30, left: 40 };
 
 // @page CSS bersifat statis, jadi untuk mendukung 2 ukuran kertas (A4/F4)
 // dari satu tombol Cetak, ukuran & padding-nya disuntikkan lewat <style>
@@ -1089,25 +1106,67 @@ async function downloadPDF() {
 
   var fmt         = getPaperFormat();
   var jsPDFFormat = fmt === 'f4' ? [215, 330] : 'a4';
+  var pageW       = fmt === 'f4' ? 215 : 210;
 
-  // Box-shadow di layar hanya untuk efek "kertas mengambang" di preview;
-  // kalau ikut ter-capture, tiap halaman PDF akan punya bayangan abu-abu
-  // tipis di tepinya. Disembunyikan sementara khusus saat capture.
-  var prevBoxShadow = el.style.boxShadow;
+  // Simpan seluruh inline style yang akan diubah sementara, supaya bisa
+  // dikembalikan persis seperti semula setelah proses selesai — termasuk
+  // kalau terjadi error di tengah jalan (lihat blok finally).
+  var prevStyle = {
+    width     : el.style.width,
+    minHeight : el.style.minHeight,
+    padding   : el.style.padding,
+    margin    : el.style.margin,
+    boxShadow : el.style.boxShadow,
+    boxSizing : el.style.boxSizing
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // FIX UTAMA bug "hasil Unduh PDF kecil":
+  // Sebelumnya elemen di-capture APA ADANYA di layar (lebar tetap 794px
+  // dengan padding versi layar), lalu gambar hasil capture itu DIPAKSA
+  // masuk ke area yang LEBIH SEMPIT LAGI (lebar halaman dikurangi
+  // margin kiri+kanan) lewat pdf.addImage(). Karena gambar tsb SUDAH
+  // mengandung padding-nya sendiri, memasukkannya ke area yang lebih
+  // sempit membuat seluruh isi — termasuk teks — ikut menyusut dua kali
+  // lipat. Itulah sebabnya hasil PDF/cetak terlihat kecil.
+  //
+  // Solusinya: sebelum capture, elemen diubah dulu PERSIS seperti mode
+  // Cetak — lebar = lebar kertas penuh dalam mm, padding = margin surat
+  // resmi dalam mm (PDF_MARGIN_MM) — lalu gambar hasil capture ditempel
+  // PENUH ke halaman PDF (x=0, y=0, lebar = lebar halaman) TANPA ada
+  // pengurangan margin lagi dari sisi jsPDF, karena marginnya sudah
+  // "terbakar" di dalam gambar itu sendiri. Prinsipnya sama seperti
+  // @page margin:0 yang dipakai di mode Cetak.
+  // ═══════════════════════════════════════════════════════════
+  el.style.width     = pageW + 'mm';
+  el.style.minHeight = 'auto';
+  el.style.padding   = PDF_MARGIN_MM.top + 'mm ' + PDF_MARGIN_MM.right + 'mm ' +
+                        PDF_MARGIN_MM.bottom + 'mm ' + PDF_MARGIN_MM.left + 'mm';
+  el.style.margin    = '0';
   el.style.boxShadow = 'none';
+  el.style.boxSizing = 'border-box';
+
+  // Beri browser waktu untuk reflow dengan ukuran barunya sebelum di-capture.
+  await new Promise(function (resolve) {
+    requestAnimationFrame(function () { requestAnimationFrame(resolve); });
+  });
 
   try {
-    // FIX UTAMA (sebelumnya): instance jsPDF ("pdf") tidak pernah dibuat,
-    // sehingga "pdf.internal.pageSize..." selalu ReferenceError. Sekarang
-    // dibuat eksplisit di sini:
     var pdf = new JsPDFCtor({
       orientation : 'portrait',
       unit        : 'mm',
       format      : jsPDFFormat
     });
 
+    var pageWidthMM  = pdf.internal.pageSize.getWidth
+      ? pdf.internal.pageSize.getWidth()
+      : pdf.internal.pageSize.width;
+    var pageHeightMM = pdf.internal.pageSize.getHeight
+      ? pdf.internal.pageSize.getHeight()
+      : pdf.internal.pageSize.height;
+
     var canvas = await html2canvas(el, {
-      scale           : 2,
+      scale           : 3,
       useCORS         : true,
       allowTaint      : true,
       backgroundColor : '#ffffff',
@@ -1118,32 +1177,20 @@ async function downloadPDF() {
       windowHeight    : el.scrollHeight
     });
 
-    var pageWidthMM  = pdf.internal.pageSize.getWidth
-      ? pdf.internal.pageSize.getWidth()
-      : pdf.internal.pageSize.width;
-    var pageHeightMM = pdf.internal.pageSize.getHeight
-      ? pdf.internal.pageSize.getHeight()
-      : pdf.internal.pageSize.height;
-
-    // Area konten = ukuran halaman DIKURANGI margin surat yang umum
-    // (lihat PDF_MARGIN_MM di atas), bukan lagi selebar/setinggi halaman
-    // penuh tanpa batas seperti sebelumnya (itu sebabnya hasil PDF
-    // sebelumnya terasa "mepet"/full-bleed, tidak seperti surat resmi).
-    var contentWidthMM  = pageWidthMM  - PDF_MARGIN_MM.left - PDF_MARGIN_MM.right;
-    var contentHeightMM = pageHeightMM - PDF_MARGIN_MM.top  - PDF_MARGIN_MM.bottom;
-
-    var domToCanvasScale = canvas.width / el.getBoundingClientRect().width;
-    var pxPerMM           = canvas.width / contentWidthMM;
-    var maxSliceHeightPx  = Math.floor(contentHeightMM * pxPerMM);
-
-    var atomicRanges = spBuildAtomicRanges(el, domToCanvasScale);
+    // Kanvas sekarang MEWAKILI PERSIS satu halaman penuh (pageWidthMM),
+    // lengkap dengan margin surat di dalamnya — jadi tidak perlu lagi
+    // dikurangi margin kiri/kanan di sini seperti versi sebelumnya.
+    var pxPerMM           = canvas.width / pageWidthMM;
+    var maxSliceHeightPx  = Math.floor(pageHeightMM * pxPerMM);
+    var domToCanvasScale  = canvas.width / el.getBoundingClientRect().width;
+    var atomicRanges      = spBuildAtomicRanges(el, domToCanvasScale);
 
     // Setiap halaman digambar dari POTONGAN KANVAS FISIK yang terpisah
     // (bukan satu gambar penuh yang digeser posisinya per halaman), agar
     // tidak ada baris teks yang dobel/tumpang-tindih akibat clipping PDF
-    // viewer yang tidak presisi. Titik potongnya sendiri sekarang dicari
-    // lewat spResolveSafeCut() supaya tidak jatuh di tengah tabel,
-    // paragraf, butir pernyataan, atau blok tanda tangan manapun.
+    // viewer yang tidak presisi. Titik potongnya sendiri dicari lewat
+    // spResolveSafeCut() supaya tidak jatuh di tengah tabel, paragraf,
+    // butir pernyataan, atau blok tanda tangan manapun.
     var sliceCanvas = document.createElement('canvas');
     var sliceCtx    = sliceCanvas.getContext('2d');
     sliceCanvas.width = canvas.width;
@@ -1168,10 +1215,12 @@ async function downloadPDF() {
       var sliceHeightMM = sliceHeightPx / pxPerMM;
 
       if (!isFirstPage) pdf.addPage(jsPDFFormat, 'portrait');
+      // x=0, y=0, lebar penuh halaman — TANPA offset margin tambahan,
+      // karena margin sudah ikut ter-capture di dalam gambar itu sendiri.
       pdf.addImage(
         sliceImgData, 'PNG',
-        PDF_MARGIN_MM.left, PDF_MARGIN_MM.top,
-        contentWidthMM, sliceHeightMM
+        0, 0,
+        pageWidthMM, sliceHeightMM
       );
 
       renderedPx += sliceHeightPx;
@@ -1179,12 +1228,18 @@ async function downloadPDF() {
     }
 
     pdf.save('<?= addslashes($filenamePdf) ?>');
-    showSpAlert('success', 'Dokumen berhasil diunduh sebagai file PDF dengan margin surat standar.');
+    showSpAlert('success', 'Dokumen berhasil diunduh sebagai file PDF dengan ukuran font dan margin surat resmi.');
   } catch (e) {
     console.error('PDF error:', e);
     showSpAlert('error', 'Gagal membuat PDF. Silakan gunakan tombol Cetak sebagai alternatif, atau coba lagi setelah memuat ulang halaman.');
   } finally {
-    el.style.boxShadow = prevBoxShadow;
+    // Kembalikan elemen ke ukuran tampilan layar semula, apa pun hasilnya.
+    el.style.width     = prevStyle.width;
+    el.style.minHeight = prevStyle.minHeight;
+    el.style.padding   = prevStyle.padding;
+    el.style.margin    = prevStyle.margin;
+    el.style.boxShadow = prevStyle.boxShadow;
+    el.style.boxSizing = prevStyle.boxSizing;
     btn.disabled = false;
     btn.innerHTML = orig;
   }
