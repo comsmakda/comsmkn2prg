@@ -100,7 +100,12 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   box-sizing: border-box;
 }
 
-/* Bingkai hias dokumen resmi */
+/* Bingkai hias dokumen resmi.
+   Sengaja TIDAK memakai border-style:double pada satu elemen — saat
+   dirender ke kanvas (html2canvas) lalu dikompres JPEG, garis tipis ganda
+   semacam itu gampang muncul "miring/bergelombang" akibat artefak
+   kompresi. Bingkai ganda dibuat dari dua elemen terpisah dengan border
+   solid tunggal supaya garisnya tetap lurus. */
 #surat-preview::before {
   content: '';
   position: absolute;
@@ -112,8 +117,8 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 #surat-preview::after {
   content: '';
   position: absolute;
-  inset: 12px;
-  border: 3px double #1a1a6e;
+  inset: 13px;
+  border: 1.5px solid #1a1a6e;
   pointer-events: none;
   z-index: 0;
 }
@@ -129,30 +134,27 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   padding-bottom: 9px;
 }
 
-/* Bingkai logo seragam (kiri & kanan) supaya berat visualnya sama,
-   walaupun bentuk/rasio file logo aslinya berbeda-beda. */
+/* Logo TANPA bingkai/lingkaran — mengikuti konvensi kop surat resmi.
+   Tinggi kedua logo disamakan (bukan lebarnya) supaya bobot visualnya
+   tetap seimbang walau rasio/bentuk file logo aslinya berbeda. */
 .kop__logo {
   flex-shrink: 0;
-  width: 76px;
-  height: 76px;
-  border-radius: 50%;
-  background: #fff;
-  border: 1.5px solid #1a1a6e;
+  width: 78px;
+  height: 78px;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  box-sizing: border-box;
-  padding: 4px;
 }
 .kop__logo img {
-  width: 100%;
-  height: 100%;
+  height: 78px;
+  width: auto;
+  max-width: 78px;
   object-fit: contain;
   display: block;
 }
 .kop__logo-fallback {
-  width: 100%; height: 100%;
+  width: 74px; height: 74px;
+  border: 2px solid #1a1a6e;
   border-radius: 50%;
   display: none;
   align-items: center; justify-content: center;
@@ -403,6 +405,17 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 }
 .ttd-col { text-align: center; }
 .ttd-col p { margin: 0; line-height: 1.6; }
+/* Area judul (di atas garis tanda tangan) disamakan tingginya di kedua
+   kolom — kolom kanan punya 2 baris teks ("Pinrang, tanggal" +
+   "Yang Membuat Pernyataan,") sedangkan kolom kiri cuma 1 baris
+   ("Orang Tua/Wali,"), jadi tanpa ini garis tanda tangannya jadi
+   tidak sejajar/tidak balance. */
+.ttd-heading {
+  min-height: calc(1.6em * 2);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
 .ttd-space { height: 60px; }
 .ttd-name-box {
   display: inline-block;
@@ -747,7 +760,9 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
           <!-- ── TANDA TANGAN ───────────────────────────────── -->
           <div class="ttd-grid">
             <div class="ttd-col">
-              <p>Orang Tua/Wali,</p>
+              <div class="ttd-heading">
+                <p>Orang Tua/Wali,</p>
+              </div>
               <div class="ttd-space"></div>
               <span class="ttd-name-box">
                 <?= $namaOrangtua ?: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' ?>
@@ -756,8 +771,10 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
             </div>
 
             <div class="ttd-col">
-              <p>Pinrang, <?= $today ?></p>
-              <p style="margin-top:2px;">Yang Membuat Pernyataan,</p>
+              <div class="ttd-heading">
+                <p>Pinrang, <?= $today ?></p>
+                <p style="margin-top:2px;">Yang Membuat Pernyataan,</p>
+              </div>
               <div class="ttd-space"></div>
               <span class="ttd-name-box"><?= $namaLengkap ?></span>
               <span class="ttd-sub">NIA: <?= $nia ?></span>
@@ -800,7 +817,10 @@ function downloadPDF() {
   var opt = {
     margin      : [10, 12, 10, 12],
     filename    : '<?= addslashes($filenamePdf) ?>',
-    image       : { type: 'jpeg', quality: 0.97 },
+    // PNG (lossless) dipakai, bukan JPEG — kompresi JPEG pada garis
+    // tipis bingkai kop surat adalah penyebab paling umum garis lurus
+    // tampak "miring/bergelombang" setelah di-scale 2x oleh html2canvas.
+    image       : { type: 'png' },
     html2canvas : {
       scale           : 2,
       useCORS         : true,
