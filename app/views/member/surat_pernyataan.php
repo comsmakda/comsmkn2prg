@@ -813,9 +813,10 @@ function printSurat() {
 }
 
 function downloadPDF() {
-  var el   = document.getElementById('surat-preview');
-  var btn  = document.querySelector('.btn-primary');
-  var orig = btn.innerHTML;
+  var el      = document.getElementById('surat-preview');
+  var scroll  = document.querySelector('.sp-scroll');
+  var btn     = document.querySelector('.btn-primary');
+  var orig    = btn.innerHTML;
 
   if (!el) { alert('Elemen surat tidak ditemukan.'); return; }
 
@@ -823,6 +824,16 @@ function downloadPDF() {
     alert('Gagal memuat pustaka PDF. Periksa koneksi internet Anda, lalu muat ulang halaman.');
     return;
   }
+
+  // PENTING: reset posisi scroll horizontal container sebelum capture.
+  // #surat-preview lebarnya tetap 794px (lebar A4 @96dpi), sedangkan
+  // .sp-scroll punya overflow-x:auto agar tetap bisa dilihat di layar
+  // sempit. Kalau container ini sempat ter-scroll ke kanan saat tombol
+  // "Unduh PDF" ditekan, html2canvas menangkap area sesuai posisi
+  // scroll saat itu — bukan dari titik (0,0) elemen — sehingga hasil
+  // PDF tampak bergeser/terpotong di sisi kanan.
+  if (scroll) scroll.scrollLeft = 0;
+  window.scrollTo(0, 0);
 
   btn.disabled = true;
   btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px;animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>&nbsp;Menyiapkan...';
@@ -843,7 +854,15 @@ function downloadPDF() {
       allowTaint      : true,
       backgroundColor : '#ffffff',
       logging         : false,
-      removeContainer : true
+      removeContainer : true,
+      // Kunci titik capture ke (0,0) elemen dan pakai lebar/tinggi
+      // penuh elemen sebagai "viewport virtual" html2canvas — supaya
+      // tidak terpengaruh posisi scroll window/container maupun lebar
+      // viewport browser yang mungkin lebih sempit dari 794px.
+      scrollX         : 0,
+      scrollY         : 0,
+      windowWidth     : el.scrollWidth,
+      windowHeight    : el.scrollHeight
     },
     jsPDF       : { unit: 'mm', format: jsPDFFormat, orientation: 'portrait' },
     pagebreak   : { mode: ['css', 'legacy'], avoid: ['.kop', '.ttd-grid', '.id-wrapper', '.jadwal-table', '.pernyataan-list li', '.seksi-judul'] }
