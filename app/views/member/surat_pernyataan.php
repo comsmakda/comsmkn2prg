@@ -919,20 +919,92 @@ document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') closeSpAlert();
 });
 
+// Margin surat resmi yang umum dipakai (kop dinas/instansi Indonesia):
+// atas 15mm, kanan 18mm, bawah 18mm, kiri 20mm (kiri sedikit lebih lebar
+// untuk ruang penjilidan/lubang arsip). Dipakai SAMA PERSIS di Cetak
+// (lewat @page) maupun di Unduh PDF (lewat offset gambar di jsPDF) supaya
+// kedua keluaran konsisten.
+var PDF_MARGIN_MM = { top: 15, right: 18, bottom: 18, left: 20 };
+
 // @page CSS bersifat statis, jadi untuk mendukung 2 ukuran kertas (A4/F4)
 // dari satu tombol Cetak, ukurannya disuntikkan lewat <style> sesaat
 // sebelum window.print() dipanggil.
 function printSurat() {
-  var fmt  = getPaperFormat();
-  var size = fmt === 'f4' ? '215mm 330mm' : 'A4 portrait';
-  var el   = document.getElementById('dynamic-page-size');
+  var fmt    = getPaperFormat();
+  var size   = fmt === 'f4' ? '215mm 330mm' : 'A4 portrait';
+  var margin = PDF_MARGIN_MM.top + 'mm ' + PDF_MARGIN_MM.right + 'mm ' +
+               PDF_MARGIN_MM.bottom + 'mm ' + PDF_MARGIN_MM.left + 'mm';
+  var el     = document.getElementById('dynamic-page-size');
   if (!el) {
     el = document.createElement('style');
     el.id = 'dynamic-page-size';
     document.head.appendChild(el);
   }
-  el.textContent = '@media print { @page { size: ' + size + '; margin: 15mm 18mm 18mm 20mm; } }';
+  el.textContent = '@media print { @page { size: ' + size + '; margin: ' + margin + '; } }';
   window.print();
+}
+
+// Elemen-elemen "atomik" yang TIDAK BOLEH terpotong di tengah oleh batas
+// halaman PDF (kop surat, judul seksi, baris tabel jadwal, tiap butir
+// pernyataan, blok tanda tangan, dst). Setiap kali batas potong ideal
+// jatuh di tengah salah satu elemen ini, batas tersebut digeser naik ke
+// awal elemen tersebut sehingga elemen itu dipindah utuh ke halaman
+// berikutnya — inilah yang sebelumnya tidak ada, sehingga baris seperti
+// "yang berlaku." bisa terisolasi sendirian dengan celah kosong besar
+// di atasnya.
+var SP_ATOMIC_SELECTOR = [
+  '.kop', '.info-surat', '.surat-judul', '.seksi-judul',
+  '.jadwal-table', '.id-wrapper', '.pernyataan-list li',
+  '.ttd-grid', '.surat-footer', '.surat-body p'
+].join(', ');
+
+// Buffer tambahan (dalam px CSS, sebelum dikonversi skala kanvas) yang
+// ditempelkan di bawah setiap judul seksi (A/B/C/D), supaya judul tidak
+// pernah berdiri sendirian di baris terakhir sebuah halaman tanpa ada
+// isi yang mengikutinya.
+var SP_HEADING_BUFFER_PX = 90;
+
+function spBuildAtomicRanges(el, domToCanvasScale) {
+  var elRect = el.getBoundingClientRect();
+  var nodes  = el.querySelectorAll(SP_ATOMIC_SELECTOR);
+  var ranges = [];
+
+  nodes.forEach(function (node) {
+    var r = node.getBoundingClientRect();
+    var topPx    = (r.top - elRect.top) * domToCanvasScale;
+    var bottomPx = (r.bottom - elRect.top) * domToCanvasScale;
+
+    if (node.classList.contains('seksi-judul')) {
+      bottomPx += SP_HEADING_BUFFER_PX * domToCanvasScale;
+    }
+    ranges.push({ top: topPx, bottom: bottomPx });
+  });
+
+  ranges.sort(function (a, b) { return a.top - b.top; });
+  return ranges;
+}
+
+// Menggeser batas potong "ideal" (idealCut) supaya tidak jatuh di tengah
+// elemen atomik manapun yang dimulai pada halaman berjalan (topnya >
+// renderedPx). Kalau tidak ada konflik, batas ideal dipakai apa adanya.
+function spResolveSafeCut(renderedPx, idealCut, atomicRanges, canvasHeight) {
+  var cut = Math.min(idealCut, canvasHeight);
+
+  for (var i = 0; i < atomicRanges.length; i++) {
+    var r = atomicRanges[i];
+    if (r.top > renderedPx && r.top < cut && r.bottom > cut) {
+      cut = Math.min(cut, r.top);
+    }
+  }
+
+  // Jaga-jaga: kalau hasil penggeseran membuat halaman nyaris kosong
+  // (misal karena elemen atomik sangat panjang/lebih tinggi dari satu
+  // halaman), paksa pakai batas ideal supaya proses tetap maju dan
+  // tidak terjebak infinite loop.
+  if (cut <= renderedPx + (canvasHeight * 0.02)) {
+    cut = Math.min(idealCut, canvasHeight);
+  }
+  return cut;
 }
 
 async function downloadPDF() {
@@ -946,18 +1018,15 @@ async function downloadPDF() {
     return;
   }
 
-  // CATATAN PENTING (setelah 2x percobaan gagal):
-  // html2pdf.js versi 0.10.1 (yang dipakai di sini lewat CDN) punya bug
-  // yang sudah dikonfirmasi resmi oleh pembuatnya sendiri di GitHub —
-  // logika auto-fit "gambar ke halaman PDF" miliknya sering salah
-  // hitung skala saat dikombinasikan dengan html2canvas scale > 1,
-  // sehingga hasil render jadi lebih lebar dari halaman dan
-  // terpotong di kiri/kanan secara tidak konsisten (persis gejala yang
-  // dilaporkan). Karena itu, fungsi ini TIDAK lagi memakai html2pdf()
-  // sama sekali untuk proses render — hanya memakai html2canvas dan
-  // jsPDF (dua library yang ikut ter-bundle di file yang sama) secara
-  // langsung, dengan lebar gambar dikunci manual = lebar halaman PDF.
-  // Ini menghilangkan sumber bug di atas sepenuhnya.
+  // CATATAN (setelah beberapa kali percobaan gagal):
+  // html2pdf.js versi 0.10.1 (yang dipakai lewat CDN) punya bug yang
+  // sudah dikonfirmasi resmi oleh pembuatnya sendiri di GitHub — logika
+  // auto-fit "gambar ke halaman PDF" miliknya sering salah hitung skala
+  // saat dikombinasikan dengan html2canvas scale > 1. Karena itu fungsi
+  // ini TIDAK memakai html2pdf() sama sekali — hanya html2canvas dan
+  // jsPDF secara langsung, dengan margin & titik potong per halaman
+  // dihitung manual (lihat spBuildAtomicRanges/spResolveSafeCut di atas)
+  // supaya tabel/daftar/paragraf tidak pernah terpotong di tengah.
   if (typeof html2canvas === 'undefined') {
     showSpAlert('error', 'Gagal memuat pustaka pembuat PDF. Periksa koneksi internet Anda, lalu muat ulang halaman.');
     return;
@@ -978,12 +1047,16 @@ async function downloadPDF() {
   var fmt         = getPaperFormat();
   var jsPDFFormat = fmt === 'f4' ? [215, 330] : 'a4';
 
+  // Box-shadow di layar hanya untuk efek "kertas mengambang" di preview;
+  // kalau ikut ter-capture, tiap halaman PDF akan punya bayangan abu-abu
+  // tipis di tepinya. Disembunyikan sementara khusus saat capture.
+  var prevBoxShadow = el.style.boxShadow;
+  el.style.boxShadow = 'none';
+
   try {
-    // FIX UTAMA: instance jsPDF ("pdf") sebelumnya TIDAK PERNAH dibuat,
-    // sehingga baris "pdf.internal.pageSize..." di bawah selalu
-    // menghasilkan ReferenceError ("pdf is not defined") dan langsung
-    // masuk ke blok catch -> muncul alert "Gagal membuat PDF".
-    // Instance-nya harus dibuat secara eksplisit di sini:
+    // FIX UTAMA (sebelumnya): instance jsPDF ("pdf") tidak pernah dibuat,
+    // sehingga "pdf.internal.pageSize..." selalu ReferenceError. Sekarang
+    // dibuat eksplisit di sini:
     var pdf = new JsPDFCtor({
       orientation : 'portrait',
       unit        : 'mm',
@@ -1009,22 +1082,25 @@ async function downloadPDF() {
       ? pdf.internal.pageSize.getHeight()
       : pdf.internal.pageSize.height;
 
-    // Lebar gambar dikunci PERSIS selebar halaman (tanpa margin tambahan
-    // dari jsPDF — margin visual surat sudah ada di padding CSS
-    // #surat-preview dan ikut ter-capture).
-    var imgWidthMM = pageWidthMM;
-    var pxPerMM    = canvas.width / imgWidthMM;
-    var pageHeightPx = Math.floor(pageHeightMM * pxPerMM);
+    // Area konten = ukuran halaman DIKURANGI margin surat yang umum
+    // (lihat PDF_MARGIN_MM di atas), bukan lagi selebar/setinggi halaman
+    // penuh tanpa batas seperti sebelumnya (itu sebabnya hasil PDF
+    // sebelumnya terasa "mepet"/full-bleed, tidak seperti surat resmi).
+    var contentWidthMM  = pageWidthMM  - PDF_MARGIN_MM.left - PDF_MARGIN_MM.right;
+    var contentHeightMM = pageHeightMM - PDF_MARGIN_MM.top  - PDF_MARGIN_MM.bottom;
 
-    // PENTING: setiap halaman di-generate dari POTONGAN KANVAS FISIK
-    // yang terpisah (bukan menggambar ulang satu gambar penuh yang sama
-    // lalu digeser posisinya per halaman). Pendekatan "gambar digeser"
-    // rawan membuat 1-2 baris teks di sekitar batas halaman muncul
-    // dobel/tumpang-tindih, karena hasilnya bergantung pada bagaimana
-    // masing-masing PDF viewer melakukan clipping — tidak selalu presisi.
-    // Dengan memotong data piksel kanvas secara nyata per halaman
-    // (drawImage dengan rentang baris piksel yang tidak saling
-    // beririsan), setiap halaman dijamin hanya berisi datanya sendiri.
+    var domToCanvasScale = canvas.width / el.getBoundingClientRect().width;
+    var pxPerMM           = canvas.width / contentWidthMM;
+    var maxSliceHeightPx  = Math.floor(contentHeightMM * pxPerMM);
+
+    var atomicRanges = spBuildAtomicRanges(el, domToCanvasScale);
+
+    // Setiap halaman digambar dari POTONGAN KANVAS FISIK yang terpisah
+    // (bukan satu gambar penuh yang digeser posisinya per halaman), agar
+    // tidak ada baris teks yang dobel/tumpang-tindih akibat clipping PDF
+    // viewer yang tidak presisi. Titik potongnya sendiri sekarang dicari
+    // lewat spResolveSafeCut() supaya tidak jatuh di tengah tabel,
+    // paragraf, butir pernyataan, atau blok tanda tangan manapun.
     var sliceCanvas = document.createElement('canvas');
     var sliceCtx    = sliceCanvas.getContext('2d');
     sliceCanvas.width = canvas.width;
@@ -1032,8 +1108,11 @@ async function downloadPDF() {
     var renderedPx  = 0;
     var isFirstPage = true;
 
-    while (renderedPx < canvas.height) {
-      var sliceHeightPx = Math.min(pageHeightPx, canvas.height - renderedPx);
+    while (renderedPx < canvas.height - 1) {
+      var idealCut = renderedPx + maxSliceHeightPx;
+      var cut      = spResolveSafeCut(renderedPx, idealCut, atomicRanges, canvas.height);
+      var sliceHeightPx = Math.max(1, Math.round(cut - renderedPx));
+
       sliceCanvas.height = sliceHeightPx;
       sliceCtx.clearRect(0, 0, sliceCanvas.width, sliceHeightPx);
       sliceCtx.drawImage(
@@ -1046,18 +1125,23 @@ async function downloadPDF() {
       var sliceHeightMM = sliceHeightPx / pxPerMM;
 
       if (!isFirstPage) pdf.addPage(jsPDFFormat, 'portrait');
-      pdf.addImage(sliceImgData, 'PNG', 0, 0, imgWidthMM, sliceHeightMM);
+      pdf.addImage(
+        sliceImgData, 'PNG',
+        PDF_MARGIN_MM.left, PDF_MARGIN_MM.top,
+        contentWidthMM, sliceHeightMM
+      );
 
       renderedPx += sliceHeightPx;
       isFirstPage = false;
     }
 
     pdf.save('<?= addslashes($filenamePdf) ?>');
-    showSpAlert('success', 'Dokumen berhasil diunduh sebagai file PDF.');
+    showSpAlert('success', 'Dokumen berhasil diunduh sebagai file PDF dengan margin surat standar.');
   } catch (e) {
     console.error('PDF error:', e);
     showSpAlert('error', 'Gagal membuat PDF. Silakan gunakan tombol Cetak sebagai alternatif, atau coba lagi setelah memuat ulang halaman.');
   } finally {
+    el.style.boxShadow = prevBoxShadow;
     btn.disabled = false;
     btn.innerHTML = orig;
   }
