@@ -507,11 +507,28 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 
 /* ═══════════════════════════════════════════════════════════
    PRINT
+   ─────────────────────────────────────────────────────────
+   PENTING (fix bug "hasil cetak kecil & margin kelihatan lebar"):
+   Sebelumnya #surat-preview tetap dipaksa lebar 794px (ukuran untuk
+   layar) sementara @page sudah punya margin sendiri. Karena kotak
+   794px itu lebih lebar dari area cetak yang tersisa setelah margin,
+   browser terpaksa MENYUSUTKAN seluruh halaman ("shrink to fit") —
+   itulah sebabnya teks tampak kecil, dan sisa ruang dari penyusutan
+   itu kelihatan seperti margin ganda/lebar.
+
+   Solusinya: saat mode cetak, #surat-preview dibuat PERSIS selebar
+   kertas (210mm untuk A4 / 215mm untuk F4), @page margin dibuat 0,
+   dan margin surat yang sesungguhnya dipindahkan ke padding elemen
+   ini sendiri memakai satuan mm yang sama dengan PDF_MARGIN_MM di
+   skrip (format surat dinas resmi: atas 2cm, kanan 2cm, bawah 2cm,
+   kiri 3cm — kiri lebih lebar untuk ruang penjilidan/arsip). Dengan
+   begitu tidak ada lagi penyusutan otomatis, dan hasil Cetak maupun
+   Unduh PDF punya margin yang identik.
 ═══════════════════════════════════════════════════════════ */
 @media print {
   @page {
     size: A4 portrait;
-    margin: 15mm 18mm 18mm 20mm;
+    margin: 0;
   }
   .sp-header { display: none !important; }
   .sp-bar    { display: none !important; }
@@ -523,11 +540,12 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
     overflow: visible !important;
   }
   #surat-preview {
-    width: 100% !important;
+    width: 210mm !important;
     min-height: auto !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 20mm 20mm 20mm 30mm !important;
     box-shadow: none !important;
+    box-sizing: border-box !important;
   }
   .kop, .ttd-grid, .id-wrapper, .jadwal-table, .pernyataan-list li, .surat-footer {
     break-inside: avoid !important;
@@ -933,28 +951,39 @@ document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') closeSpAlert();
 });
 
-// Margin surat resmi yang umum dipakai (kop dinas/instansi Indonesia):
-// atas 15mm, kanan 18mm, bawah 18mm, kiri 20mm (kiri sedikit lebih lebar
-// untuk ruang penjilidan/lubang arsip). Dipakai SAMA PERSIS di Cetak
-// (lewat @page) maupun di Unduh PDF (lewat offset gambar di jsPDF) supaya
-// kedua keluaran konsisten.
-var PDF_MARGIN_MM = { top: 15, right: 18, bottom: 18, left: 20 };
+// Margin surat resmi/dinas standar (atas 2cm, kanan 2cm, bawah 2cm,
+// kiri 3cm — kiri sedikit lebih lebar untuk ruang penjilidan/lubang
+// arsip). Dipakai SAMA PERSIS di Cetak (lewat padding #surat-preview,
+// karena @page margin sengaja dibuat 0 — lihat catatan di blok CSS
+// @media print) maupun di Unduh PDF (lewat offset gambar di jsPDF),
+// supaya kedua keluaran konsisten satu sama lain.
+var PDF_MARGIN_MM = { top: 20, right: 20, bottom: 20, left: 30 };
 
 // @page CSS bersifat statis, jadi untuk mendukung 2 ukuran kertas (A4/F4)
-// dari satu tombol Cetak, ukurannya disuntikkan lewat <style> sesaat
-// sebelum window.print() dipanggil.
+// dari satu tombol Cetak, ukuran & padding-nya disuntikkan lewat <style>
+// sesaat sebelum window.print() dipanggil. #surat-preview dipaksa PERSIS
+// selebar kertas terpilih (bukan 794px seperti tampilan layar) supaya
+// browser tidak perlu menyusutkan halaman ("shrink to fit") — itulah
+// akar masalah hasil cetak yang sebelumnya tampak kecil & bermargin
+// lebar.
 function printSurat() {
-  var fmt    = getPaperFormat();
-  var size   = fmt === 'f4' ? '215mm 330mm' : 'A4 portrait';
-  var margin = PDF_MARGIN_MM.top + 'mm ' + PDF_MARGIN_MM.right + 'mm ' +
-               PDF_MARGIN_MM.bottom + 'mm ' + PDF_MARGIN_MM.left + 'mm';
-  var el     = document.getElementById('dynamic-page-size');
+  var fmt      = getPaperFormat();
+  var pageW    = fmt === 'f4' ? 215 : 210;
+  var pageH    = fmt === 'f4' ? 330 : 297;
+  var padding  = PDF_MARGIN_MM.top + 'mm ' + PDF_MARGIN_MM.right + 'mm ' +
+                 PDF_MARGIN_MM.bottom + 'mm ' + PDF_MARGIN_MM.left + 'mm';
+  var el       = document.getElementById('dynamic-page-size');
   if (!el) {
     el = document.createElement('style');
     el.id = 'dynamic-page-size';
     document.head.appendChild(el);
   }
-  el.textContent = '@media print { @page { size: ' + size + '; margin: ' + margin + '; } }';
+  el.textContent =
+    '@media print {' +
+    '  @page { size: ' + pageW + 'mm ' + pageH + 'mm; margin: 0; }' +
+    '  #surat-preview { width: ' + pageW + 'mm !important; min-height: auto !important; ' +
+    '    margin: 0 !important; padding: ' + padding + ' !important; box-shadow: none !important; }' +
+    '}';
   window.print();
 }
 
