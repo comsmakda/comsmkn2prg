@@ -463,6 +463,12 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 }
 .sp-alert-box {
   width: 380px; max-width: 100%;
+  /* Dibatasi agar tidak pernah melebihi tinggi layar (HP maupun PC).
+     20px atas + 20px bawah mengikuti padding .sp-alert-overlay, supaya
+     box tetap punya jarak aman ke tepi viewport di layar sekecil apa pun. */
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  box-sizing: border-box;
   background: var(--c-white);
   border-radius: var(--radius-lg);
   box-shadow: 0 24px 64px rgba(15,23,42,.28), 0 4px 16px rgba(15,23,42,.12);
@@ -902,6 +908,13 @@ function showSpAlert(type, message, customTitle) {
 
   overlay.classList.add('is-open');
   overlay.setAttribute('aria-hidden', 'false');
+
+  // Kunci scroll halaman belakang selama modal terbuka, supaya modal
+  // (yang sudah dibatasi max-height & overflow-y sendiri lewat CSS)
+  // terasa seperti dialog seukuran layar, bukan ikut scroll bersama
+  // konten surat di belakangnya.
+  document.body.style.overflow = 'hidden';
+
   document.getElementById('spAlertOkBtn').focus();
 }
 
@@ -909,6 +922,7 @@ function closeSpAlert() {
   var overlay = document.getElementById('spAlertOverlay');
   overlay.classList.remove('is-open');
   overlay.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
 }
 
 // Tutup modal saat klik area gelap di luar box, atau tekan Escape
