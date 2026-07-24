@@ -375,12 +375,6 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 }
 .ttd-col { text-align: center; }
 .ttd-col p { margin: 0; line-height: 1.6; }
-.ttd-meterai {
-  font-size: 8.5pt;
-  color: #777;
-  font-style: italic;
-  margin-top: 8px;
-}
 .ttd-space { height: 60px; }
 .ttd-name-box {
   display: inline-block;
@@ -704,8 +698,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
             <div class="ttd-col">
               <p>Pinrang, <?= $today ?></p>
               <p style="margin-top:2px;">Yang Membuat Pernyataan,</p>
-              <p class="ttd-meterai">(Meterai Rp10.000 jika diperlukan)</p>
-              <div class="ttd-space" style="height:36px;"></div>
+              <div class="ttd-space"></div>
               <span class="ttd-name-box"><?= $namaLengkap ?></span>
               <span class="ttd-sub">NIA: <?= $nia ?></span>
             </div>
@@ -727,7 +720,6 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 </div><!-- /.sp-page -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
-        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 function downloadPDF() {
@@ -736,6 +728,11 @@ function downloadPDF() {
   var orig = btn.innerHTML;
 
   if (!el) { alert('Elemen surat tidak ditemukan.'); return; }
+
+  if (typeof html2pdf === 'undefined') {
+    alert('Gagal memuat pustaka PDF. Periksa koneksi internet Anda, lalu muat ulang halaman.');
+    return;
+  }
 
   btn.disabled = true;
   btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px;animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>&nbsp;Menyiapkan...';
