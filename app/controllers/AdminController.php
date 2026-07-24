@@ -208,6 +208,25 @@ class AdminController extends Controller
         $this->flash('success', 'Data anggota diperbarui.');
         $this->redirect('/admin/anggota');
     }
+    public function anggotaResetPassword(string $id): void
+{
+    $this->requireAdmin();
+    $this->verifyCsrf();
+
+    $um   = new UserModel();
+    $user = $um->find((int)$id);
+
+    if (!$user) {
+        $this->flash('error', 'Anggota tidak ditemukan.');
+        $this->redirect('/admin/anggota');
+    }
+
+    $defaultHash = password_hash('comsmakda', PASSWORD_BCRYPT, ['cost' => 12]);
+    $um->updatePassword((int)$id, $defaultHash);
+
+    $this->flash('success', 'Password ' . htmlspecialchars($user['nama_lengkap']) . ' berhasil direset ke default: <strong>comsmakda</strong>.');
+    $this->redirect('/admin/anggota');
+}
 
     // ================================================================
     //  PAB
