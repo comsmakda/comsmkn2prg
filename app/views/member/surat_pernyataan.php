@@ -125,27 +125,34 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 14px;
   padding-bottom: 9px;
 }
 
+/* Bingkai logo seragam (kiri & kanan) supaya berat visualnya sama,
+   walaupun bentuk/rasio file logo aslinya berbeda-beda. */
 .kop__logo {
   flex-shrink: 0;
-  width: 78px;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid #1a1a6e;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 4px;
 }
 .kop__logo img {
-  height: 78px;
-  width: auto;
-  max-width: 78px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
 }
 .kop__logo-fallback {
-  width: 74px; height: 74px;
-  border: 2px solid #1a1a6e;
+  width: 100%; height: 100%;
   border-radius: 50%;
   display: none;
   align-items: center; justify-content: center;
@@ -158,7 +165,8 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 .kop__text {
   flex: 1;
   text-align: center;
-  padding: 0 6px;
+  padding: 0 4px;
+  min-width: 0;
 }
 .kop__org {
   font-family: Arial Black, 'Arial Bold', Arial, sans-serif;
@@ -197,20 +205,24 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 .kop-divider-thick { height: 3.5px; background: #1a1a6e; }
 .kop-divider-thin  { height: 1px;   background: #1a1a6e; margin-top: 2px; }
 
-/* ── NOMOR SURAT & TEMPAT/TANGGAL ───────────────────────── */
+/* ── NOMOR SURAT & PERIHAL ───────────────────────────────
+   Ditumpuk rata kiri (format surat resmi baku), bukan
+   space-between, supaya tetap rapi walau teks Perihal panjang. */
 .info-surat {
-  display: flex;
-  justify-content: space-between;
   font-family: Arial, sans-serif;
-  font-size: 9pt;
+  font-size: 9.5pt;
   color: #222;
-  margin: 8px 0 0 0;
+  margin: 10px 0 0 0;
 }
+.info-surat table { border-collapse: collapse; }
+.info-surat td { padding: 1.5px 0; vertical-align: top; }
+.info-surat td.label { width: 58px; white-space: nowrap; }
+.info-surat td.colon { width: 12px; }
 
 /* ── JUDUL SURAT ────────────────────────────────────────── */
 .surat-judul {
   text-align: center;
-  margin: 20px 0 4px;
+  margin: 18px 0 4px;
 }
 .surat-judul h2 {
   font-family: Arial Black, 'Arial Bold', Arial, sans-serif;
@@ -241,6 +253,8 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   margin-bottom: 8px;
   text-align: justify;
   line-height: 1.75;
+  orphans: 3;
+  widows: 3;
 }
 .surat-body p.indent { text-indent: 2em; }
 
@@ -255,26 +269,30 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   padding: 4px 8px;
   background: #1a1a6e;
   color: #fff;
+  break-after: avoid;
+  page-break-after: avoid;
 }
 
 /* ── IDENTITAS + FOTO ───────────────────────────────────── */
 .id-wrapper {
   display: flex;
   gap: 20px;
-  align-items: flex-start;
-  justify-content: flex-start; /* pastikan rata kiri, bukan space-between */
+  align-items: center;
+  justify-content: flex-start;
   margin: 6px 0 10px;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 .id-table {
   flex: 1 1 auto;
-  max-width: 480px; /* batasi lebar tabel agar foto tidak terlalu jauh ke kanan */
+  max-width: 480px;
   border-collapse: collapse;
   font-size: 11.5pt;
 }
 .id-foto {
   flex-shrink: 0;
   text-align: center;
-  margin-left: 8px; /* geser sedikit ke kiri, mendekat ke tabel identitas */
+  margin-left: 8px;
 }
 .id-table td {
   padding: 3.5px 0;
@@ -310,9 +328,12 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 /* ── JADWAL ─────────────────────────────────────────────── */
 .jadwal-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 11pt;
   margin: 6px 0 4px;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 .jadwal-table th {
   background: #1a1a6e;
@@ -332,7 +353,10 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   font-size: 11pt;
   vertical-align: middle;
   color: #111;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
+.jadwal-table tr { break-inside: avoid; page-break-inside: avoid; }
 .jadwal-table tr:nth-child(even) td { background: #f5f6fb; }
 
 .catatan-jadwal {
@@ -356,6 +380,8 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   margin-bottom: 7px;
   text-align: justify;
   line-height: 1.7;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 .pernyataan-list li .num {
   flex-shrink: 0;
@@ -372,6 +398,8 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   margin-top: 26px;
   font-family: Arial, sans-serif;
   font-size: 10.5pt;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 .ttd-col { text-align: center; }
 .ttd-col p { margin: 0; line-height: 1.6; }
@@ -402,6 +430,14 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   font-size: 7.5pt;
   color: #888;
   font-family: Arial, sans-serif;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Blok section A-D: judul + 1-2 baris pertama isinya jangan sampai
+   sendirian di ujung halaman (hindari "orphan heading"). */
+.seksi-block {
+  break-inside: avoid-page;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -430,6 +466,11 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   }
   #surat-preview::before,
   #surat-preview::after { display: none !important; }
+  .kop, .ttd-grid, .id-wrapper, .jadwal-table, .pernyataan-list li, .surat-footer {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .seksi-judul { break-after: avoid !important; page-break-after: avoid !important; }
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -521,9 +562,20 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
             <div class="kop-divider-thin"></div>
           </div>
 
+          <!-- Nomor & Perihal ditumpuk rata kiri (format surat resmi) -->
           <div class="info-surat">
-            <span>Nomor&nbsp;: <?= $nomorSurat ?></span>
-            <span>Perihal&nbsp;: Pernyataan Keanggotaan dan Izin Orang Tua</span>
+            <table>
+              <tr>
+                <td class="label">Nomor</td>
+                <td class="colon">:</td>
+                <td><?= $nomorSurat ?></td>
+              </tr>
+              <tr>
+                <td class="label">Perihal</td>
+                <td class="colon">:</td>
+                <td>Pernyataan Keanggotaan dan Izin Orang Tua</td>
+              </tr>
+            </table>
           </div>
 
           <!-- ── JUDUL SURAT ─────────────────────────────── -->
@@ -543,137 +595,145 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
           </div>
 
           <!-- ── A. IDENTITAS ANGGOTA ──────────────────────── -->
-          <div class="seksi-judul">A.&nbsp;&nbsp;Identitas Anggota</div>
+          <div class="seksi-block">
+            <div class="seksi-judul">A.&nbsp;&nbsp;Identitas Anggota</div>
 
-          <div class="id-wrapper">
-            <table class="id-table">
-              <tbody>
-                <tr>
-                  <td>Nama Lengkap</td>
-                  <td>:</td>
-                  <td><?= $namaLengkap ?></td>
-                </tr>
-                <tr>
-                  <td>Nomor Induk Anggota</td>
-                  <td>:</td>
-                  <td><?= $nia ?></td>
-                </tr>
-                <tr>
-                  <td>Kelas</td>
-                  <td>:</td>
-                  <td><?= $kelas ?></td>
-                </tr>
-                <tr>
-                  <td>Nomor Wa</td>
-                  <td>:</td>
-                  <td><?= $noHp ?></td>
-                </tr>
-                <tr>
-                  <td>Tahun Bergabung</td>
-                  <td>:</td>
-                  <td><?= $tahunDaftar ?></td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="id-wrapper">
+              <table class="id-table">
+                <tbody>
+                  <tr>
+                    <td>Nama Lengkap</td>
+                    <td>:</td>
+                    <td><?= $namaLengkap ?></td>
+                  </tr>
+                  <tr>
+                    <td>Nomor Induk Anggota</td>
+                    <td>:</td>
+                    <td><?= $nia ?></td>
+                  </tr>
+                  <tr>
+                    <td>Kelas</td>
+                    <td>:</td>
+                    <td><?= $kelas ?></td>
+                  </tr>
+                  <tr>
+                    <td>Nomor Wa</td>
+                    <td>:</td>
+                    <td><?= $noHp ?></td>
+                  </tr>
+                  <tr>
+                    <td>Tahun Bergabung</td>
+                    <td>:</td>
+                    <td><?= $tahunDaftar ?></td>
+                  </tr>
+                </tbody>
+              </table>
 
-            <div class="id-foto">
-              <?php if ($fotoUrl): ?>
-                <img src="<?= $fotoUrl ?>" alt="Foto <?= $namaLengkap ?>">
-              <?php else: ?>
-                <div class="id-foto-placeholder">Pas Foto<br>3 &times; 4</div>
-              <?php endif; ?>
-              <span class="id-foto-label">Foto Siswa</span>
+              <div class="id-foto">
+                <?php if ($fotoUrl): ?>
+                  <img src="<?= $fotoUrl ?>" alt="Foto <?= $namaLengkap ?>">
+                <?php else: ?>
+                  <div class="id-foto-placeholder">Pas Foto<br>3 &times; 4</div>
+                <?php endif; ?>
+                <span class="id-foto-label">Foto Siswa</span>
+              </div>
             </div>
           </div>
 
           <!-- ── B. JADWAL PERTEMUAN ───────────────────────── -->
-          <div class="seksi-judul">B.&nbsp;&nbsp;Jadwal Pertemuan Rutin</div>
+          <div class="seksi-block">
+            <div class="seksi-judul">B.&nbsp;&nbsp;Jadwal Pertemuan Rutin</div>
 
-          <table class="jadwal-table">
-            <thead>
-              <tr>
-                <th style="width:140px;">Hari</th>
-                <th>Waktu</th>
-                <th>Tempat</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Kamis</td>
-                <td>Pukul 15.30 WITA, setelah jam pelajaran berakhir sampai dengan Pukul 17.00 WITA</td>
-                <td>Laboratorium Komputer SMK Negeri 2 Pinrang</td>
-              </tr>
-              <tr>
-                <td>Jumat</td>
-                <td>Pukul 14.30 WITA, setelah jam pelajaran berakhir sampai dengan Pukul 17.00 WITA</td>
-                <td>Laboratorium Komputer SMK Negeri 2 Pinrang</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="catatan-jadwal">
-            Catatan: Jadwal dapat berubah sewaktu-waktu dan akan dikomunikasikan terlebih
-            dahulu kepada anggota beserta orang tua/wali.
-          </p>
-
-          <!-- ── C. PERNYATAAN ANGGOTA ─────────────────────── -->
-          <div class="seksi-judul">C.&nbsp;&nbsp;Pernyataan Anggota</div>
-
-          <div class="surat-body">
-            <p class="indent">
-              Berdasarkan identitas tersebut di atas, saya menyatakan dengan sesungguhnya
-              bahwa:
+            <table class="jadwal-table">
+              <thead>
+                <tr>
+                  <th style="width:18%;">Hari</th>
+                  <th style="width:52%;">Waktu</th>
+                  <th style="width:30%;">Tempat</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Kamis</td>
+                  <td>Pukul 15.30 WITA, setelah jam pelajaran berakhir sampai dengan Pukul 17.00 WITA</td>
+                  <td>Laboratorium Komputer SMK Negeri 2 Pinrang</td>
+                </tr>
+                <tr>
+                  <td>Jumat</td>
+                  <td>Pukul 14.30 WITA, setelah jam pelajaran berakhir sampai dengan Pukul 17.00 WITA</td>
+                  <td>Laboratorium Komputer SMK Negeri 2 Pinrang</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="catatan-jadwal">
+              Catatan: Jadwal dapat berubah sewaktu-waktu dan akan dikomunikasikan terlebih
+              dahulu kepada anggota beserta orang tua/wali.
             </p>
           </div>
 
-          <ol class="pernyataan-list">
-            <li>
-              <span class="num">1.</span>
-              <span>
-                Saya merupakan anggota resmi <strong><?= $orgName ?></strong> SMK Negeri 2
-                Pinrang yang terdaftar dengan Nomor Induk Anggota (NIA) <strong><?= $nia ?></strong>.
-              </span>
-            </li>
-            <li>
-              <span class="num">2.</span>
-              <span>
-                Saya bersedia mematuhi seluruh peraturan, tata tertib, dan kode etik
-                organisasi yang berlaku selama menjadi anggota <?= $orgName ?>.
-              </span>
-            </li>
-            <li>
-              <span class="num">3.</span>
-              <span>
-                Saya bersedia hadir dan berpartisipasi aktif dalam setiap kegiatan dan
-                pertemuan rutin yang diselenggarakan oleh <?= $orgName ?>.
-              </span>
-            </li>
-            <li>
-              <span class="num">4.</span>
-              <span>
-                Seluruh data dan informasi yang tercantum dalam surat ini adalah benar dan
-                dapat dipertanggungjawabkan. Apabila di kemudian hari terdapat
-                ketidaksesuaian, saya bersedia menerima sanksi sesuai dengan ketentuan yang
-                berlaku.
-              </span>
-            </li>
-          </ol>
+          <!-- ── C. PERNYATAAN ANGGOTA ─────────────────────── -->
+          <div class="seksi-block">
+            <div class="seksi-judul">C.&nbsp;&nbsp;Pernyataan Anggota</div>
+
+            <div class="surat-body">
+              <p class="indent">
+                Berdasarkan identitas tersebut di atas, saya menyatakan dengan sesungguhnya
+                bahwa:
+              </p>
+            </div>
+
+            <ol class="pernyataan-list">
+              <li>
+                <span class="num">1.</span>
+                <span>
+                  Saya merupakan anggota resmi <strong><?= $orgName ?></strong> SMK Negeri 2
+                  Pinrang yang terdaftar dengan Nomor Induk Anggota (NIA) <strong><?= $nia ?></strong>.
+                </span>
+              </li>
+              <li>
+                <span class="num">2.</span>
+                <span>
+                  Saya bersedia mematuhi seluruh peraturan, tata tertib, dan kode etik
+                  organisasi yang berlaku selama menjadi anggota <?= $orgName ?>.
+                </span>
+              </li>
+              <li>
+                <span class="num">3.</span>
+                <span>
+                  Saya bersedia hadir dan berpartisipasi aktif dalam setiap kegiatan dan
+                  pertemuan rutin yang diselenggarakan oleh <?= $orgName ?>.
+                </span>
+              </li>
+              <li>
+                <span class="num">4.</span>
+                <span>
+                  Seluruh data dan informasi yang tercantum dalam surat ini adalah benar dan
+                  dapat dipertanggungjawabkan. Apabila di kemudian hari terdapat
+                  ketidaksesuaian, saya bersedia menerima sanksi sesuai dengan ketentuan yang
+                  berlaku.
+                </span>
+              </li>
+            </ol>
+          </div>
 
           <!-- ── D. IZIN ORANG TUA / WALI ──────────────────── -->
-          <div class="seksi-judul">D.&nbsp;&nbsp;Pernyataan Izin Orang Tua/Wali</div>
+          <div class="seksi-block">
+            <div class="seksi-judul">D.&nbsp;&nbsp;Pernyataan Izin Orang Tua/Wali</div>
 
-          <div class="surat-body">
-            <p class="indent">
-              Saya yang bertindak selaku orang tua/wali dari <strong><?= $namaLengkap ?></strong>
-              dengan ini menyatakan memberikan izin sepenuhnya kepada anak/wali kami untuk
-              bergabung dan mengikuti seluruh kegiatan <strong><?= $orgName ?></strong>
-              SMK Negeri 2 Pinrang, termasuk pertemuan rutin setiap hari <strong>Kamis</strong>
-              dan <strong>Jumat</strong> hingga pukul <strong>17.00 WITA</strong>.
-            </p>
-            <p class="indent">
-              Kami menyanggupi untuk memastikan kepulangan anak/wali kami dengan aman
-              setelah kegiatan selesai, serta mendukung penuh partisipasi anak/wali kami
-              dalam setiap program yang diselenggarakan oleh organisasi tersebut.
-            </p>
+            <div class="surat-body">
+              <p class="indent">
+                Saya yang bertindak selaku orang tua/wali dari <strong><?= $namaLengkap ?></strong>
+                dengan ini menyatakan memberikan izin sepenuhnya kepada anak/wali kami untuk
+                bergabung dan mengikuti seluruh kegiatan <strong><?= $orgName ?></strong>
+                SMK Negeri 2 Pinrang, termasuk pertemuan rutin setiap hari <strong>Kamis</strong>
+                dan <strong>Jumat</strong> hingga pukul <strong>17.00 WITA</strong>.
+              </p>
+              <p class="indent">
+                Kami menyanggupi untuk memastikan kepulangan anak/wali kami dengan aman
+                setelah kegiatan selesai, serta mendukung penuh partisipasi anak/wali kami
+                dalam setiap program yang diselenggarakan oleh organisasi tersebut.
+              </p>
+            </div>
           </div>
 
           <!-- ── PENUTUP ────────────────────────────────────── -->
@@ -750,7 +810,7 @@ function downloadPDF() {
       removeContainer : true
     },
     jsPDF       : { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak   : { mode: ['css', 'legacy'] }
+    pagebreak   : { mode: ['css', 'legacy'], avoid: ['.kop', '.ttd-grid', '.id-wrapper', '.jadwal-table', '.pernyataan-list li', '.seksi-judul'] }
   };
 
   html2pdf()
