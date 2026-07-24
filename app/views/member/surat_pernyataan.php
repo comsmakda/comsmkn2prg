@@ -788,7 +788,9 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 
 </div><!-- /.sp-page -->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 function getPaperFormat() {
