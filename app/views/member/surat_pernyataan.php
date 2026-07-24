@@ -867,7 +867,6 @@ async function downloadPDF() {
       windowHeight    : el.scrollHeight
     });
 
-    var pdf = new JsPDFCtor({ unit: 'mm', format: jsPDFFormat, orientation: 'portrait' });
     var pageWidthMM  = pdf.internal.pageSize.getWidth
       ? pdf.internal.pageSize.getWidth()
       : pdf.internal.pageSize.width;
@@ -875,26 +874,47 @@ async function downloadPDF() {
       ? pdf.internal.pageSize.getHeight()
       : pdf.internal.pageSize.height;
 
-    // Kunci lebar gambar PERSIS selebar halaman (tanpa margin tambahan
+    // Lebar gambar dikunci PERSIS selebar halaman (tanpa margin tambahan
     // dari jsPDF — margin visual surat sudah ada di padding CSS
-    // #surat-preview dan ikut ter-capture). Tinggi dihitung proporsional
-    // dari rasio canvas asli, lalu dipotong per halaman sesuai tinggi
-    // halaman kertas.
-    var imgWidthMM  = pageWidthMM;
-    var imgHeightMM = canvas.height * (imgWidthMM / canvas.width);
-    var imgData     = canvas.toDataURL('image/png');
+    // #surat-preview dan ikut ter-capture).
+    var imgWidthMM = pageWidthMM;
+    var pxPerMM    = canvas.width / imgWidthMM;
+    var pageHeightPx = Math.floor(pageHeightMM * pxPerMM);
 
-    var heightLeftMM = imgHeightMM;
-    var positionMM   = 0;
+    // PENTING: setiap halaman di-generate dari POTONGAN KANVAS FISIK
+    // yang terpisah (bukan menggambar ulang satu gambar penuh yang sama
+    // lalu digeser posisinya per halaman). Pendekatan "gambar digeser"
+    // rawan membuat 1-2 baris teks di sekitar batas halaman muncul
+    // dobel/tumpang-tindih, karena hasilnya bergantung pada bagaimana
+    // masing-masing PDF viewer melakukan clipping — tidak selalu presisi.
+    // Dengan memotong data piksel kanvas secara nyata per halaman
+    // (drawImage dengan rentang baris piksel yang tidak saling
+    // beririsan), setiap halaman dijamin hanya berisi datanya sendiri.
+    var sliceCanvas = document.createElement('canvas');
+    var sliceCtx    = sliceCanvas.getContext('2d');
+    sliceCanvas.width = canvas.width;
 
-    pdf.addImage(imgData, 'PNG', 0, positionMM, imgWidthMM, imgHeightMM);
-    heightLeftMM -= pageHeightMM;
+    var renderedPx = 0;
+    var isFirstPage = true;
 
-    while (heightLeftMM > 0) {
-      positionMM = heightLeftMM - imgHeightMM;
-      pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, positionMM, imgWidthMM, imgHeightMM);
-      heightLeftMM -= pageHeightMM;
+    while (renderedPx < canvas.height) {
+      var sliceHeightPx = Math.min(pageHeightPx, canvas.height - renderedPx);
+      sliceCanvas.height = sliceHeightPx;
+      sliceCtx.clearRect(0, 0, sliceCanvas.width, sliceHeightPx);
+      sliceCtx.drawImage(
+        canvas,
+        0, renderedPx, canvas.width, sliceHeightPx,   // area sumber di kanvas asli
+        0, 0, canvas.width, sliceHeightPx              // digambar penuh di kanvas potongan
+      );
+
+      var sliceImgData  = sliceCanvas.toDataURL('image/png');
+      var sliceHeightMM = sliceHeightPx / pxPerMM;
+
+      if (!isFirstPage) pdf.addPage();
+      pdf.addImage(sliceImgData, 'PNG', 0, 0, imgWidthMM, sliceHeightMM);
+
+      renderedPx += sliceHeightPx;
+      isFirstPage = false;
     }
 
     pdf.save('<?= addslashes($filenamePdf) ?>');
