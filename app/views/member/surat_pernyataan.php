@@ -812,7 +812,7 @@ function printSurat() {
   window.print();
 }
 
-function downloadPDF() {
+async function downloadPDF() {
   var el      = document.getElementById('surat-preview');
   var scroll  = document.querySelector('.sp-scroll');
   var btn     = document.querySelector('.btn-primary');
@@ -820,7 +820,24 @@ function downloadPDF() {
 
   if (!el) { alert('Elemen surat tidak ditemukan.'); return; }
 
-  if (typeof html2pdf === 'undefined') {
+  // CATATAN PENTING (setelah 2x percobaan gagal):
+  // html2pdf.js versi 0.10.1 (yang dipakai di sini lewat CDN) punya bug
+  // yang sudah dikonfirmasi resmi oleh pembuatnya sendiri di GitHub —
+  // logika auto-fit "gambar ke halaman PDF" miliknya sering salah
+  // hitung skala saat dikombinasikan dengan html2canvas scale > 1,
+  // sehingga hasil render jadi lebih lebar dari halaman dan
+  // terpotong di kiri/kanan secara tidak konsisten (persis gejala yang
+  // dilaporkan). Karena itu, fungsi ini TIDAK lagi memakai html2pdf()
+  // sama sekali untuk proses render — hanya memakai html2canvas dan
+  // jsPDF (dua library yang ikut ter-bundle di file yang sama) secara
+  // langsung, dengan lebar gambar dikunci manual = lebar halaman PDF.
+  // Ini menghilangkan sumber bug di atas sepenuhnya.
+  if (typeof html2canvas === 'undefined') {
+    alert('Gagal memuat pustaka PDF. Periksa koneksi internet Anda, lalu muat ulang halaman.');
+    return;
+  }
+  var JsPDFCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+  if (!JsPDFCtor) {
     alert('Gagal memuat pustaka PDF. Periksa koneksi internet Anda, lalu muat ulang halaman.');
     return;
   }
@@ -835,52 +852,56 @@ function downloadPDF() {
   var fmt         = getPaperFormat();
   var jsPDFFormat = fmt === 'f4' ? [215, 330] : 'a4';
 
-  var opt = {
-    // margin SENGAJA di-nol-kan. #surat-preview sudah punya padding
-    // sendiri (30px atas, 46px kiri/kanan/bawah ≈ setara margin
-    // dokumen resmi) yang ikut ter-capture oleh html2canvas.
-    // Kombinasi opsi "margin" milik html2pdf.js dengan
-    // "html2canvas.scale > 1" adalah bug lama yang sering membuat
-    // hasil render lebih lebar dari halaman PDF (px→mm salah hitung
-    // di atas canvas yang sudah di-scale), sehingga isi surat tampak
-    // bergeser/terpotong di kiri atau kanan secara tidak konsisten.
-    // Dengan margin:0, html2pdf tinggal menskalakan gambar penuh agar
-    // pas dengan lebar halaman — tanpa perhitungan margin tambahan.
-    margin      : 0,
-    filename    : '<?= addslashes($filenamePdf) ?>',
-    // PNG (lossless) dipakai, bukan JPEG — kompresi JPEG pada garis
-    // tipis adalah penyebab paling umum garis lurus tampak
-    // "miring/bergelombang" setelah di-scale 2x oleh html2canvas.
-    image       : { type: 'png' },
-    html2canvas : {
+  try {
+    var canvas = await html2canvas(el, {
       scale           : 2,
       useCORS         : true,
       allowTaint      : true,
       backgroundColor : '#ffffff',
       logging         : false,
-      removeContainer : true,
       scrollX         : 0,
       scrollY         : 0,
       windowWidth     : el.scrollWidth,
       windowHeight    : el.scrollHeight
-    },
-    jsPDF       : { unit: 'mm', format: jsPDFFormat, orientation: 'portrait' },
-    pagebreak   : { mode: ['css', 'legacy'], avoid: ['.kop', '.ttd-grid', '.id-wrapper', '.jadwal-table', '.pernyataan-list li', '.seksi-judul'] }
-  };
-
-  html2pdf()
-    .set(opt)
-    .from(el)
-    .save()
-    .then(function () {
-      btn.disabled = false;
-      btn.innerHTML = orig;
-    })
-    .catch(function (e) {
-      console.error('PDF error:', e);
-      alert('Gagal membuat PDF. Gunakan tombol Cetak sebagai alternatif.');
-      btn.disabled = false;
-      btn.innerHTML = orig;
     });
+
+    var pdf = new JsPDFCtor({ unit: 'mm', format: jsPDFFormat, orientation: 'portrait' });
+    var pageWidthMM  = pdf.internal.pageSize.getWidth
+      ? pdf.internal.pageSize.getWidth()
+      : pdf.internal.pageSize.width;
+    var pageHeightMM = pdf.internal.pageSize.getHeight
+      ? pdf.internal.pageSize.getHeight()
+      : pdf.internal.pageSize.height;
+
+    // Kunci lebar gambar PERSIS selebar halaman (tanpa margin tambahan
+    // dari jsPDF — margin visual surat sudah ada di padding CSS
+    // #surat-preview dan ikut ter-capture). Tinggi dihitung proporsional
+    // dari rasio canvas asli, lalu dipotong per halaman sesuai tinggi
+    // halaman kertas.
+    var imgWidthMM  = pageWidthMM;
+    var imgHeightMM = canvas.height * (imgWidthMM / canvas.width);
+    var imgData     = canvas.toDataURL('image/png');
+
+    var heightLeftMM = imgHeightMM;
+    var positionMM   = 0;
+
+    pdf.addImage(imgData, 'PNG', 0, positionMM, imgWidthMM, imgHeightMM);
+    heightLeftMM -= pageHeightMM;
+
+    while (heightLeftMM > 0) {
+      positionMM = heightLeftMM - imgHeightMM;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, positionMM, imgWidthMM, imgHeightMM);
+      heightLeftMM -= pageHeightMM;
+    }
+
+    pdf.save('<?= addslashes($filenamePdf) ?>');
+  } catch (e) {
+    console.error('PDF error:', e);
+    alert('Gagal membuat PDF. Gunakan tombol Cetak sebagai alternatif.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  }
 }
 </script>
