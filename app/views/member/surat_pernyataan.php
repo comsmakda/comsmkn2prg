@@ -444,6 +444,62 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 }
 
 /* ═══════════════════════════════════════════════════════════
+   MODAL ALERT PROFESIONAL — pengganti window.alert()/confirm()
+═══════════════════════════════════════════════════════════ */
+.sp-alert-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15, 23, 42, .5);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  z-index: 10000;
+  opacity: 0; visibility: hidden;
+  transition: opacity 180ms var(--ease), visibility 0s linear 180ms;
+}
+.sp-alert-overlay.is-open {
+  opacity: 1; visibility: visible;
+  transition: opacity 180ms var(--ease), visibility 0s linear 0s;
+}
+.sp-alert-box {
+  width: 380px; max-width: 100%;
+  background: var(--c-white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px rgba(15,23,42,.28), 0 4px 16px rgba(15,23,42,.12);
+  padding: 22px 22px 18px;
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  transform: translateY(10px) scale(.97);
+  transition: transform 200ms var(--ease-spring);
+}
+.sp-alert-overlay.is-open .sp-alert-box { transform: translateY(0) scale(1); }
+
+.sp-alert-icon {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+}
+.sp-alert-icon svg { width: 22px; height: 22px; }
+.sp-alert-box.type-error   .sp-alert-icon { background: var(--c-red-bg, #fee2e2);   color: var(--c-red-text, #dc2626); }
+.sp-alert-box.type-success .sp-alert-icon { background: var(--c-green-bg, #dcfce7); color: var(--c-green-text, #16a34a); }
+.sp-alert-box.type-info    .sp-alert-icon { background: #e0f2fe; color: var(--c-primary, #0e7490); }
+.sp-alert-box.type-warning .sp-alert-icon { background: #fef3c7; color: var(--c-amber-icon, #d97706); }
+
+.sp-alert-title {
+  font-size: 15px; font-weight: 800; color: var(--c-ink);
+  margin-bottom: 5px; letter-spacing: -0.2px;
+}
+.sp-alert-text {
+  font-size: 13px; line-height: 1.6; color: var(--c-muted);
+  margin-bottom: 20px;
+}
+.sp-alert-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.sp-alert-actions .btn { padding: 8px 16px; font-size: 12.5px; }
+
+@media (max-width: 480px) {
+  .sp-alert-box { padding: 18px 16px 16px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
    PRINT
 ═══════════════════════════════════════════════════════════ */
 @media print {
@@ -472,6 +528,7 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
     page-break-inside: avoid !important;
   }
   .seksi-judul { break-after: avoid !important; page-break-after: avoid !important; }
+  .sp-alert-overlay { display: none !important; }
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -788,6 +845,20 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 
 </div><!-- /.sp-page -->
 
+<!-- ═══════════════════════════════════════════════════════
+     MODAL ALERT PROFESIONAL (pengganti window.alert)
+════════════════════════════════════════════════════════ -->
+<div class="sp-alert-overlay" id="spAlertOverlay" role="alertdialog" aria-modal="true" aria-hidden="true">
+  <div class="sp-alert-box" id="spAlertBox">
+    <div class="sp-alert-icon" id="spAlertIcon"></div>
+    <div class="sp-alert-title" id="spAlertTitle"></div>
+    <div class="sp-alert-text" id="spAlertText"></div>
+    <div class="sp-alert-actions">
+      <button type="button" class="btn btn-primary" id="spAlertOkBtn" onclick="closeSpAlert()">Mengerti</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
@@ -797,6 +868,56 @@ function getPaperFormat() {
   var sel = document.getElementById('paperFormatSelect');
   return sel ? sel.value : 'a4';
 }
+
+/* ═══════════════════════════════════════════════════════
+   MODAL ALERT — pengganti window.alert() bawaan browser
+   Tipe: 'error' | 'success' | 'info' | 'warning'
+════════════════════════════════════════════════════════ */
+var SP_ALERT_ICONS = {
+  error: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>',
+  success: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>',
+  info: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg>',
+  warning: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>'
+};
+var SP_ALERT_TITLES = {
+  error: 'Terjadi Kesalahan',
+  success: 'Berhasil',
+  info: 'Informasi',
+  warning: 'Perhatian'
+};
+
+function showSpAlert(type, message, customTitle) {
+  var overlay = document.getElementById('spAlertOverlay');
+  var box     = document.getElementById('spAlertBox');
+  var icon    = document.getElementById('spAlertIcon');
+  var title   = document.getElementById('spAlertTitle');
+  var text    = document.getElementById('spAlertText');
+
+  type = SP_ALERT_ICONS[type] ? type : 'info';
+
+  box.className = 'sp-alert-box type-' + type;
+  icon.innerHTML = SP_ALERT_ICONS[type];
+  title.textContent = customTitle || SP_ALERT_TITLES[type];
+  text.textContent = message;
+
+  overlay.classList.add('is-open');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.getElementById('spAlertOkBtn').focus();
+}
+
+function closeSpAlert() {
+  var overlay = document.getElementById('spAlertOverlay');
+  overlay.classList.remove('is-open');
+  overlay.setAttribute('aria-hidden', 'true');
+}
+
+// Tutup modal saat klik area gelap di luar box, atau tekan Escape
+document.getElementById('spAlertOverlay').addEventListener('click', function (e) {
+  if (e.target === this) closeSpAlert();
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeSpAlert();
+});
 
 // @page CSS bersifat statis, jadi untuk mendukung 2 ukuran kertas (A4/F4)
 // dari satu tombol Cetak, ukurannya disuntikkan lewat <style> sesaat
@@ -820,7 +941,10 @@ async function downloadPDF() {
   var btn     = document.querySelector('.btn-primary');
   var orig    = btn.innerHTML;
 
-  if (!el) { alert('Elemen surat tidak ditemukan.'); return; }
+  if (!el) {
+    showSpAlert('error', 'Elemen surat tidak ditemukan di halaman ini.');
+    return;
+  }
 
   // CATATAN PENTING (setelah 2x percobaan gagal):
   // html2pdf.js versi 0.10.1 (yang dipakai di sini lewat CDN) punya bug
@@ -835,12 +959,12 @@ async function downloadPDF() {
   // langsung, dengan lebar gambar dikunci manual = lebar halaman PDF.
   // Ini menghilangkan sumber bug di atas sepenuhnya.
   if (typeof html2canvas === 'undefined') {
-    alert('Gagal memuat pustaka PDF. Periksa koneksi internet Anda, lalu muat ulang halaman.');
+    showSpAlert('error', 'Gagal memuat pustaka pembuat PDF. Periksa koneksi internet Anda, lalu muat ulang halaman.');
     return;
   }
   var JsPDFCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
   if (!JsPDFCtor) {
-    alert('Gagal memuat pustaka PDF. Periksa koneksi internet Anda, lalu muat ulang halaman.');
+    showSpAlert('error', 'Gagal memuat pustaka pembuat PDF. Periksa koneksi internet Anda, lalu muat ulang halaman.');
     return;
   }
 
@@ -855,6 +979,17 @@ async function downloadPDF() {
   var jsPDFFormat = fmt === 'f4' ? [215, 330] : 'a4';
 
   try {
+    // FIX UTAMA: instance jsPDF ("pdf") sebelumnya TIDAK PERNAH dibuat,
+    // sehingga baris "pdf.internal.pageSize..." di bawah selalu
+    // menghasilkan ReferenceError ("pdf is not defined") dan langsung
+    // masuk ke blok catch -> muncul alert "Gagal membuat PDF".
+    // Instance-nya harus dibuat secara eksplisit di sini:
+    var pdf = new JsPDFCtor({
+      orientation : 'portrait',
+      unit        : 'mm',
+      format      : jsPDFFormat
+    });
+
     var canvas = await html2canvas(el, {
       scale           : 2,
       useCORS         : true,
@@ -894,7 +1029,7 @@ async function downloadPDF() {
     var sliceCtx    = sliceCanvas.getContext('2d');
     sliceCanvas.width = canvas.width;
 
-    var renderedPx = 0;
+    var renderedPx  = 0;
     var isFirstPage = true;
 
     while (renderedPx < canvas.height) {
@@ -910,7 +1045,7 @@ async function downloadPDF() {
       var sliceImgData  = sliceCanvas.toDataURL('image/png');
       var sliceHeightMM = sliceHeightPx / pxPerMM;
 
-      if (!isFirstPage) pdf.addPage();
+      if (!isFirstPage) pdf.addPage(jsPDFFormat, 'portrait');
       pdf.addImage(sliceImgData, 'PNG', 0, 0, imgWidthMM, sliceHeightMM);
 
       renderedPx += sliceHeightPx;
@@ -918,9 +1053,10 @@ async function downloadPDF() {
     }
 
     pdf.save('<?= addslashes($filenamePdf) ?>');
+    showSpAlert('success', 'Dokumen berhasil diunduh sebagai file PDF.');
   } catch (e) {
     console.error('PDF error:', e);
-    alert('Gagal membuat PDF. Gunakan tombol Cetak sebagai alternatif.');
+    showSpAlert('error', 'Gagal membuat PDF. Silakan gunakan tombol Cetak sebagai alternatif, atau coba lagi setelah memuat ulang halaman.');
   } finally {
     btn.disabled = false;
     btn.innerHTML = orig;
