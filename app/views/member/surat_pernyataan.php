@@ -825,13 +825,7 @@ function downloadPDF() {
     return;
   }
 
-  // PENTING: reset posisi scroll horizontal container sebelum capture.
-  // #surat-preview lebarnya tetap 794px (lebar A4 @96dpi), sedangkan
-  // .sp-scroll punya overflow-x:auto agar tetap bisa dilihat di layar
-  // sempit. Kalau container ini sempat ter-scroll ke kanan saat tombol
-  // "Unduh PDF" ditekan, html2canvas menangkap area sesuai posisi
-  // scroll saat itu — bukan dari titik (0,0) elemen — sehingga hasil
-  // PDF tampak bergeser/terpotong di sisi kanan.
+  // Reset posisi scroll horizontal sebelum capture (jaga-jaga di layar sempit).
   if (scroll) scroll.scrollLeft = 0;
   window.scrollTo(0, 0);
 
@@ -842,7 +836,17 @@ function downloadPDF() {
   var jsPDFFormat = fmt === 'f4' ? [215, 330] : 'a4';
 
   var opt = {
-    margin      : [10, 12, 10, 12],
+    // margin SENGAJA di-nol-kan. #surat-preview sudah punya padding
+    // sendiri (30px atas, 46px kiri/kanan/bawah ≈ setara margin
+    // dokumen resmi) yang ikut ter-capture oleh html2canvas.
+    // Kombinasi opsi "margin" milik html2pdf.js dengan
+    // "html2canvas.scale > 1" adalah bug lama yang sering membuat
+    // hasil render lebih lebar dari halaman PDF (px→mm salah hitung
+    // di atas canvas yang sudah di-scale), sehingga isi surat tampak
+    // bergeser/terpotong di kiri atau kanan secara tidak konsisten.
+    // Dengan margin:0, html2pdf tinggal menskalakan gambar penuh agar
+    // pas dengan lebar halaman — tanpa perhitungan margin tambahan.
+    margin      : 0,
     filename    : '<?= addslashes($filenamePdf) ?>',
     // PNG (lossless) dipakai, bukan JPEG — kompresi JPEG pada garis
     // tipis adalah penyebab paling umum garis lurus tampak
@@ -855,10 +859,6 @@ function downloadPDF() {
       backgroundColor : '#ffffff',
       logging         : false,
       removeContainer : true,
-      // Kunci titik capture ke (0,0) elemen dan pakai lebar/tinggi
-      // penuh elemen sebagai "viewport virtual" html2canvas — supaya
-      // tidak terpengaruh posisi scroll window/container maupun lebar
-      // viewport browser yang mungkin lebih sempit dari 794px.
       scrollX         : 0,
       scrollY         : 0,
       windowWidth     : el.scrollWidth,
