@@ -31,31 +31,33 @@ class AdminController extends Controller
     // ================================================================
     //  ANGGOTA
     // ================================================================
-    public function anggota(): void
-    {
-        $this->requireAdmin();
-        $filter = [
-            'kelas'   => $_GET['kelas']   ?? '',
-            'search'  => $_GET['search']  ?? '',
-            'jabatan' => $_GET['jabatan'] ?? '',
-        ];
-        $um        = new UserModel();
-        $list      = $um->getAnggotaAktif($filter);
-        $pending   = $um->getPendingAnggota();
-        $kelasList = $um->getKelasList();
+  public function anggota(): void
+{
+    $this->requireAdmin();
+    $filter = [
+        'kelas'        => $_GET['kelas']        ?? '',
+        'search'       => $_GET['search']       ?? '',
+        'jabatan'      => $_GET['jabatan']       ?? '',
+        'tahun_daftar' => $_GET['tahun_daftar']  ?? '',
+    ];
+    $um          = new UserModel();
+    $list        = $um->getAnggotaAktif($filter);
+    $pending     = $um->getPendingAnggota();
+    $kelasList   = $um->getKelasList();
+    $angkatanList = $um->getAngkatanList();
 
-        $db    = Database::getInstance();
-        $stats = [
-            'total_aktif'      => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif'")->fetchColumn(),
-            'total_pending'    => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='pending'")->fetchColumn(),
-            'total_ada_nisn'   => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND nisn IS NOT NULL AND nisn != ''")->fetchColumn(),
-            'total_tanpa_nisn' => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND (nisn IS NULL OR nisn = '')")->fetchColumn(),
-        ];
+    $db    = Database::getInstance();
+    $stats = [
+        'total_aktif'      => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif'")->fetchColumn(),
+        'total_pending'    => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='pending'")->fetchColumn(),
+        'total_ada_nisn'   => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND nisn IS NOT NULL AND nisn != ''")->fetchColumn(),
+        'total_tanpa_nisn' => (int)$db->query("SELECT COUNT(*) FROM users WHERE role='anggota' AND status='aktif' AND (nisn IS NULL OR nisn = '')")->fetchColumn(),
+    ];
 
-        $flash = $this->getFlash();
-        $csrf  = $this->csrfToken();
-        $this->view('admin/anggota', compact('list', 'pending', 'kelasList', 'filter', 'stats', 'flash', 'csrf'), 'admin');
-    }
+    $flash = $this->getFlash();
+    $csrf  = $this->csrfToken();
+    $this->view('admin/anggota', compact('list', 'pending', 'kelasList', 'angkatanList', 'filter', 'stats', 'flash', 'csrf'), 'admin');
+}
 
     public function anggotaCreate(): void
     {
@@ -1471,60 +1473,62 @@ class AdminController extends Controller
     //  ANGGOTA — EXPORT
     // ================================================================
     public function anggotaExport(): void
-    {
-        $this->requireAdmin();
+{
+    $this->requireAdmin();
 
-        $format = ($_GET['format'] ?? 'csv') === 'xlsx' ? 'xlsx' : 'csv';
-        $filter = [
-            'kelas'   => $_GET['kelas']   ?? '',
-            'search'  => $_GET['search']  ?? '',
-            'jabatan' => $_GET['jabatan'] ?? '',
+    $format = ($_GET['format'] ?? 'csv') === 'xlsx' ? 'xlsx' : 'csv';
+    $filter = [
+        'kelas'        => $_GET['kelas']        ?? '',
+        'search'       => $_GET['search']       ?? '',
+        'jabatan'      => $_GET['jabatan']       ?? '',
+        'tahun_daftar' => $_GET['tahun_daftar']  ?? '',
+    ];
+
+    $um   = new UserModel();
+    $rows = $um->getAnggotaForExport($filter);
+
+    $headers = ['NIA', 'NISN', 'Nama Lengkap', 'Kelas', 'No HP', 'Email', 'Jabatan', 'Status', 'Tahun Daftar'];
+    $data    = [];
+    foreach ($rows as $r) {
+        $data[] = [
+            $r['nia']          ?? '',
+            $r['nisn']         ?? '',
+            $r['nama_lengkap'] ?? '',
+            $r['kelas']        ?? '',
+            $r['no_hp']        ?? '',
+            $r['email']        ?? '',
+            UserModel::jabatanLabel($r['jabatan'] ?? null),
+            $r['status']       ?? '',
+            $r['tahun_daftar'] ?? '',
         ];
+    }
 
-        $um   = new UserModel();
-        $rows = $um->getAnggotaForExport($filter);
+    $filenameSuffix = !empty($filter['tahun_daftar']) ? '_angkatan_' . $filter['tahun_daftar'] : '';
+    $filename       = 'anggota' . $filenameSuffix . '_' . date('Ymd_His');
 
-        $headers = ['NIA', 'NISN', 'Nama Lengkap', 'Kelas', 'No HP', 'Email', 'Jabatan', 'Status', 'Tahun Daftar'];
-        $data    = [];
-        foreach ($rows as $r) {
-            $data[] = [
-                $r['nia']          ?? '',
-                $r['nisn']         ?? '',
-                $r['nama_lengkap'] ?? '',
-                $r['kelas']        ?? '',
-                $r['no_hp']        ?? '',
-                $r['email']        ?? '',
-                UserModel::jabatanLabel($r['jabatan'] ?? null),
-                $r['status']       ?? '',
-                $r['tahun_daftar'] ?? '',
-            ];
-        }
-
-        $filename = 'anggota_' . date('Ymd_His');
-
-        if ($format === 'xlsx') {
-            $content = Xlsx::write($headers, $data);
-            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment; filename="' . $filename . '.xlsx"');
-            header('Content-Length: ' . strlen($content));
-            header('Cache-Control: max-age=0');
-            echo $content;
-            exit;
-        }
-
-        header('Content-Type: text/csv; charset=UTF-8');
-        header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+    if ($format === 'xlsx') {
+        $content = Xlsx::write($headers, $data);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '.xlsx"');
+        header('Content-Length: ' . strlen($content));
         header('Cache-Control: max-age=0');
-
-        $out = fopen('php://output', 'w');
-        fputs($out, "\xEF\xBB\xBF");
-        fputcsv($out, $headers);
-        foreach ($data as $row) {
-            fputcsv($out, $row);
-        }
-        fclose($out);
+        echo $content;
         exit;
     }
+
+    header('Content-Type: text/csv; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+    header('Cache-Control: max-age=0');
+
+    $out = fopen('php://output', 'w');
+    fputs($out, "\xEF\xBB\xBF");
+    fputcsv($out, $headers);
+    foreach ($data as $row) {
+        fputcsv($out, $row);
+    }
+    fclose($out);
+    exit;
+}
 
     // ================================================================
     //  ANGGOTA — IMPORT

@@ -248,6 +248,9 @@ class UserModel extends Model
      * Anggota aktif untuk keperluan tabel admin/absensi/filter.
      * Pencarian ('search') mencakup nama, NIA, NISN, dan No HP —
      * supaya admin bisa cari anggota pakai NISN juga, bukan cuma nama/NIA.
+     *
+     * Filter 'tahun_daftar' (angkatan) opsional — dipakai halaman
+     * admin/anggota supaya admin bisa lihat/export per angkatan tertentu.
      */
     public function getAnggotaAktif(array $filter = []): array
     {
@@ -261,6 +264,10 @@ class UserModel extends Model
         if (!empty($filter['jabatan'])) {
             $where[]  = "jabatan = ?";
             $params[] = $filter['jabatan'];
+        }
+        if (!empty($filter['tahun_daftar'])) {
+            $where[]  = "tahun_daftar = ?";
+            $params[] = $filter['tahun_daftar'];
         }
         if (!empty($filter['search'])) {
             $where[]  = "(nama_lengkap LIKE ? OR nia LIKE ? OR nisn LIKE ? OR no_hp LIKE ?)";
@@ -284,6 +291,9 @@ class UserModel extends Model
      * Filter 'sumber' di bawah dibiarkan ada (tidak dihapus paksa) supaya
      * tetap kompatibel jika suatu saat dipanggil dari tempat lain, tapi
      * AdminController::anggotaExport() saat ini tidak mengirim filter itu lagi.
+     *
+     * Filter 'tahun_daftar' (angkatan): kosong/tidak diisi = semua angkatan,
+     * diisi tahun tertentu (mis. 2024/2025/2026) = hanya angkatan tsb.
      */
     public function getAnggotaForExport(array $filter = []): array
     {
@@ -301,6 +311,10 @@ class UserModel extends Model
         if (!empty($filter['jabatan'])) {
             $where[]  = "jabatan = ?";
             $params[] = $filter['jabatan'];
+        }
+        if (!empty($filter['tahun_daftar'])) {
+            $where[]  = "tahun_daftar = ?";
+            $params[] = $filter['tahun_daftar'];
         }
         if (!empty($filter['search'])) {
             $where[]  = "(nama_lengkap LIKE ? OR nia LIKE ? OR no_hp LIKE ? OR nisn LIKE ?)";
@@ -398,6 +412,21 @@ class UserModel extends Model
     {
         return $this->fetchAll(
             "SELECT DISTINCT kelas FROM users WHERE role='anggota' AND kelas IS NOT NULL ORDER BY kelas"
+        );
+    }
+
+    /**
+     * Daftar tahun_daftar (angkatan) unik dari anggota — dipakai untuk
+     * dropdown filter "Angkatan" di halaman admin/anggota (baik untuk
+     * filter tampilan tabel maupun untuk export CSV/Excel per angkatan).
+     * Diurutkan terbaru dulu (DESC) supaya angkatan terbaru muncul di atas.
+     */
+    public function getAngkatanList(): array
+    {
+        return $this->fetchAll(
+            "SELECT DISTINCT tahun_daftar FROM users
+             WHERE role = 'anggota' AND tahun_daftar IS NOT NULL
+             ORDER BY tahun_daftar DESC"
         );
     }
 

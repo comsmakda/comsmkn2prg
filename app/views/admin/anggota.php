@@ -171,7 +171,7 @@
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
-  min-width: 180px;
+  min-width: 230px;
   background: var(--bg-surface);
   border: 1px solid var(--bd-subtle);
   border-radius: var(--r-lg);
@@ -194,6 +194,38 @@
 .export-menu a:hover { background: var(--ac-dim); color: var(--ac); }
 .export-menu a i { font-size: 15px; color: var(--tx-muted); }
 .export-menu a:hover i { color: var(--ac); }
+
+/* Angkatan picker di dalam export menu */
+.export-menu__label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tx-muted);
+  padding: 8px 11px 4px;
+}
+.export-menu__select-wrap { padding: 0 11px 8px; }
+.export-menu__select {
+  width: 100%;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tx-primary);
+  background: var(--bg-elevated);
+  border: 1.5px solid var(--bd-subtle);
+  border-radius: var(--r-sm);
+  padding: 7px 10px;
+  outline: none;
+}
+.export-menu__select:focus {
+  border-color: var(--c-primary-lt, #06b6d4);
+  background: #fff;
+}
+.export-menu__divider {
+  height: 1px;
+  background: var(--bd-subtle);
+  margin: 2px 0 4px;
+}
 
 /* ═══════════════════════════════════════
    SECTION LABEL
@@ -900,9 +932,10 @@
 
     <?php
       $exportQuery = http_build_query(array_filter([
-        'search'  => $filter['search']  ?? '',
-        'kelas'   => $filter['kelas']   ?? '',
-        'jabatan' => $filter['jabatan'] ?? '',
+        'search'       => $filter['search']       ?? '',
+        'kelas'        => $filter['kelas']        ?? '',
+        'jabatan'      => $filter['jabatan']       ?? '',
+        'tahun_daftar' => $filter['tahun_daftar'] ?? '',
       ]));
     ?>
     <div class="export-dropdown" id="export-dropdown">
@@ -912,10 +945,25 @@
         <i class="ti ti-chevron-down" aria-hidden="true" style="font-size:11px;"></i>
       </button>
       <div class="export-menu" id="export-menu">
-        <a href="<?= BASE_URL ?>/admin/anggota/export?format=csv<?= $exportQuery ? '&' . $exportQuery : '' ?>">
+
+        <div class="export-menu__label">Angkatan yang diekspor</div>
+        <div class="export-menu__select-wrap">
+          <select class="export-menu__select" id="export-angkatan">
+            <option value="">Semua Angkatan</option>
+            <?php foreach ($angkatanList as $a): ?>
+              <option value="<?= htmlspecialchars((string)$a['tahun_daftar']) ?>"
+                      <?= ((string)($filter['tahun_daftar'] ?? '')) === (string)$a['tahun_daftar'] ? 'selected' : '' ?>>
+                Angkatan <?= htmlspecialchars((string)$a['tahun_daftar']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="export-menu__divider"></div>
+
+        <a href="#" id="export-csv-link" data-base="<?= BASE_URL ?>/admin/anggota/export?format=csv<?= $exportQuery ? '&' . $exportQuery : '' ?>">
           <i class="ti ti-file-type-csv" aria-hidden="true"></i> Export CSV
         </a>
-        <a href="<?= BASE_URL ?>/admin/anggota/export?format=xlsx<?= $exportQuery ? '&' . $exportQuery : '' ?>">
+        <a href="#" id="export-xlsx-link" data-base="<?= BASE_URL ?>/admin/anggota/export?format=xlsx<?= $exportQuery ? '&' . $exportQuery : '' ?>">
           <i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Export Excel
         </a>
       </div>
@@ -1072,12 +1120,26 @@
     </select>
   </div>
 
+  <!-- Angkatan (tahun_daftar) -->
+  <div class="fi fi--select">
+    <span class="fi__icon"><i class="ti ti-calendar-event" aria-hidden="true"></i></span>
+    <select name="tahun_daftar">
+      <option value="">Semua Angkatan</option>
+      <?php foreach ($angkatanList as $a): ?>
+        <option value="<?= htmlspecialchars((string)$a['tahun_daftar']) ?>"
+                <?= ((string)($filter['tahun_daftar'] ?? '')) === (string)$a['tahun_daftar'] ? 'selected' : '' ?>>
+          Angkatan <?= htmlspecialchars((string)$a['tahun_daftar']) ?>
+        </option>
+      <?php endforeach; ?>
+    </select>
+  </div>
+
   <button type="submit" class="filter-btn">
     <i class="ti ti-filter" aria-hidden="true"></i>
     Filter
   </button>
 
-  <?php if (!empty($filter['search']) || !empty($filter['kelas']) || !empty($filter['jabatan'])): ?>
+  <?php if (!empty($filter['search']) || !empty($filter['kelas']) || !empty($filter['jabatan']) || !empty($filter['tahun_daftar'])): ?>
     <a href="<?= BASE_URL ?>/admin/anggota" class="filter-reset">✕ Reset</a>
   <?php endif; ?>
 </form>
@@ -1226,9 +1288,10 @@
   <?php if (!empty($pagination) && $pagination['total_pages'] > 1): ?>
   <?php
     $pagiFilterQuery = http_build_query(array_filter([
-      'search'  => $filter['search']  ?? '',
-      'kelas'   => $filter['kelas']   ?? '',
-      'jabatan' => $filter['jabatan'] ?? '',
+      'search'       => $filter['search']       ?? '',
+      'kelas'        => $filter['kelas']        ?? '',
+      'jabatan'      => $filter['jabatan']       ?? '',
+      'tahun_daftar' => $filter['tahun_daftar'] ?? '',
     ]));
   ?>
   <div class="pagination">
@@ -1388,6 +1451,32 @@
   var exportToggle = document.getElementById('export-toggle');
   var exportMenu   = document.getElementById('export-menu');
   var exportWrap   = document.getElementById('export-dropdown');
+  var exportAngkatanSel = document.getElementById('export-angkatan');
+  var exportCsvLink     = document.getElementById('export-csv-link');
+  var exportXlsxLink    = document.getElementById('export-xlsx-link');
+
+  // Susun ulang link export tiap kali angkatan yang dipilih di dropdown export berubah,
+  // supaya bisa export per-angkatan tanpa perlu submit filter-bar dulu.
+  function rebuildExportLinks() {
+    var tahun = exportAngkatanSel.value;
+    [exportCsvLink, exportXlsxLink].forEach(function (link) {
+      var base = link.dataset.base;
+      // Buang tahun_daftar lama (kalau ada dari filter aktif) lalu tambahkan yang baru dipilih
+      var url = new URL(base, window.location.origin);
+      if (tahun) {
+        url.searchParams.set('tahun_daftar', tahun);
+      } else {
+        url.searchParams.delete('tahun_daftar');
+      }
+      link.href = url.pathname + '?' + url.searchParams.toString();
+    });
+  }
+
+  if (exportAngkatanSel) {
+    rebuildExportLinks();
+    exportAngkatanSel.addEventListener('change', rebuildExportLinks);
+    exportAngkatanSel.addEventListener('click', function (e) { e.stopPropagation(); });
+  }
 
   if (exportToggle) {
     exportToggle.addEventListener('click', function (e) {

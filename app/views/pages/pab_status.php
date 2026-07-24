@@ -186,7 +186,7 @@ $page_description = "Cek status pendaftaran anggota baru COM SMKN 2 Pinrang meng
               </div>
             <?php endif; ?>
             <div class="pcs-note">
-              Selamat! Pendaftaran kamu sudah disetujui. Silakan login ke portal anggota menggunakan NISN dan password yang kamu buat saat mendaftar.
+              Selamat! Pendaftaran kamu sudah disetujui. Silakan login ke portal anggota menggunakan NIA di atas dan password yang kamu buat saat mendaftar.
             </div>
             <a href="<?= BASE_URL ?>/login" class="pcs-btn" style="display:block;text-align:center;margin-top:.9rem;text-decoration:none;">Login Sekarang</a>
 
