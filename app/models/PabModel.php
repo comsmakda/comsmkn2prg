@@ -36,18 +36,53 @@ class PabModel extends Model
     }
 
     /**
-     * Sama seperti findByNisn(), tapi ikut join ke users untuk ambil NIA
-     * (dipakai halaman cek status — supaya anggota yang sudah approved
-     * bisa langsung lihat NIA-nya tanpa query terpisah).
+     * Cek status pendaftaran PAB berdasarkan NISN — dipakai halaman publik
+     * "cek status" yang tidak butuh login.
+     *
+     * PENTING: dicek DUA lapis, bukan cuma ke pab_registrations.
+     *
+     * 1) Tabel `users` dicek LEBIH DULU. Ini sumber kebenaran untuk anggota
+     *    yang statusnya sudah aktif — termasuk kasus di mana baris
+     *    pab_registrations terkait sudah tidak ada lagi (misalnya sudah
+     *    dihapus admin dari daftar PAB setelah diproses, atau NISN
+     *    di-backfill manual lewat edit profil anggota). Tanpa lapis ini,
+     *    anggota yang NISN-nya sudah terdaftar & aktif bisa muncul
+     *    "tidak ditemukan" walau sebenarnya sudah di-ACC — inilah bug yang
+     *    dilaporkan sebelumnya.
+     *
+     * 2) Kalau tidak ketemu di `users`, baru dicek riwayat pendaftaran di
+     *    pab_registrations (mencakup status pending/rejected/approved).
+     *    ORDER BY created_at DESC + LIMIT 1 supaya kalau ada lebih dari
+     *    satu baris riwayat, yang paling baru yang ditampilkan.
      */
     public function findByNisnWithNia(string $nisn): ?array
     {
+        // 1) Cek ke tabel users (anggota aktif)
+        $user = $this->fetch(
+            "SELECT nama_lengkap, kelas, nia FROM users WHERE nisn = ? LIMIT 1",
+            [$nisn]
+        );
+
+        if ($user) {
+            return [
+                'status'        => 'approved',
+                'nama_lengkap'  => $user['nama_lengkap'],
+                'kelas'         => $user['kelas'],
+                'nia'           => $user['nia'],
+                'catatan_admin' => null,
+            ];
+        }
+
+        // 2) Fallback: cek riwayat pendaftaran PAB
         $rows = $this->fetchAll(
             "SELECT p.*, u.nia FROM pab_registrations p
              LEFT JOIN users u ON u.id = p.user_id
-             WHERE p.nisn = ? LIMIT 1",
+             WHERE p.nisn = ?
+             ORDER BY p.created_at DESC
+             LIMIT 1",
             [$nisn]
         );
+
         return $rows[0] ?? null;
     }
 
