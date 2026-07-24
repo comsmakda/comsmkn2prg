@@ -56,6 +56,13 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 .btn-ghost:hover { background: #f4f7fa; color: var(--c-ink); border-color: rgba(14,116,144,.25); }
 .btn[disabled] { opacity: .6; cursor: not-allowed; }
 
+.paper-select {
+  padding: 9px 12px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  border: 1px solid var(--c-border); background: var(--c-white);
+  color: var(--c-ink); cursor: pointer;
+}
+
 .sp-shell {
   background: var(--c-white);
   border: 1px solid var(--c-border);
@@ -100,28 +107,11 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
   box-sizing: border-box;
 }
 
-/* Bingkai hias dokumen resmi.
-   Sengaja TIDAK memakai border-style:double pada satu elemen — saat
-   dirender ke kanvas (html2canvas) lalu dikompres JPEG, garis tipis ganda
-   semacam itu gampang muncul "miring/bergelombang" akibat artefak
-   kompresi. Bingkai ganda dibuat dari dua elemen terpisah dengan border
-   solid tunggal supaya garisnya tetap lurus. */
-#surat-preview::before {
-  content: '';
-  position: absolute;
-  inset: 9px;
-  border: 1px solid #1a1a6e;
-  pointer-events: none;
-  z-index: 0;
-}
-#surat-preview::after {
-  content: '';
-  position: absolute;
-  inset: 13px;
-  border: 1.5px solid #1a1a6e;
-  pointer-events: none;
-  z-index: 0;
-}
+/* Catatan: bingkai dekoratif ganda yang tadinya di sini sudah DIHAPUS.
+   Selain jadi sumber artefak render "miring/bergelombang" yang berulang
+   di html2canvas, bingkai halaman semacam itu juga bukan konvensi surat
+   resmi Indonesia — cukup kop + garis tebal-tipis di bawahnya (sudah ada
+   di .kop-divider-thick/.kop-divider-thin). */
 
 .surat-inner { position: relative; z-index: 1; }
 
@@ -477,8 +467,6 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
     padding: 0 !important;
     box-shadow: none !important;
   }
-  #surat-preview::before,
-  #surat-preview::after { display: none !important; }
   .kop, .ttd-grid, .id-wrapper, .jadwal-table, .pernyataan-list li, .surat-footer {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
@@ -514,7 +502,11 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
       <p>Dokumen resmi keanggotaan &mdash; Nomor: <?= $nomorSurat ?></p>
     </div>
     <div class="sp-header__actions">
-      <button class="btn btn-ghost" type="button" onclick="window.print()">
+      <select id="paperFormatSelect" class="paper-select" title="Ukuran kertas">
+        <option value="a4">A4 (210 &times; 297 mm)</option>
+        <option value="f4">F4 / Folio (215 &times; 330 mm)</option>
+      </select>
+      <button class="btn btn-ghost" type="button" onclick="printSurat()">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round"
             d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.75 19.5m10.56-5.671.72.096m-.72-.096L17.25 19.5M9 10.5h.008v.008H9V10.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 0h.008v.008H13.5V10.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM6 7.5H4.875a1.875 1.875 0 0 0-1.875 1.875v6c0 1.036.84 1.875 1.875 1.875h14.25A1.875 1.875 0 0 0 21 15.375v-6A1.875 1.875 0 0 0 19.125 7.5H18M6 7.5V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v1.5m-12 0h12"/>
@@ -799,6 +791,27 @@ $filenamePdf  = 'Surat_Pernyataan_' . str_replace(' ', '_', $user['nama_lengkap'
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
+function getPaperFormat() {
+  var sel = document.getElementById('paperFormatSelect');
+  return sel ? sel.value : 'a4';
+}
+
+// @page CSS bersifat statis, jadi untuk mendukung 2 ukuran kertas (A4/F4)
+// dari satu tombol Cetak, ukurannya disuntikkan lewat <style> sesaat
+// sebelum window.print() dipanggil.
+function printSurat() {
+  var fmt  = getPaperFormat();
+  var size = fmt === 'f4' ? '215mm 330mm' : 'A4 portrait';
+  var el   = document.getElementById('dynamic-page-size');
+  if (!el) {
+    el = document.createElement('style');
+    el.id = 'dynamic-page-size';
+    document.head.appendChild(el);
+  }
+  el.textContent = '@media print { @page { size: ' + size + '; margin: 15mm 18mm 18mm 20mm; } }';
+  window.print();
+}
+
 function downloadPDF() {
   var el   = document.getElementById('surat-preview');
   var btn  = document.querySelector('.btn-primary');
@@ -814,12 +827,15 @@ function downloadPDF() {
   btn.disabled = true;
   btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px;animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>&nbsp;Menyiapkan...';
 
+  var fmt         = getPaperFormat();
+  var jsPDFFormat = fmt === 'f4' ? [215, 330] : 'a4';
+
   var opt = {
     margin      : [10, 12, 10, 12],
     filename    : '<?= addslashes($filenamePdf) ?>',
     // PNG (lossless) dipakai, bukan JPEG — kompresi JPEG pada garis
-    // tipis bingkai kop surat adalah penyebab paling umum garis lurus
-    // tampak "miring/bergelombang" setelah di-scale 2x oleh html2canvas.
+    // tipis adalah penyebab paling umum garis lurus tampak
+    // "miring/bergelombang" setelah di-scale 2x oleh html2canvas.
     image       : { type: 'png' },
     html2canvas : {
       scale           : 2,
@@ -829,7 +845,7 @@ function downloadPDF() {
       logging         : false,
       removeContainer : true
     },
-    jsPDF       : { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    jsPDF       : { unit: 'mm', format: jsPDFFormat, orientation: 'portrait' },
     pagebreak   : { mode: ['css', 'legacy'], avoid: ['.kop', '.ttd-grid', '.id-wrapper', '.jadwal-table', '.pernyataan-list li', '.seksi-judul'] }
   };
 
